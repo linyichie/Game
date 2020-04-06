@@ -10,15 +10,15 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: Window
+  m_Name: Windows
   m_EditorClassIdentifier: 
-  m_GroupName: Window
+  m_GroupName: Windows
   m_Data:
     m_SerializedData: []
   m_GUID: beb77969e8b4f42368eb4bc70297731a
   m_SerializeEntries:
   - m_GUID: 288bcbae820e5433aa8afdad653a003c
-    m_Address: Assets/AddressableAssets/UI/Window/Launch.prefab
+    m_Address: Window/Launch
     m_ReadOnly: 0
     m_SerializedLabels: []
     m_mainAssetType: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0,
