@@ -19,6 +19,7 @@ public class SingletonMonobehaviour<T> : MonoBehaviour where T : MonoBehaviour {
 
     private void Awake() {
         instance = this as T;
+        DontDestroyOnLoad(this.gameObject);
     }
 }
 

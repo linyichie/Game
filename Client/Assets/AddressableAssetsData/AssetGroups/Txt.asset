@@ -25,6 +25,38 @@ MonoBehaviour:
       Culture=neutral, PublicKeyToken=null
     m_MainAsset: {fileID: 4900000, guid: 3a569106382b5694d85656aadc51b506, type: 3}
     m_TargetAsset: {fileID: 4900000, guid: 3a569106382b5694d85656aadc51b506, type: 3}
+  - m_GUID: 4cf7e1bb06ec36f42953d371467019c9
+    m_Address: Txt/Language_KR
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_mainAssetType: UnityEngine.TextAsset, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 664fa244756c56842b3775ac7a53ef6d
+    m_Address: Txt/Language_JP
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_mainAssetType: UnityEngine.TextAsset, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
+  - m_GUID: 9218d7015827c9e4a88442a69fbad9a1
+    m_Address: Txt/Language_CN
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_mainAssetType: UnityEngine.TextAsset, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+    m_MainAsset: {fileID: 4900000, guid: 9218d7015827c9e4a88442a69fbad9a1, type: 3}
+    m_TargetAsset: {fileID: 4900000, guid: 9218d7015827c9e4a88442a69fbad9a1, type: 3}
+  - m_GUID: f4e0881d46b38d64aa07da8dea89ea22
+    m_Address: Txt/Language_EN
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_mainAssetType: UnityEngine.TextAsset, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+    m_MainAsset: {fileID: 0}
+    m_TargetAsset: {fileID: 0}
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: c56ca8b0e96454e3b8957841fbde2b3c, type: 2}
   m_SchemaSet:

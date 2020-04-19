@@ -7,7 +7,7 @@ public partial class #ClassName# {
 
     static Dictionary<#KeyType#, #ClassName#> configs = new Dictionary<#KeyType#, #ClassName#>();
 
-    private GeoConfig(string[] values) {
+    private #ClassName#(string[] values) {
         try {
             #Parses#
 
@@ -36,4 +36,8 @@ public partial class #ClassName# {
 
         callback?.Invoke();
     }
+    
+    public static void Clear() {
+        configs.Clear();
+    }    
 }

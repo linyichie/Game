@@ -11,8 +11,5 @@ public class TestConfig : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        if (ConfigLoader.compelted) {
-            Debug.Log(GeoConfig.Get(11).polygon);
-        }
     }
 }

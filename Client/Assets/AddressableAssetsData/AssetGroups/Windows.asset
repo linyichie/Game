@@ -16,7 +16,17 @@ MonoBehaviour:
   m_Data:
     m_SerializedData: []
   m_GUID: beb77969e8b4f42368eb4bc70297731a
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: ade6f8dd73b91bf469f890da12f82be8
+    m_Address: Windows/Login
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    m_mainAssetType: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0,
+      Culture=neutral, PublicKeyToken=null
+    m_MainAsset: {fileID: 8772580944679400812, guid: ade6f8dd73b91bf469f890da12f82be8,
+      type: 3}
+    m_TargetAsset: {fileID: 8772580944679400812, guid: ade6f8dd73b91bf469f890da12f82be8,
+      type: 3}
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: c56ca8b0e96454e3b8957841fbde2b3c, type: 2}
   m_SchemaSet:
