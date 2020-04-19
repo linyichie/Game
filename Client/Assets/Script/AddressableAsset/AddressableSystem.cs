@@ -9,4 +9,8 @@ public class AddressableSystem {
         var assetAsync = Addressables.LoadAssetAsync<T>(key);
         assetAsync.Completed += (@object) => { callback?.Invoke(@object.Result); };
     }
+
+    public static void Release(GameObject go) {
+        Addressables.Release(go);
+    }
 }

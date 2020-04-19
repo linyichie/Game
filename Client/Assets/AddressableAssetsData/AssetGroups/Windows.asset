@@ -16,17 +16,7 @@ MonoBehaviour:
   m_Data:
     m_SerializedData: []
   m_GUID: beb77969e8b4f42368eb4bc70297731a
-  m_SerializeEntries:
-  - m_GUID: 288bcbae820e5433aa8afdad653a003c
-    m_Address: Window/Launch
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-    m_mainAssetType: UnityEngine.GameObject, UnityEngine.CoreModule, Version=0.0.0.0,
-      Culture=neutral, PublicKeyToken=null
-    m_MainAsset: {fileID: 216102544447107138, guid: 288bcbae820e5433aa8afdad653a003c,
-      type: 3}
-    m_TargetAsset: {fileID: 216102544447107138, guid: 288bcbae820e5433aa8afdad653a003c,
-      type: 3}
+  m_SerializeEntries: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: c56ca8b0e96454e3b8957841fbde2b3c, type: 2}
   m_SchemaSet:
