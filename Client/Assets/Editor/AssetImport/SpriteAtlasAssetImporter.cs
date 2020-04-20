@@ -10,7 +10,7 @@ public static class SpriteAtlasAssetImporter {
 
     public static void OnPostprocessSpriteAtlas(string assetName) {
         spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(assetName);
-        if (!IsNewCreate(spriteAtlas)) {
+        if (!CustomAssetImport.IsNewCreateFile(assetName)) {
             return;
         }
         SetIncludeInBuild();

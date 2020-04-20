@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.U2D;
 
 public class CustomAssetImport : AssetPostprocessor {
-
     public const string Platform_Standalone = "Standalone";
     public const string Platform_iPhone = "iPhone";
     public const string Platform_Android = "Android";
@@ -39,11 +39,17 @@ public class CustomAssetImport : AssetPostprocessor {
     }
 
     private void OnPostprocessSprites(Texture2D texture, Sprite[] sprites) {
-        throw new NotImplementedException();
+        if (IsNewCreateFile(assetPath)) {
+            var importer = assetImporter as TextureImporter;
+            TextureAssetImporter.OnPostprocessTexture(importer);
+        }
     }
 
     private void OnPostprocessTexture(Texture2D texture) {
-        throw new NotImplementedException();
+        if (IsNewCreateFile(assetPath)) {
+            var importer = assetImporter as TextureImporter;
+            TextureAssetImporter.OnPostprocessTexture(importer);
+        }
     }
 
     private void OnPostprocessMeshHierarchy(GameObject root) {
@@ -72,5 +78,19 @@ public class CustomAssetImport : AssetPostprocessor {
         if (assetName.EndsWith(".spriteatlas")) {
             SpriteAtlasAssetImporter.OnPostprocessSpriteAtlas(assetName);
         }
+    }
+
+    public static bool IsNewCreateFile(string assetPath) {
+        var metaFilePath = StringUtility.Contact(assetPath, ".meta");
+        if (!File.Exists(metaFilePath)) {
+            return true;
+        }
+        var fileInfo = new FileInfo(metaFilePath);
+        if (fileInfo != null) {
+            var seconds = (DateTime.UtcNow - fileInfo.CreationTimeUtc).TotalSeconds;
+            return seconds < 3;
+        }
+
+        return false;
     }
 }
