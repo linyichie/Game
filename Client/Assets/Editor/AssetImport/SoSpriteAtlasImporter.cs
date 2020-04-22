@@ -15,7 +15,7 @@ public class SoSpriteAtlasImporter : SoAssetImporter {
         if (index == -1) {
             var platformSetting = new AssetImporterHelper.TexturePlatformSettings() {
                 platform = platform,
-                textureMaxSize = 2048,
+                maxTextureSize = 2048,
                 compressionQuality = 50,
                 format = AssetImporterHelper.GetDefaultTextureFormat(platform),
             };
@@ -81,8 +81,8 @@ public class SoSpriteAtlasImpoterInspector : Editor {
 
         var selectPlatform = helper.platforms[selectPlatformIndex];
         var platformSetting = soImporter.GetPlatformSettings(selectPlatform);
-        platformSetting.textureMaxSize = EditorGUILayout.IntPopup(styles.textureSizeLabel,
-            platformSetting.textureMaxSize,
+        platformSetting.maxTextureSize = EditorGUILayout.IntPopup(styles.textureSizeLabel,
+            platformSetting.maxTextureSize,
             helper.textureSizeOptionLabels,
             helper.textureSizeOptions);
 

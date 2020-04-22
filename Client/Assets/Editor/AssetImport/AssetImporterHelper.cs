@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class AssetImporterHelper {
     public enum TextureImporterFormat_Standalone {
@@ -14,6 +15,7 @@ public class AssetImporterHelper {
     public enum TextureImporterFormat_iPhone {
         RGBA32 = TextureImporterFormat.RGBA32,
         ASTC_6x6 = TextureImporterFormat.ASTC_6x6,
+        PVRTC_RGB4 = TextureImporterFormat.PVRTC_RGB4,
     }
 
     public enum TextureImporterFormat_Android {
@@ -25,7 +27,7 @@ public class AssetImporterHelper {
     [Serializable]
     public class TexturePlatformSettings {
         public string platform;
-        public int textureMaxSize = 2048;
+        public int maxTextureSize = 2048;
         public int format = (int) TextureImporterFormat.Automatic;
         public int compressionQuality = 50;
     }
@@ -118,7 +120,6 @@ public class AssetImporterHelper {
                 enumArray = Enum.GetValues(typeof(TextureImporterFormat_Standalone));
                 enumNames = Enum.GetNames(typeof(TextureImporterFormat_Standalone));
                 break;
-                ;
             case Platform_Android:
                 enumArray = Enum.GetValues(typeof(TextureImporterFormat_Android));
                 enumNames = Enum.GetNames(typeof(TextureImporterFormat_Android));

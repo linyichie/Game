@@ -58,7 +58,7 @@ public static class SpriteAtlasAssetPostprocessor {
         var platformSettings = spriteAtlas.GetPlatformSettings(platform);
         platformSettings.overridden = true;
         platformSettings.format = (TextureImporterFormat)soPlatformSettings.format;
-        platformSettings.maxTextureSize = soPlatformSettings.textureMaxSize;
+        platformSettings.maxTextureSize = soPlatformSettings.maxTextureSize;
         if (platform != AssetImporterHelper.Platform_Standalone) {
             platformSettings.compressionQuality = soPlatformSettings.compressionQuality;
         }
