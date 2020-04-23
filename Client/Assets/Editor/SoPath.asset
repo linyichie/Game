@@ -14,6 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   paths:
   - key: SpriteAtlasImporter
-    path: Assets/Editor/AssetImport/Config/SoSpriteAtlasImporter.asset
+    path: Assets/Editor/AssetPostprocessor/Config/SoSpriteAtlasImporter.asset
   - key: SpriteImporter
-    path: Assets/Editor/AssetImport/Config/SoSpriteImporter.asset
+    path: Assets/Editor/AssetPostprocessor/Config/SoSpriteImporter.asset
+  - key: TextureImporter
+    path: Assets/Editor/AssetPostprocessor/Config/SoTextureImporter.asset
+  - key: AssetImporterFolder
+    path: Assets/Editor/AssetPostprocessor/SoAssetImporterFolder.asset

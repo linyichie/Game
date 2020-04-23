@@ -73,6 +73,6 @@ SpriteAtlas:
   m_PackedSprites:
   - {fileID: 21300000, guid: 04cec7689fa2dcf4d952566afee8d3e6, type: 3}
   m_PackedSpriteNamesToIndex:
-  - Btn20_yellow
+  - BtnYellow
   m_Tag: Common
   m_IsVariant: 0

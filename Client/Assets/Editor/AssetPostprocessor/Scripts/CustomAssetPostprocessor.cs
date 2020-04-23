@@ -30,17 +30,13 @@ public class CustomAssetPostprocessor : AssetPostprocessor {
     }
 
     private void OnPostprocessSprites(Texture2D texture, Sprite[] sprites) {
-        if (IsNewCreateFile(assetPath)) {
-            var importer = assetImporter as TextureImporter;
-            TextureAssetImporter.OnPostprocessTexture(importer);
-        }
+        var importer = assetImporter as TextureImporter;
+        TextureAssetPostprocessor.OnPostprocessTexture(importer);
     }
 
     private void OnPostprocessTexture(Texture2D texture) {
-        if (IsNewCreateFile(assetPath)) {
-            var importer = assetImporter as TextureImporter;
-            TextureAssetImporter.OnPostprocessTexture(importer);
-        }
+        var importer = assetImporter as TextureImporter;
+        TextureAssetPostprocessor.OnPostprocessTexture(importer);
     }
 
     private void OnPostprocessMeshHierarchy(GameObject root) {

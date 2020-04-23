@@ -12,3 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a96de2b563da30d43ba15e62a9699b03, type: 3}
   m_Name: SoSpriteAtlasImporter
   m_EditorClassIdentifier: 
+  platformSettings:
+  - platform: Standalone
+    maxTextureSize: 2048
+    format: 4
+    compressionQuality: 50
+  - platform: iPhone
+    maxTextureSize: 2048
+    format: 50
+    compressionQuality: 50
+  - platform: Android
+    maxTextureSize: 2048
+    format: 47
+    compressionQuality: 50
+  folderGuids: []

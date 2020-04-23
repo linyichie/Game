@@ -17,7 +17,7 @@ public static class SpriteAtlasAssetPostprocessor {
         SetPackingSettings();
         SetPlatformSettings();
         EditorUtility.SetDirty(spriteAtlas);
-        AssetDatabase.Refresh();
+        AssetDatabase.SaveAssets();
     }
 
     static void SetIncludeInBuild() {
@@ -43,13 +43,13 @@ public static class SpriteAtlasAssetPostprocessor {
     static void SetPlatformSettings() {
         
         //-- Standalone
-        SetPlatformSettings(AssetImporterHelper.Platform_Standalone);
+        SetPlatformSettings(AssetImporterHelper.PlatformStandalone);
 
         //-- iPhone
-        SetPlatformSettings(AssetImporterHelper.Platform_iPhone);
+        SetPlatformSettings(AssetImporterHelper.PlatformIPhone);
 
         //-- Android
-        SetPlatformSettings(AssetImporterHelper.Platform_Android);
+        SetPlatformSettings(AssetImporterHelper.PlatformAndroid);
     }
 
     static void SetPlatformSettings(string platform) {
@@ -59,8 +59,8 @@ public static class SpriteAtlasAssetPostprocessor {
         platformSettings.overridden = true;
         platformSettings.format = (TextureImporterFormat)soPlatformSettings.format;
         platformSettings.maxTextureSize = soPlatformSettings.maxTextureSize;
-        if (platform != AssetImporterHelper.Platform_Standalone) {
-            platformSettings.compressionQuality = soPlatformSettings.compressionQuality;
+        if (platform != AssetImporterHelper.PlatformStandalone) {
+            platformSettings.compressionQuality = (int)soPlatformSettings.compressionQuality;
         }
         spriteAtlas.SetPlatformSettings(platformSettings);
     }
