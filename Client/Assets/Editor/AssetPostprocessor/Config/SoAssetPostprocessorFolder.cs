@@ -41,7 +41,6 @@ namespace LinChunJie.AssetPostprocessor {
                 if (index >= 0) {
                     assetPostprocessorFolders.RemoveAt(index);
                     EditorUtility.SetDirty(this);
-                    AssetDatabase.SaveAssets();
                 }
             }
         }

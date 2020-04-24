@@ -84,7 +84,7 @@ namespace LinChunJie.AssetPostprocessor {
         protected override void ContextClickedItem(int id) {
             var selectIds = GetSelection();
 
-            if (selectIds.Count == 1) {
+            if (selectIds.Count > 0) {
                 GenericMenu menu = new GenericMenu();
                 menu.AddItem(new GUIContent("Remove"), false, OnRemoveFolder, selectIds);
                 if (menu.GetItemCount() > 0) {
@@ -102,6 +102,7 @@ namespace LinChunJie.AssetPostprocessor {
                 }
                 soAssetPostprocessorFolder.Remove(this.assetType, item.Path);
             }
+            AssetDatabase.SaveAssets();
 
             dirty = true;
         }
@@ -109,8 +110,7 @@ namespace LinChunJie.AssetPostprocessor {
         private bool CheckDragAndDrop(Rect parentRect) {
             parentRect = new Rect(0, 0, parentRect.width, parentRect.height);
             if (parentRect.Contains(Event.current.mousePosition) && (Event.current.type == EventType.DragUpdated || Event.current.type == EventType.DragPerform)) {
-                var paths = DragAndDrop.paths;
-                return AssetPostprocessorHelper.IsDragFolders(paths);
+                return AssetPostprocessorHelper.IsDragFolders(DragAndDrop.paths);
             }
 
             return false;
@@ -119,7 +119,6 @@ namespace LinChunJie.AssetPostprocessor {
         private void CheckDragPerform(Rect pos) {
             if (pos.Contains(Event.current.mousePosition)) {
                 if (Event.current.type == EventType.DragUpdated) {
-                    DragAndDrop.activeControlID = GUIUtility.GetControlID(FocusType.Passive);
                     DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
                 } else if (Event.current.type == EventType.DragPerform) {
                     DragAndDrop.AcceptDrag();
