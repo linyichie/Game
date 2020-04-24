@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: SoAssetPostprocessorFolder
   m_EditorClassIdentifier: 
   assetPostprocessorFolders:
-  - assetType: 1
-    path: Assets/AddressableAssets/UI/Texture
+  - assetType: 0
+    path: Assets/AddressableAssets/UI/Atlas
     guid: eb3639e085a5eb44f8c4e30a914e4b5a

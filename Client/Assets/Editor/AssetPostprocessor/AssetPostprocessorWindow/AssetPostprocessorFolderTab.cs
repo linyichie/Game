@@ -8,8 +8,8 @@ using UnityEngine;
 
 namespace LinChunJie.AssetPostprocessor {
     public class AssetPostprocessorFolderTab : TreeView {
-        private EditorWindow parent;
-        private AssetPostprocessorHelper.PostprocessorAssetType assetType;
+        private readonly EditorWindow parent;
+        private AssetPostprocessorHelper.PostprocessorAssetType assetType = (AssetPostprocessorHelper.PostprocessorAssetType)(-1);
         private List<string> paths = new List<string>();
         private bool dirty = false;
         
@@ -25,7 +25,6 @@ namespace LinChunJie.AssetPostprocessor {
                 dragDropLabelStyle.normal.textColor = new Color(Color.gray.r, Color.gray.g, Color.gray.b, 0.5f);
                 dragDropLabelStyle.fontSize = 14;
                 dragDropLabelStyle.alignment = TextAnchor.MiddleCenter;
-                dragDropLabelStyle.fontStyle = FontStyle.Bold;
                 dragDropLabelStyle.clipping = TextClipping.Clip;
             }
         }
@@ -37,7 +36,7 @@ namespace LinChunJie.AssetPostprocessor {
             return treeView;
         }
 
-        public AssetPostprocessorFolderTab(EditorWindow parent, TreeViewState state) : base(state) {
+        private AssetPostprocessorFolderTab(EditorWindow parent, TreeViewState state) : base(state) {
             this.parent = parent;
             soAssetPostprocessorFolder = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();
         }
@@ -140,6 +139,18 @@ namespace LinChunJie.AssetPostprocessor {
                     dirty = true;
                 }
             }
+        }
+
+        public string GetSelectPostprocessorFolder() {
+            var selectIds = GetSelection();
+            if(selectIds != null && selectIds.Count > 0) {
+                var item = FindItem(selectIds[0], rootItem) as AssetPostprocessorFolderTreeItem;
+                if(item != null) {
+                    return item.Path;
+                }
+            }
+
+            return string.Empty;
         }
 
         public void SetAssetType(AssetPostprocessorHelper.PostprocessorAssetType assetType) {
