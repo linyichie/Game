@@ -20,10 +20,11 @@ namespace LinChunJie.AssetPostprocessor {
         private static readonly float splitterWidth = 3f;
 
         private readonly Rect toolBarRect;
+        private readonly string[] assetImportTypeOptions;
 
-        private AssetImporterConfigTab assetImporterConfigTab;
-        private AssetImporterFolderTab assetImporterFolderTab;
-        private AssetImporterDetailTab assetImporterDetailTab;
+        private AssetPostprocessorConfigTab assetPostprocessorConfig;
+        private AssetPostprocessorFolderTab assetPostprocessorFolder;
+        private AssetPostprocessorDetailTab assetPostprocessorDetail;
         private AssetListTab assetListTab;
 
         [SerializeField] private float horizontalLeftSplitterPercent;
@@ -36,13 +37,14 @@ namespace LinChunJie.AssetPostprocessor {
         private Rect horizontalLeftSplitterRect, horizontalRightSplitterRect, verticalSplitterRect;
         private Rect subRect;
 
-        private int selectImportType = 0;
+        private AssetPostprocessorHelper.PostprocessorAssetType selectImportType = AssetPostprocessorHelper.PostprocessorAssetType.SpriteAtlas;
 
         private AssetPostprocessorWindow() {
             toolBarRect = new Rect(20, splitterWidth, position.width, toolBarHeight);
             horizontalLeftSplitterPercent = 0.4f;
             horizontalRightSplitterPercent = 0.7f;
             verticalSplitterPercent = 0.5f;
+            assetImportTypeOptions = Enum.GetNames(typeof(AssetPostprocessorHelper.PostprocessorAssetType));
         }
 
         private void OnEnable() {
@@ -53,8 +55,8 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         private void OnDisable() {
-            if (assetImporterConfigTab != null) {
-                assetImporterConfigTab.SelectChanged -= OnSoImportSelectChanged;
+            if (assetPostprocessorConfig != null) {
+                assetPostprocessorConfig.SelectChanged -= OnSoImportSelectChanged;
             }
         }
 
@@ -65,17 +67,17 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         private void ShowToggle() {
-            selectImportType = GUI.Toolbar(toolBarRect, selectImportType, AssetImporterHelper.ImportAssetOptions);
+            selectImportType = (AssetPostprocessorHelper.PostprocessorAssetType)GUI.Toolbar(toolBarRect, (int)selectImportType, assetImportTypeOptions);
         }
 
         private void ShowSubTabs() {
             subRect = GetSubWindowArea();
-            if (assetImporterConfigTab == null) {
-                assetImporterConfigTab = assetImporterConfigTab ?? AssetImporterConfigTab.Get();
-                assetImporterFolderTab = assetImporterFolderTab ?? AssetImporterFolderTab.Get();
-                assetImporterDetailTab = assetImporterDetailTab ?? new AssetImporterDetailTab();
+            if (assetPostprocessorConfig == null) {
+                assetPostprocessorFolder = assetPostprocessorFolder ?? AssetPostprocessorFolderTab.Get(this);
+                assetPostprocessorConfig = assetPostprocessorConfig ?? AssetPostprocessorConfigTab.Get();
+                assetPostprocessorDetail = assetPostprocessorDetail ?? new AssetPostprocessorDetailTab();
                 assetListTab = assetListTab ?? new AssetListTab();
-                assetImporterConfigTab.SelectChanged += OnSoImportSelectChanged;
+                assetPostprocessorConfig.SelectChanged += OnSoImportSelectChanged;
             }
 
             HandleHorizontalResize();
@@ -89,17 +91,17 @@ namespace LinChunJie.AssetPostprocessor {
 
             var detailTabRect = new Rect(subRect.x + assetFolderRect.width + splitterWidth, subRect.y + configTabRect.height + splitterWidth, configTabRect.width, subRect.height - configTabRect.height - splitterWidth);
 
-            assetImporterFolderTab.SetImportType(AssetImporterHelper.ImportAssetOptions[selectImportType]);
-            assetImporterConfigTab.SetImportType(AssetImporterHelper.ImportAssetOptions[selectImportType]);
+            assetPostprocessorFolder.SetAssetType(selectImportType);
+            assetPostprocessorConfig.SetAssetType(selectImportType);
 
-            assetImporterConfigTab.OnGUI(configTabRect);
-            assetImporterFolderTab.OnGUI(assetFolderRect);
-            assetImporterDetailTab.OnGUI(detailTabRect);
+            assetPostprocessorConfig.OnGUI(configTabRect);
+            assetPostprocessorFolder.OnGUI(assetFolderRect);
+            assetPostprocessorDetail.OnGUI(detailTabRect);
             assetListTab.OnGUI(assetListRect);
         }
 
         private void OnSoImportSelectChanged() {
-            var path = assetImporterConfigTab.GetSelectSoImporterPath();
+            var path = assetPostprocessorConfig.GetSelectSoImporterPath();
             //assetImporterFolderTab.SetSoImporterConfig(path);
         }
 

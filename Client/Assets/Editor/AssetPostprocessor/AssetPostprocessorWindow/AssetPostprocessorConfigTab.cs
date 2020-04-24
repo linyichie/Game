@@ -13,29 +13,28 @@ using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
 
 namespace LinChunJie.AssetPostprocessor {
-    public class AssetImporterConfigTab : TreeView {
-        private static readonly string spriteAtlasConfigPath = "Assets/Editor/AssetPostprocessor/Config/SpriteAtlas";
+    public class AssetPostprocessorConfigTab : TreeView {
 
         private List<string> paths = new List<string>();
-        private string importType = string.Empty;
+        private AssetPostprocessorHelper.PostprocessorAssetType assetType;
 
         public event Action SelectChanged;
 
-        public static AssetImporterConfigTab Get() {
-            var treeView = new AssetImporterConfigTab(new TreeViewState());
+        public static AssetPostprocessorConfigTab Get() {
+            var treeView = new AssetPostprocessorConfigTab(new TreeViewState());
             treeView.Reload();
             treeView.showAlternatingRowBackgrounds = true;
             return treeView;
         }
 
-        public AssetImporterConfigTab(TreeViewState state) : base(state) {
+        public AssetPostprocessorConfigTab(TreeViewState state) : base(state) {
         }
 
         protected override TreeViewItem BuildRoot() {
             var root = new TreeViewItem(-1, -1);
             root.children = new List<TreeViewItem>();
             foreach (var path in paths) {
-                root.AddChild(new AssetImporterConfigTreeItem(path, 0, Path.GetFileNameWithoutExtension(path)));
+                root.AddChild(new AssetPostprocessorConfigItem(path, 0, Path.GetFileNameWithoutExtension(path)));
             }
 
             return root;
@@ -69,19 +68,19 @@ namespace LinChunJie.AssetPostprocessor {
         public string GetSelectSoImporterPath() {
             var selectedIds = GetSelection();
             if (selectedIds != null && selectedIds.Count > 0) {
-                var item = FindItem(selectedIds[0], rootItem) as AssetImporterConfigTreeItem;
+                var item = FindItem(selectedIds[0], rootItem) as AssetPostprocessorConfigItem;
                 return item.Path;
             }
 
             return string.Empty;
         }
 
-        public void SetImportType(string importType) {
-            if (this.importType != importType) {
+        public void SetAssetType(AssetPostprocessorHelper.PostprocessorAssetType assetType) {
+            if (this.assetType != assetType) {
                 paths.Clear();
-                this.importType = importType;
+                this.assetType = assetType;
                 var guids = AssetDatabase.FindAssets("", new string[] {
-                    spriteAtlasConfigPath
+                    AssetPostprocessorHelper.GetSoAssetPostprocessorFolder(this.assetType),
                 });
                 if (guids != null) {
                     for (int i = 0; i < guids.Length; i++) {
@@ -95,10 +94,10 @@ namespace LinChunJie.AssetPostprocessor {
         }
     }
 
-    public class AssetImporterConfigTreeItem : TreeViewItem {
+    public class AssetPostprocessorConfigItem : TreeViewItem {
         public string Path;
 
-        public AssetImporterConfigTreeItem(string path, int depth, string name) : base(path.GetHashCode(), depth, name) {
+        public AssetPostprocessorConfigItem(string path, int depth, string name) : base(path.GetHashCode(), depth, name) {
             this.Path = path;
         }
     }

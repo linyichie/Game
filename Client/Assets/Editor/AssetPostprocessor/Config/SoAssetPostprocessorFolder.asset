@@ -10,6 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 49014d3fbe5bb954b81e3553d13d3849, type: 3}
-  m_Name: SoAssetImporterFolder
+  m_Name: SoAssetPostprocessorFolder
   m_EditorClassIdentifier: 
-  folderSoImporters: []
+  assetPostprocessorFolders:
+  - assetType: 1
+    path: Assets/AddressableAssets/UI/Texture
+    guid: eb3639e085a5eb44f8c4e30a914e4b5a
