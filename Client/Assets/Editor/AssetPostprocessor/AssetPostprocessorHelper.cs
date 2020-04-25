@@ -12,7 +12,7 @@ namespace LinChunJie.AssetPostprocessor {
 
         public enum TextureImporterFormatIPhone {
             RGBA32 = TextureImporterFormat.RGBA32,
-            Astc6X6 = TextureImporterFormat.ASTC_6x6,
+            ASTC_6X6 = TextureImporterFormat.ASTC_6x6,
             PVRTC_RGB4 = TextureImporterFormat.PVRTC_RGB4,
         }
 
@@ -98,7 +98,7 @@ namespace LinChunJie.AssetPostprocessor {
                 case PlatformAndroid:
                     return (int) TextureImporterFormatAndroid.ETC2_RGBA8;
                 case PlatformIPhone:
-                    return (int) TextureImporterFormatIPhone.Astc6X6;
+                    return (int) TextureImporterFormatIPhone.ASTC_6X6;
             }
 
             return (int) TextureImporterFormat.Automatic;
