@@ -9,11 +9,11 @@ using UnityEngine;
 namespace LinChunJie.AssetPostprocessor {
     public class AssetPostprocessorFolderTab : TreeView {
         private readonly EditorWindow parent;
+        private readonly List<Folder> folders = new List<Folder>();
+        private readonly SoAssetPostprocessorFolder soAssetPostprocessorFolder;
         private AssetPostprocessorHelper.PostprocessorAssetType assetType = (AssetPostprocessorHelper.PostprocessorAssetType)(-1);
         private List<string> paths = new List<string>();
         private bool dirty = false;
-        
-        private readonly SoAssetPostprocessorFolder soAssetPostprocessorFolder;
 
         private static Styles styles;
 
@@ -29,6 +29,12 @@ namespace LinChunJie.AssetPostprocessor {
             }
         }
 
+        class Folder {
+            public string path;
+            public Folder parent;
+            public List<Folder> childs;
+        }
+
         public static AssetPostprocessorFolderTab Get(EditorWindow parent) {
             var treeView = new AssetPostprocessorFolderTab(parent, new TreeViewState());
             treeView.Reload();
@@ -42,51 +48,99 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         protected override TreeViewItem BuildRoot() {
-            var root = new TreeViewItem(-1, -1);
-            root.children = new List<TreeViewItem>();
-            if (paths != null) {
-                foreach (var path in paths) {
-                    root.AddChild(new AssetPostprocessorFolderTreeItem(path, 0, path));
+            var root = new TreeViewItem(-1, -1) {children = new List<TreeViewItem>()};
+            folders.Clear();
+            paths.Sort((lhs, rhs) => lhs.Length.CompareTo(rhs.Length));
+            foreach(var path in paths) {
+                if(!SetFolder(folders, path)) {
+                    folders.Add(new Folder() {
+                        path = path
+                    });
                 }
+            }
+
+            foreach(var folder in folders) {
+                CreateTreeItem(root, folder);
             }
 
             return root;
         }
 
+        private bool SetFolder(List<Folder> folders, string path) {
+            foreach(var folder in folders) {
+                if(path.Contains(folder.path + "/")) {
+                    if(folder.childs != null) {
+                        if(SetFolder(folder.childs, path)) {
+                            return true;
+                        }
+                    }
+
+                    folder.childs = folder.childs ?? new List<Folder>();
+                    folder.childs.Add(new Folder() {
+                        parent = folder,
+                        path = path,
+                    });
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void CreateTreeItem(TreeViewItem root, Folder folder) {
+            var displayName = folder.path;
+            if(folder.parent != null) {
+                displayName = folder.path.Remove(0, folder.parent.path.Length + 1);
+            }
+
+            var treeItem = new AssetPostprocessorFolderTreeItem(folder.path, root.depth + 1, displayName);
+            root.AddChild(treeItem);
+            if(folder.childs == null) {
+                return;
+            }
+
+            foreach(var item in folder.childs) {
+                CreateTreeItem(treeItem, item);
+            }
+        }
+
         public override void OnGUI(Rect pos) {
             styles = styles ?? new Styles();
-            if (CheckDragAndDrop(parent.position)) {
+            if(CheckDragAndDrop(parent.position)) {
                 CheckDragPerform(pos);
             } else {
                 GUI.Box(pos, string.Empty, GUI.skin.box);
-                if (!rootItem.hasChildren) {
+                if(!rootItem.hasChildren) {
                     GUI.Label(pos, "拖动文件夹至此添加配置", styles.dragDropLabelStyle);
                 } else {
                     base.OnGUI(new Rect(pos.x + 1, pos.y + 1, pos.width - 2, pos.height - 2));
-                    if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && pos.Contains(Event.current.mousePosition)) {
+                    if(Event.current.type == EventType.MouseDown && Event.current.button == 0 && pos.Contains(Event.current.mousePosition)) {
                         SetSelection(new int[0], TreeViewSelectionOptions.FireSelectionChanged);
                     }
                 }
             }
 
-            if (dirty) {
+            if(dirty) {
                 Reload();
             }
         }
 
-        protected override void RowGUI(RowGUIArgs args) {
-            var cellRect = args.rowRect;
-            var item = args.item;
-            DefaultGUI.BoldLabel(new Rect(cellRect.x, cellRect.y, cellRect.width, cellRect.height), item.displayName, args.selected, args.focused);
+        protected override void DoubleClickedItem(int id) {
+            var item = FindItem(id, rootItem) as AssetPostprocessorFolderTreeItem;
+            if(item != null) {
+                var o = AssetDatabase.LoadAssetAtPath<Object>(item.Path);
+                EditorGUIUtility.PingObject(o);
+                Selection.activeObject = o;
+            }
         }
 
         protected override void ContextClickedItem(int id) {
             var selectIds = GetSelection();
 
-            if (selectIds.Count > 0) {
+            if(selectIds.Count > 0) {
                 GenericMenu menu = new GenericMenu();
                 menu.AddItem(new GUIContent("Remove"), false, OnRemoveFolder, selectIds);
-                if (menu.GetItemCount() > 0) {
+                if(menu.GetItemCount() > 0) {
                     menu.ShowAsContext();
                 }
             }
@@ -94,13 +148,15 @@ namespace LinChunJie.AssetPostprocessor {
 
         private void OnRemoveFolder(object @object) {
             var selectIds = @object as IList<int>;
-            for (int i = 0; i < selectIds.Count; i++) {
+            for(int i = 0; i < selectIds.Count; i++) {
                 var item = FindItem(selectIds[i], rootItem) as AssetPostprocessorFolderTreeItem;
-                if (paths.Contains(item.Path)) {
+                if(paths.Contains(item.Path)) {
                     paths.Remove(item.Path);
                 }
+
                 soAssetPostprocessorFolder.Remove(this.assetType, item.Path);
             }
+
             AssetDatabase.SaveAssets();
 
             dirty = true;
@@ -108,7 +164,7 @@ namespace LinChunJie.AssetPostprocessor {
 
         private bool CheckDragAndDrop(Rect parentRect) {
             parentRect = new Rect(0, 0, parentRect.width, parentRect.height);
-            if (parentRect.Contains(Event.current.mousePosition) && (Event.current.type == EventType.DragUpdated || Event.current.type == EventType.DragPerform)) {
+            if(parentRect.Contains(Event.current.mousePosition) && (Event.current.type == EventType.DragUpdated || Event.current.type == EventType.DragPerform)) {
                 return AssetPostprocessorHelper.IsDragFolders(DragAndDrop.paths);
             }
 
@@ -116,28 +172,30 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         private void CheckDragPerform(Rect pos) {
-            if (pos.Contains(Event.current.mousePosition)) {
-                if (Event.current.type == EventType.DragUpdated) {
+            if(pos.Contains(Event.current.mousePosition)) {
+                if(Event.current.type == EventType.DragUpdated) {
                     DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
-                } else if (Event.current.type == EventType.DragPerform) {
+                } else if(Event.current.type == EventType.DragPerform) {
                     DragAndDrop.AcceptDrag();
                     Event.current.Use();
-                    TryAddFolder(DragAndDrop.paths);
+                    AddFolder(DragAndDrop.paths);
                 }
             }
         }
 
-        private void TryAddFolder(string[] paths) {
+        private void AddFolder(string[] paths) {
             var defaultImporter = SoSpriteAtlasPostprocessor.GetDefaultSoPostprocessor();
             var assetPath = AssetDatabase.GetAssetPath(defaultImporter);
             var guid = AssetDatabase.AssetPathToGUID(assetPath);
-            for (int i = 0; i < paths.Length; i++) {
+            for(var i = 0; i < paths.Length; i++) {
                 var path = paths[i];
-                if (!this.paths.Contains(path)) {
-                    this.paths.Add(path);
-                    soAssetPostprocessorFolder.Set(this.assetType, path, guid);
-                    dirty = true;
+                if(this.paths.Contains(path)) {
+                    continue;
                 }
+
+                this.paths.Add(path);
+                soAssetPostprocessorFolder.Set(this.assetType, path, guid);
+                dirty = true;
             }
         }
 
@@ -154,12 +212,14 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         public void SetAssetType(AssetPostprocessorHelper.PostprocessorAssetType assetType) {
-            if (this.assetType != assetType) {
-                paths?.Clear();
-                this.assetType = assetType;
-                paths = soAssetPostprocessorFolder.GetPaths(this.assetType);
-                Reload();
+            if(this.assetType == assetType) {
+                return;
             }
+
+            paths?.Clear();
+            this.assetType = assetType;
+            paths = soAssetPostprocessorFolder.GetPaths(this.assetType);
+            Reload();
         }
     }
 

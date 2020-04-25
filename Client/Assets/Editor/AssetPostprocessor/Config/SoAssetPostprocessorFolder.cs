@@ -16,7 +16,7 @@ namespace LinChunJie.AssetPostprocessor {
                 assetPostprocessorFolders = new List<AssetPostprocessorFolder>();
             }
 
-            var index = assetPostprocessorFolders.FindIndex((x) => { return x.path == path; });
+            var index = assetPostprocessorFolders.FindIndex((x) => x.path == path);
             if (index >= 0) {
                 assetPostprocessorFolders[index] = new AssetPostprocessorFolder() {
                     assetType = assetType,
@@ -37,7 +37,7 @@ namespace LinChunJie.AssetPostprocessor {
 
         public void Remove(AssetPostprocessorHelper.PostprocessorAssetType assetType, string path) {
             if (assetPostprocessorFolders != null) {
-                var index = assetPostprocessorFolders.FindIndex((x) => { return x.path == path && x.assetType == assetType; });
+                var index = assetPostprocessorFolders.FindIndex((x) => x.path == path && x.assetType == assetType);
                 if (index >= 0) {
                     assetPostprocessorFolders.RemoveAt(index);
                     EditorUtility.SetDirty(this);
@@ -47,7 +47,7 @@ namespace LinChunJie.AssetPostprocessor {
 
         public string Get(AssetPostprocessorHelper.PostprocessorAssetType assetType, string path) {
             if (assetPostprocessorFolders != null) {
-                var index = assetPostprocessorFolders.FindIndex((x) => { return x.path == path && x.assetType == assetType; });
+                var index = assetPostprocessorFolders.FindIndex((x) => x.path == path && x.assetType == assetType);
                 if (index >= 0) {
                     return assetPostprocessorFolders[index].guid;
                 }
@@ -57,7 +57,7 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         public List<string> GetPaths(AssetPostprocessorHelper.PostprocessorAssetType assetType) {
-            var query = assetPostprocessorFolders.FindAll((x) => { return x.assetType == assetType; });
+            var query = assetPostprocessorFolders.FindAll((x) => x.assetType == assetType);
             List<string> paths = new List<string>();
             for (int i = 0; i < query.Count; i++) {
                 paths.Add(query[i].path);
