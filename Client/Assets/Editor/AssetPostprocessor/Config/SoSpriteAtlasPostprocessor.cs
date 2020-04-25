@@ -8,12 +8,12 @@ using UnityEngine;
 
 namespace LinChunJie.AssetPostprocessor {
     public class SoSpriteAtlasPostprocessor : SoTexturePostprocessorBase {
-        private static readonly string path = "Assets/Editor/AssetPostprocessor/Config/SpriteAtlas/SoSpriteAtlasPostprocessor.asset";
+        private static readonly string path = "Assets/Editor/AssetPostprocessor/Config/SpriteAtlas/New Postprocessor.asset";
         private static readonly string defaultPath = "Assets/Editor/AssetPostprocessor/Config/SpriteAtlas/DefaultSoSpriteAtlasPostprocessor.asset";
 
         [MenuItem("Tools/资源导入规范/SpriteAtlas")]
-        static void Create() {
-            Create(path);
+        public static SoSpriteAtlasPostprocessor Create() {
+            return Create(path);
         }
 
         static SoSpriteAtlasPostprocessor Create(string path) {

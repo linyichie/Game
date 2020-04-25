@@ -20,16 +20,25 @@ namespace LinChunJie.AssetPostprocessor {
         private Styles styles;
         private string folderPath;
         private string postprocessorConfigGuid = string.Empty;
+        private bool contextOnItem = false;
 
         public event Action SelectChanged;
 
         class Styles {
             public readonly Texture checkIcon;
-            public readonly Texture toggleIcon;
+            public readonly GUIStyle itemSelectedStyle;
+            public readonly GUIStyle itemNormalStyle;
+            public readonly GUIStyle itemConfigStyle;
 
             public Styles() {
                 checkIcon = AssetDatabase.LoadAssetAtPath<Texture>("Assets/Editor/AssetPostprocessor/Texture/check.png");
-                toggleIcon = AssetDatabase.LoadAssetAtPath<Texture>("Assets/Editor/AssetPostprocessor/Texture/toggle.png");
+                itemNormalStyle = new GUIStyle() {
+                    alignment = TextAnchor.MiddleLeft,
+                    fontStyle = FontStyle.Bold,
+                };
+                itemSelectedStyle = new GUIStyle(itemNormalStyle);
+                itemSelectedStyle.normal.textColor = Color.white;
+                itemConfigStyle = new GUIStyle(itemNormalStyle);
             }
         }
 
@@ -37,6 +46,7 @@ namespace LinChunJie.AssetPostprocessor {
             var treeView = new AssetPostprocessorConfigTab(new TreeViewState());
             treeView.Reload();
             treeView.showAlternatingRowBackgrounds = true;
+            treeView.rowHeight = 30;
             return treeView;
         }
 
@@ -67,16 +77,52 @@ namespace LinChunJie.AssetPostprocessor {
             var cellRect = args.rowRect;
             var item = args.item as AssetPostprocessorConfigItem;
             var iconRect = new Rect(cellRect.x + 2, cellRect.y + 2, cellRect.height - 4, cellRect.height - 4);
+            var style = styles.itemNormalStyle;
             if(item.Guid == this.postprocessorConfigGuid) {
-                GUI.DrawTexture(iconRect, styles.toggleIcon);
                 GUI.DrawTexture(iconRect, styles.checkIcon);
-            } else {
-                if(GUI.Toggle(iconRect, false, styles.toggleIcon)) {
-                    
-                }
+                style = styles.itemConfigStyle;
             }
 
-            DefaultGUI.BoldLabel(new Rect(cellRect.x + iconRect.xMax + 1, cellRect.y, cellRect.width - iconRect.width, cellRect.height), item.displayName, args.selected, args.focused);
+            if(args.selected) {
+                style = styles.itemSelectedStyle;
+            }
+
+            var labelRect = new Rect(cellRect.x + iconRect.xMax + 1, cellRect.y, cellRect.width - iconRect.width, cellRect.height);
+            GUI.Label(labelRect, item.displayName, style);
+        }
+
+        protected override void ContextClicked() {
+            if(contextOnItem) {
+                contextOnItem = false;
+                return;
+            }
+
+            GenericMenu menu = new GenericMenu();
+            menu.AddItem(new GUIContent("Create"), false, OnCreate, null);
+
+            if(menu.GetItemCount() > 0) {
+                menu.ShowAsContext();
+            }
+        }
+
+        protected override void ContextClickedItem(int id) {
+            contextOnItem = true;
+
+            var selectIds = GetSelection();
+
+            if(selectIds.Count > 0) {
+                GenericMenu menu = new GenericMenu();
+                
+                if(!string.IsNullOrEmpty(postprocessorConfigGuid)) {
+                    menu.AddItem(new GUIContent("Set as Config"), false, OnUseConfig, selectIds);
+                }
+
+                menu.AddItem(new GUIContent("Remove"), false, OnRemoveConfig, selectIds);
+
+                if(menu.GetItemCount() > 0) {
+                    menu.ShowAsContext();
+                }
+            }
         }
 
         protected override bool CanMultiSelect(TreeViewItem item) {
@@ -87,6 +133,26 @@ namespace LinChunJie.AssetPostprocessor {
             if(selectedIds != null && selectedIds.Count > 0) {
                 SelectChanged?.Invoke();
             }
+        }
+
+        private void OnCreate(object @object) {
+            var so = SoAssetPostprocessor.Create(this.assetType);
+            var path = AssetDatabase.GetAssetPath(so);
+            paths.Add(path);
+            Reload();
+        }
+
+        private void OnUseConfig(object @object) {
+            var selectIds = @object as IList<int>;
+            if(selectIds != null && selectIds.Count == 1) {
+                var item = FindItem(selectIds[0], rootItem) as AssetPostprocessorConfigItem;
+                soAssetPostprocessorFolder.Set(this.assetType, folderPath, item.Guid);
+                postprocessorConfigGuid = item.Guid;
+            }
+        }
+
+        private void OnRemoveConfig(object @object) {
+            var selectIds = @object as IList<int>;
         }
 
         public void SetAssetType(AssetPostprocessorHelper.PostprocessorAssetType assetType) {
@@ -111,6 +177,12 @@ namespace LinChunJie.AssetPostprocessor {
             if(this.folderPath != folderPath) {
                 this.folderPath = folderPath;
                 postprocessorConfigGuid = soAssetPostprocessorFolder.Get(this.assetType, this.folderPath);
+                if(!string.IsNullOrEmpty(postprocessorConfigGuid)) {
+                    var path = AssetDatabase.GUIDToAssetPath(postprocessorConfigGuid);
+                    var id = path.GetHashCode();
+                    SetSelection(new List<int>() {id});
+                }
+
                 Repaint();
             }
         }
