@@ -10,6 +10,7 @@ namespace LinChunJie.AssetPostprocessor {
         private readonly Styles styles;
         private readonly AssetPostprocessorHelper helper;
         private SoTexturePostprocessorBase soTexturePostprocessorBase;
+        public event Action OnChanged;
         
         class Styles {
             public readonly string TextureSizeLabel = "Max Texture Size";
@@ -59,6 +60,7 @@ namespace LinChunJie.AssetPostprocessor {
             if(EditorGUI.EndChangeCheck()) {
                 EditorUtility.SetDirty(soTexturePostprocessorBase);
                 AssetDatabase.SaveAssets();
+                OnChanged?.Invoke();
             }
 
             GUILayout.EndVertical();

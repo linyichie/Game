@@ -58,10 +58,12 @@ namespace LinChunJie.AssetPostprocessor {
             var item = args.item as AssetListItem;
             var iconRect = new Rect(rect.x + 1, rect.y + 1, rect.height - 2, rect.height - 2);
             GUI.DrawTexture(iconRect, item.icon, ScaleMode.ScaleToFit);
-            var labelRect = new Rect(rect.x + iconRect.xMax + 1, rect.y, rect.width - iconRect.width, rect.height);
+            var labelRect = new Rect(rect.x + iconRect.xMax + 1, rect.y, rect.width - iconRect.width - 1, rect.height);
             if(item.IsDirty) {
-                var warnRect = new Rect(rect.width - rect.height - 2, rect.y + 1, rect.height - 2, rect.height - 2);
+                var warnRect = new Rect(rect.width - rect.height, rect.y + 1, rect.height - 2, rect.height - 2);
                 GUI.DrawTexture(warnRect, warnIcon, ScaleMode.ScaleToFit);
+
+                labelRect.width = labelRect.width - warnRect.width - 2;
             }
 
             DefaultGUI.BoldLabel(labelRect, item.displayName, args.selected, args.focused);
@@ -103,6 +105,15 @@ namespace LinChunJie.AssetPostprocessor {
             }
 
             Reload();
+        }
+
+        public void SoPostprocessorChanged(string guid) {
+            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            var so = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessor>(assetPath);
+            for(int i = 0; i < rootItem.children.Count; i++) {
+                var item = rootItem.children[i] as AssetListItem;
+                item.VerifyImporterSetting(so);
+            }
         }
 
         private void GetParentDirectories(string rootPath, string path, ref List<string> directories) {
@@ -151,6 +162,8 @@ namespace LinChunJie.AssetPostprocessor {
         protected AssetListTextureBaseItem(string path, int depth, string displayName) : base(path, depth, displayName) { }
 
         public override void VerifyImporterSetting(SoAssetPostprocessor so) {
+            IsDirty = false;
+            
             var texturePostprocessorBase = so as SoTexturePostprocessorBase;
             var importer = AssetImporter.GetAtPath(Path) as TextureImporter;
 
@@ -173,8 +186,7 @@ namespace LinChunJie.AssetPostprocessor {
             }
         }
 
-        public override void FixAndReimport(SoAssetPostprocessor so) {
-        }
+        public override void FixAndReimport(SoAssetPostprocessor so) { }
 
         private bool CompareTexturePlatformSetting(AssetPostprocessorHelper.TexturePlatformSettings so, TextureImporterPlatformSettings texturePlatformSettings) {
             if((int)so.format != (int)texturePlatformSettings.format || (int)so.compressionQuality != texturePlatformSettings.compressionQuality || so.maxTextureSize != texturePlatformSettings.maxTextureSize) {
@@ -189,6 +201,8 @@ namespace LinChunJie.AssetPostprocessor {
         public AssetListSpriteAtlasItem(string path, int depth, string displayName) : base(path, depth, displayName) { }
 
         public override void VerifyImporterSetting(SoAssetPostprocessor so) {
+            IsDirty = false;
+            
             var texturePostprocessorBase = so as SoTexturePostprocessorBase;
             var spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(Path);
 
@@ -211,9 +225,7 @@ namespace LinChunJie.AssetPostprocessor {
             }
         }
 
-        public override void FixAndReimport(SoAssetPostprocessor so) {
-            
-        }
+        public override void FixAndReimport(SoAssetPostprocessor so) { }
 
         private bool CompareTexturePlatformSetting(AssetPostprocessorHelper.TexturePlatformSettings so, TextureImporterPlatformSettings texturePlatformSettings) {
             if((int)so.format != (int)texturePlatformSettings.format || (int)so.compressionQuality != texturePlatformSettings.compressionQuality || so.maxTextureSize != texturePlatformSettings.maxTextureSize) {
@@ -236,7 +248,6 @@ namespace LinChunJie.AssetPostprocessor {
         public AssetListModelItem(string path, int depth, string displayName) : base(path, depth, displayName) { }
 
         public override void VerifyImporterSetting(SoAssetPostprocessor so) { }
-        public override void FixAndReimport(SoAssetPostprocessor so) {
-        }
+        public override void FixAndReimport(SoAssetPostprocessor so) { }
     }
 }

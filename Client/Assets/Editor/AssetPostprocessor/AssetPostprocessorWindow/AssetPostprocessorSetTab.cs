@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.Hardware;
 using UnityEngine;
 
 namespace LinChunJie.AssetPostprocessor {
     public class AssetPostprocessorSetTab {
         private IPostprocessorSetTab postprocessorSetTab;
         private PostprocessorAssetType assetType;
-        private string soPostprocessorGuid = string.Empty;
+        private string guid = string.Empty;
+        public event Action<string> OnChanged;
 
         public void OnGUI(Rect pos) {
             GUI.Box(pos, string.Empty);
@@ -17,9 +19,9 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         public void SetPostprocessor(PostprocessorAssetType assetType, string guid) {
-            if (this.assetType != assetType || soPostprocessorGuid != guid) {
+            if (this.assetType != assetType || this.guid != guid) {
                 this.assetType = assetType;
-                this.soPostprocessorGuid = guid;
+                this.guid = guid;
                 switch (assetType) {
                     case PostprocessorAssetType.SpriteAtlas:
                     case PostprocessorAssetType.Sprite:
@@ -27,6 +29,7 @@ namespace LinChunJie.AssetPostprocessor {
                         if (!string.IsNullOrEmpty(guid)) {
                             postprocessorSetTab = new TextureBasePostprocessorTab();
                             postprocessorSetTab.Initialize(guid);
+                            postprocessorSetTab.OnChanged += HandleOnChanged;
                         } else {
                             postprocessorSetTab = null;
                         }
@@ -36,6 +39,10 @@ namespace LinChunJie.AssetPostprocessor {
                         break;
                 }
             }
+        }
+
+        private void HandleOnChanged() {
+            OnChanged?.Invoke(this.guid);
         }
     }
 }
