@@ -15,12 +15,12 @@ namespace LinChunJie.AssetPostprocessor {
         [SerializeField] private List<AssetPostprocessorFolder> folders;
 
         public void Set(PostprocessorAssetType assetType, string path, string guid) {
-            if (folders == null) {
+            if(folders == null) {
                 folders = new List<AssetPostprocessorFolder>();
             }
 
             var index = folders.FindIndex((x) => x.path == path);
-            if (index >= 0) {
+            if(index >= 0) {
                 folders[index] = new AssetPostprocessorFolder() {
                     assetType = assetType,
                     path = path,
@@ -39,9 +39,9 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         public void Remove(PostprocessorAssetType assetType, string path) {
-            if (folders != null) {
+            if(folders != null) {
                 var index = folders.FindIndex((x) => x.path == path && x.assetType == assetType);
-                if (index >= 0) {
+                if(index >= 0) {
                     folders.RemoveAt(index);
                     EditorUtility.SetDirty(this);
                 }
@@ -50,7 +50,7 @@ namespace LinChunJie.AssetPostprocessor {
 
         public string Get(PostprocessorAssetType assetType, string path) {
             var list = folders?.FindAll((x) => x.assetType == assetType && path.StartsWith(x.path));
-            if (list != null && list.Count > 0) {
+            if(list != null && list.Count > 0) {
                 list.Sort((lhs, rhs) => { return -lhs.path.Length.CompareTo(rhs.path.Length); });
                 return list[0].guid;
             }
@@ -61,7 +61,7 @@ namespace LinChunJie.AssetPostprocessor {
         public List<string> GetPaths(PostprocessorAssetType assetType) {
             var query = folders.FindAll((x) => x.assetType == assetType);
             List<string> paths = new List<string>();
-            for (int i = 0; i < query.Count; i++) {
+            for(int i = 0; i < query.Count; i++) {
                 paths.Add(query[i].path);
             }
 
@@ -69,13 +69,13 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         public bool ContainsOneOfFolders(PostprocessorAssetType assetType, List<string> folderPaths) {
-            if (folderPaths == null) {
+            if(folderPaths == null) {
                 return false;
             }
 
             var paths = GetPaths(assetType);
-            for (int i = 0; i < folderPaths.Count; i++) {
-                if (paths.Contains(folderPaths[i])) {
+            for(int i = 0; i < folderPaths.Count; i++) {
+                if(paths.Contains(folderPaths[i])) {
                     return true;
                 }
             }
@@ -89,9 +89,9 @@ namespace LinChunJie.AssetPostprocessor {
             var dirty = false;
             Dictionary<PostprocessorAssetType, string> defaultSoAssetPostprocessors = null;
             List<AssetPostprocessorFolder> lostFolders = null;
-            if (folders != null) {
-                foreach (var folder in folders) {
-                    if (!Directory.Exists(folder.path)) {
+            if(folders != null) {
+                foreach(var folder in folders) {
+                    if(!Directory.Exists(folder.path)) {
                         lostFolders = lostFolders ?? new List<AssetPostprocessorFolder>();
                         lostFolders.Add(folder);
                         dirty = true;
@@ -100,9 +100,9 @@ namespace LinChunJie.AssetPostprocessor {
 
                     var soPath = AssetDatabase.GUIDToAssetPath(folder.guid);
                     var soAssetPostprocessor = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessor>(soPath);
-                    if (soAssetPostprocessor == null) {
+                    if(soAssetPostprocessor == null) {
                         defaultSoAssetPostprocessors = defaultSoAssetPostprocessors ?? new Dictionary<PostprocessorAssetType, string>();
-                        if (!defaultSoAssetPostprocessors.ContainsKey(folder.assetType)) {
+                        if(!defaultSoAssetPostprocessors.ContainsKey(folder.assetType)) {
                             var defaultSo = SoAssetPostprocessor.GetDefault(folder.assetType);
                             var assetPath = AssetDatabase.GetAssetPath(defaultSo);
                             defaultSoAssetPostprocessors.Add(folder.assetType, AssetDatabase.AssetPathToGUID(assetPath));
@@ -114,15 +114,15 @@ namespace LinChunJie.AssetPostprocessor {
                 }
             }
 
-            if (lostFolders != null) {
-                foreach (var folder in lostFolders) {
+            if(lostFolders != null) {
+                foreach(var folder in lostFolders) {
                     so.folders.Remove(folder);
                 }
 
                 lostFolders.Clear();
             }
 
-            if (dirty) {
+            if(dirty) {
                 EditorUtility.SetDirty(so);
                 AssetDatabase.SaveAssets();
             }
@@ -131,7 +131,7 @@ namespace LinChunJie.AssetPostprocessor {
         [MenuItem("Tools/资源导入规范/文件夹规则")]
         static SoAssetPostprocessorFolder Create() {
             var so = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessorFolder>(path);
-            if (so == null) {
+            if(so == null) {
                 so = ScriptableObject.CreateInstance<SoAssetPostprocessorFolder>();
                 AssetDatabase.CreateAsset(so, path);
                 AssetDatabase.Refresh();
@@ -143,7 +143,7 @@ namespace LinChunJie.AssetPostprocessor {
 
         public static SoAssetPostprocessorFolder GetSoAssetPostprocessorFolder() {
             var so = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessorFolder>(path);
-            if (so == null) {
+            if(so == null) {
                 so = Create();
             }
 
@@ -155,6 +155,15 @@ namespace LinChunJie.AssetPostprocessor {
             public PostprocessorAssetType assetType;
             public string path;
             public string guid;
+        }
+    }
+
+    [CustomEditor(typeof(SoAssetPostprocessorFolder))]
+    public class SoAssetPostprocessorFolderInspector : Editor {
+        public override void OnInspectorGUI() {
+            using(new EditorGUI.DisabledScope(true)) {
+                base.OnInspectorGUI();
+            }
         }
     }
 }
