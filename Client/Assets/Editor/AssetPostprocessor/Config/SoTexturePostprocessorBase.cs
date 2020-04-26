@@ -13,8 +13,8 @@ namespace LinChunJie.AssetPostprocessor {
         public List<string> folderGuids = new List<string>();
 
         private void OnEnable() {
-            if(platformSettings.Count != AssetPostprocessorHelper.Platforms.Length) {
-                for(int i = 0; i < AssetPostprocessorHelper.Platforms.Length; i++) {
+            if (platformSettings.Count != AssetPostprocessorHelper.Platforms.Length) {
+                for (int i = 0; i < AssetPostprocessorHelper.Platforms.Length; i++) {
                     GetPlatformSettings(AssetPostprocessorHelper.Platforms[i]);
                 }
 
@@ -25,7 +25,7 @@ namespace LinChunJie.AssetPostprocessor {
 
         public AssetPostprocessorHelper.TexturePlatformSettings GetPlatformSettings(string platform) {
             var index = platformSettings.FindIndex((x) => { return x.platform == platform; });
-            if(index == -1) {
+            if (index == -1) {
                 var platformSetting = new AssetPostprocessorHelper.TexturePlatformSettings() {
                     platform = platform,
                     format = AssetPostprocessorHelper.GetDefaultTextureFormat(platform),
@@ -60,15 +60,16 @@ namespace LinChunJie.AssetPostprocessor {
             selectPlatformIndex = selectPlatformIndex == -1 ? 0 : selectPlatformIndex;
         }
 
-        private void OnDisable() { }
+        private void OnDisable() {
+        }
 
         public override void OnInspectorGUI() {
             var config = target as SoTexturePostprocessorBase;
             GUILayout.BeginVertical(EditorStyles.helpBox);
             GUILayout.BeginHorizontal();
             {
-                for(int i = 0; i < AssetPostprocessorHelper.Platforms.Length; i++) {
-                    if(GUILayout.Toggle(selectPlatformIndex == i, AssetPostprocessorHelper.Platforms[i], EditorStyles.toolbarButton)) {
+                for (int i = 0; i < AssetPostprocessorHelper.Platforms.Length; i++) {
+                    if (GUILayout.Toggle(selectPlatformIndex == i, AssetPostprocessorHelper.Platforms[i], EditorStyles.toolbarButton)) {
                         selectPlatformIndex = i;
                         AssetPostprocessorHelper.SelectPlatform = AssetPostprocessorHelper.Platforms[i];
                     }
@@ -76,8 +77,7 @@ namespace LinChunJie.AssetPostprocessor {
             }
             GUILayout.EndHorizontal();
 
-            EditorGUI.BeginChangeCheck();
-            {
+            using (new EditorGUI.DisabledScope(true)) {
                 var selectPlatform = AssetPostprocessorHelper.Platforms[selectPlatformIndex];
                 var platformSetting = config.GetPlatformSettings(selectPlatform);
                 platformSetting.maxTextureSize = EditorGUILayout.IntPopup(styles.TextureSizeLabel, platformSetting.maxTextureSize, helper.TextureSizeOptionLabels, helper.TextureSizeOptions);
@@ -85,12 +85,7 @@ namespace LinChunJie.AssetPostprocessor {
                 var textureFormatValue = helper.GetFormatValues(platformSetting.platform);
                 platformSetting.format = EditorGUILayout.IntPopup(styles.FormatLabel, platformSetting.format, textureFormatValue.FormatStrings, textureFormatValue.FormatValues);
 
-                platformSetting.compressionQuality = (UnityEditor.TextureCompressionQuality)EditorGUILayout.EnumPopup(styles.CompressionQualityLabel, platformSetting.compressionQuality);
-            }
-
-            if(EditorGUI.EndChangeCheck()) {
-                EditorUtility.SetDirty(config);
-                AssetDatabase.SaveAssets();
+                platformSetting.compressionQuality = (UnityEditor.TextureCompressionQuality) EditorGUILayout.EnumPopup(styles.CompressionQualityLabel, platformSetting.compressionQuality);
             }
 
             GUILayout.EndVertical();

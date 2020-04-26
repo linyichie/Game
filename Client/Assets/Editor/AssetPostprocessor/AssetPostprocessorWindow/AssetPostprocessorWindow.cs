@@ -47,6 +47,10 @@ namespace LinChunJie.AssetPostprocessor {
             assetTypeOptions = Enum.GetNames(typeof(AssetPostprocessorHelper.PostprocessorAssetType));
         }
 
+        private void OnFocus() {
+            Refresh();
+        }
+
         private void OnEnable() {
             subRect = GetSubWindowArea();
             horizontalLeftSplitterRect = new Rect(subRect.x + subRect.width * horizontalLeftSplitterPercent, subRect.y, splitterWidth, subRect.height);
@@ -55,6 +59,15 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         private void OnDisable() {
+            if (configTab != null) {
+                configTab.DeleteSoAssetPostprocessor -= OnDeleteSoAssetPostprocessor;
+            }
+        }
+
+        private void Refresh() {
+            SoAssetPostprocessorFolder.VerifyConfigs();
+            folderTab?.Refresh();
+            configTab?.Refresh();
         }
 
         private void OnGUI() {
@@ -74,6 +87,8 @@ namespace LinChunJie.AssetPostprocessor {
                 configTab = configTab ?? AssetPostprocessorConfigTab.Get();
                 setTab = setTab ?? new AssetPostprocessorSetTab();
                 assetListTab = assetListTab ?? new AssetListTab();
+
+                configTab.DeleteSoAssetPostprocessor += OnDeleteSoAssetPostprocessor;
             }
 
             HandleHorizontalResize();
@@ -99,6 +114,21 @@ namespace LinChunJie.AssetPostprocessor {
             setTab.OnGUI(detailTabRect);
             assetListTab.OnGUI(assetListRect);
         }
+
+        private void OnDeleteSoAssetPostprocessor(string deleteGuid) {
+            var so = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();
+            var defaultSo = SoAssetPostprocessor.GetDefault(selectAssetType);
+            var defaultGuid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(defaultSo));
+            var paths = so.GetPaths(selectAssetType);
+            for (int i = 0; i < paths.Count; i++) {
+                var path = paths[i];
+                var guid = so.Get(selectAssetType, path);
+                if (guid == deleteGuid) {
+                    so.Set(selectAssetType, path, defaultGuid);
+                }
+            }
+        }
+
         private void HandleHorizontalResize() {
             horizontalLeftSplitterRect.x = (int) (subRect.x + subRect.width * horizontalLeftSplitterPercent);
             horizontalRightSplitterRect.x = (int) (subRect.x + subRect.width * horizontalRightSplitterPercent - splitterWidth);

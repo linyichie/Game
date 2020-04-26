@@ -20,7 +20,6 @@ namespace LinChunJie.AssetPostprocessor {
         static SoSpritePostprocessor Create(string path) {
             var so = ScriptableObject.CreateInstance<SoSpritePostprocessor>();
             AssetDatabase.CreateAsset(so, path);
-            AssetDatabase.Refresh();
             Selection.activeObject = so;
             return so;
         }

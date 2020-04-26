@@ -12,19 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49014d3fbe5bb954b81e3553d13d3849, type: 3}
   m_Name: SoAssetPostprocessorFolder
   m_EditorClassIdentifier: 
-  assetPostprocessorFolders:
-  - assetType: 0
-    path: Assets/AddressableAssets
-    guid: bad9e69910e55b74ca5115b4a12dbcf3
-  - assetType: 0
-    path: Assets/AddressableAssets/UI/Sprite
-    guid: eb3639e085a5eb44f8c4e30a914e4b5a
-  - assetType: 0
-    path: Assets/AddressableAssets/UI/Atlas/Common
-    guid: bad9e69910e55b74ca5115b4a12dbcf3
-  - assetType: 0
-    path: Assets/AddressableAssets/UI
-    guid: eb3639e085a5eb44f8c4e30a914e4b5a
+  folders:
   - assetType: 0
     path: Assets/AddressableAssets/UI/Atlas
-    guid: bad9e69910e55b74ca5115b4a12dbcf3
+    guid: eb3639e085a5eb44f8c4e30a914e4b5a

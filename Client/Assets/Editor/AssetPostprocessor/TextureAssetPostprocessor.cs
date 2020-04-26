@@ -8,23 +8,26 @@ using UnityEngine;
 namespace LinChunJie.AssetPostprocessor {
     public static class TextureAssetPostprocessor {
         public static void OnPostprocessTexture(TextureImporter importer) {
-            if (importer.assetPath.Contains("Sprite")) {
+            if (importer.assetPath.Contains("UI/Sprite")) {
                 importer.textureType = TextureImporterType.Sprite;
-            } else if (importer.assetPath.Contains("Texture")) {
+            } else if (importer.assetPath.Contains("UI/Texture")) {
                 importer.textureType = TextureImporterType.Default;
+            } else {
+                return;
             }
 
+            var haveAlphaChannel = importer.DoesSourceTextureHaveAlpha();
             importer.sRGBTexture = true;
-            importer.alphaSource = TextureImporterAlphaSource.FromInput;
-            importer.alphaIsTransparency = true;
+            importer.alphaSource = haveAlphaChannel ? TextureImporterAlphaSource.FromInput : TextureImporterAlphaSource.None;
+            importer.alphaIsTransparency = haveAlphaChannel;
             importer.isReadable = false;
             importer.mipmapEnabled = false;
             importer.streamingMipmaps = false;
             importer.filterMode = FilterMode.Bilinear;
             importer.wrapMode = TextureWrapMode.Clamp;
             SetPlatformSettings(importer);
-            EditorUtility.SetDirty(importer);
-            AssetDatabase.SaveAssets();
+            
+            Debug.Log("OnPostprocessTexture : " + importer.assetPath);
         }
 
         static void SetPlatformSettings(TextureImporter importer) {

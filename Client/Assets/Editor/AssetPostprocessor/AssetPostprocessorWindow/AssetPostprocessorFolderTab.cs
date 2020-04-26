@@ -215,9 +215,12 @@ namespace LinChunJie.AssetPostprocessor {
             if(this.assetType == assetType) {
                 return;
             }
-
-            paths?.Clear();
             this.assetType = assetType;
+            Refresh();
+        }
+
+        public void Refresh() {
+            paths?.Clear();
             paths = soAssetPostprocessorFolder.GetPaths(this.assetType);
             Reload();
         }

@@ -17,18 +17,19 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         public void SetPostprocessor(AssetPostprocessorHelper.PostprocessorAssetType assetType, string guid) {
-            if(this.assetType != assetType || soPostprocessorGuid != guid) {
+            if (this.assetType != assetType || soPostprocessorGuid != guid) {
                 this.assetType = assetType;
                 this.soPostprocessorGuid = guid;
-                switch(assetType) {
+                switch (assetType) {
                     case AssetPostprocessorHelper.PostprocessorAssetType.SpriteAtlas:
-                        if(!string.IsNullOrEmpty(guid)) {
+                    case AssetPostprocessorHelper.PostprocessorAssetType.Sprite:
+                    case AssetPostprocessorHelper.PostprocessorAssetType.Texture:
+                        if (!string.IsNullOrEmpty(guid)) {
                             postprocessorSetTab = new TextureBasePostprocessorTab();
                             postprocessorSetTab.Initialize(guid);
                         } else {
                             postprocessorSetTab = null;
                         }
-
                         break;
                     default:
                         postprocessorSetTab = null;

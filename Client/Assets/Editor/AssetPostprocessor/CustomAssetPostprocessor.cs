@@ -30,8 +30,8 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         private void OnPostprocessSprites(Texture2D texture, Sprite[] sprites) {
-            var importer = assetImporter as TextureImporter;
-            TextureAssetPostprocessor.OnPostprocessTexture(importer);
+            //var importer = assetImporter as TextureImporter;
+            //TextureAssetPostprocessor.OnPostprocessTexture(importer);
         }
 
         private void OnPostprocessTexture(Texture2D texture) {
