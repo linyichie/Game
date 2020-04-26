@@ -5,6 +5,13 @@ using UnityEditor;
 using UnityEngine;
 
 namespace LinChunJie.AssetPostprocessor {
+    public enum PostprocessorAssetType {
+        SpriteAtlas = 0,
+        Sprite = 1,
+        Texture = 2,
+        Model = 3,
+    }
+
     public class AssetPostprocessorHelper {
         public enum TextureImporterFormatStandalone {
             RGBA32 = TextureImporterFormat.RGBA32,
@@ -20,13 +27,6 @@ namespace LinChunJie.AssetPostprocessor {
             RGBA32 = TextureImporterFormat.RGBA32,
             ETC2_RGBA8 = TextureImporterFormat.ETC2_RGBA8,
             ETC2_RGB4 = TextureImporterFormat.ETC2_RGB4,
-        }
-
-        public enum PostprocessorAssetType {
-            SpriteAtlas = 0,
-            Sprite = 1,
-            Texture = 2,
-            Model = 3,
         }
 
         [Serializable]
@@ -153,6 +153,21 @@ namespace LinChunJie.AssetPostprocessor {
                 default:
                     throw new ArgumentOutOfRangeException(nameof(assetType), assetType, null);
             }
+        }
+
+        public static string GetAssetSearchFilterByAssetType(PostprocessorAssetType assetType) {
+            switch (assetType) {
+                case PostprocessorAssetType.SpriteAtlas:
+                    return "t:spriteatlas";
+                case PostprocessorAssetType.Sprite:
+                    return "t:sprite";
+                case PostprocessorAssetType.Texture:
+                    return "t:texture";
+                case PostprocessorAssetType.Model:
+                    return "t:model";
+            }
+
+            return string.Empty;
         }
 
         public static bool IsDragFolders(string[] paths) {

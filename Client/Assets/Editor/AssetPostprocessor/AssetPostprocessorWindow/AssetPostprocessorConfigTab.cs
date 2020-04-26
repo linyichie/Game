@@ -9,7 +9,7 @@ using UnityEngine;
 namespace LinChunJie.AssetPostprocessor {
     public class AssetPostprocessorConfigTab : TreeView {
         private readonly List<string> paths = new List<string>();
-        private AssetPostprocessorHelper.PostprocessorAssetType assetType = (AssetPostprocessorHelper.PostprocessorAssetType) (-1);
+        private PostprocessorAssetType assetType = (PostprocessorAssetType) (-1);
         private readonly SoAssetPostprocessorFolder soAssetPostprocessorFolder;
         private Styles styles;
         private string folderPath;
@@ -42,13 +42,13 @@ namespace LinChunJie.AssetPostprocessor {
         public static AssetPostprocessorConfigTab Get() {
             var treeView = new AssetPostprocessorConfigTab(new TreeViewState());
             treeView.Reload();
-            treeView.showAlternatingRowBackgrounds = true;
-            treeView.rowHeight = 25;
             return treeView;
         }
 
         private AssetPostprocessorConfigTab(TreeViewState state) : base(state) {
             soAssetPostprocessorFolder = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();
+            showAlternatingRowBackgrounds = true;
+            rowHeight = 25;
         }
 
         protected override TreeViewItem BuildRoot() {
@@ -135,6 +135,15 @@ namespace LinChunJie.AssetPostprocessor {
             return false;
         }
 
+        protected override void DoubleClickedItem(int id) {
+            var item = FindItem(id, rootItem) as AssetPostprocessorConfigItem;
+            if(item != null) {
+                var o = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(item.Path);
+                EditorGUIUtility.PingObject(o);
+                Selection.activeObject = o;
+            }
+        }
+
         protected override bool CanRename(TreeViewItem item) {
             var configItem = item as AssetPostprocessorConfigItem;
             return !configItem.IsDefault;
@@ -208,18 +217,17 @@ namespace LinChunJie.AssetPostprocessor {
                     soAssetPostprocessorFolder.Set(this.assetType, this.folderPath, guid);
                     postprocessorConfigGuid = guid;
                 }
-
-                var removePath = AssetDatabase.GUIDToAssetPath(item.Guid);
-                paths.Remove(removePath);
+                
+                paths.Remove(item.Path);
                 DeleteSoAssetPostprocessor?.Invoke(item.Guid);
-                AssetDatabase.DeleteAsset(removePath);
+                AssetDatabase.DeleteAsset(item.Path);
                 AssetDatabase.Refresh();
             }
 
             Reload();
         }
 
-        public void SetAssetType(AssetPostprocessorHelper.PostprocessorAssetType assetType) {
+        public void SetAssetType(PostprocessorAssetType assetType) {
             if (this.assetType != assetType) {
                 this.assetType = assetType;
                 Refresh();

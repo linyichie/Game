@@ -10,8 +10,6 @@ namespace LinChunJie.AssetPostprocessor {
     public class SoTexturePostprocessorBase : SoAssetPostprocessor {
         public List<AssetPostprocessorHelper.TexturePlatformSettings> platformSettings = new List<AssetPostprocessorHelper.TexturePlatformSettings>();
 
-        public List<string> folderGuids = new List<string>();
-
         private void OnEnable() {
             if (platformSettings.Count != AssetPostprocessorHelper.Platforms.Length) {
                 for (int i = 0; i < AssetPostprocessorHelper.Platforms.Length; i++) {

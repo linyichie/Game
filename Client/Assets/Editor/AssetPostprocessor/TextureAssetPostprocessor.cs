@@ -2,43 +2,56 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
 namespace LinChunJie.AssetPostprocessor {
     public static class TextureAssetPostprocessor {
         public static void OnPostprocessTexture(TextureImporter importer) {
-            if (importer.assetPath.Contains("UI/Sprite")) {
-                importer.textureType = TextureImporterType.Sprite;
-            } else if (importer.assetPath.Contains("UI/Texture")) {
-                importer.textureType = TextureImporterType.Default;
-            } else {
+            var assetType = (PostprocessorAssetType) (-1);
+            if (importer.assetPath.Contains("Sprite")) {
+                assetType = PostprocessorAssetType.Sprite;
+            } else if (importer.assetPath.Contains("Texture")) {
+                assetType = PostprocessorAssetType.Texture;
+            }
+
+            if (assetType != PostprocessorAssetType.Sprite && assetType != PostprocessorAssetType.Texture) {
                 return;
             }
 
-            var haveAlphaChannel = importer.DoesSourceTextureHaveAlpha();
+            var postprocessorFolder = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();
+            var guid = postprocessorFolder.Get(assetType, importer.assetPath);
+            if (string.IsNullOrEmpty(guid)) {
+                return;
+            }
+
+            importer.textureType = assetType == PostprocessorAssetType.Sprite ? TextureImporterType.Sprite : TextureImporterType.Default;
+            importer.alphaIsTransparency = importer.DoesSourceTextureHaveAlpha();
             importer.sRGBTexture = true;
-            importer.alphaSource = haveAlphaChannel ? TextureImporterAlphaSource.FromInput : TextureImporterAlphaSource.None;
-            importer.alphaIsTransparency = haveAlphaChannel;
             importer.isReadable = false;
             importer.mipmapEnabled = false;
             importer.streamingMipmaps = false;
             importer.filterMode = FilterMode.Bilinear;
             importer.wrapMode = TextureWrapMode.Clamp;
-            SetPlatformSettings(importer);
-            
-            Debug.Log("OnPostprocessTexture : " + importer.assetPath);
+            SetPlatformSettings(importer, assetType, guid);
+            Reimport(importer);
         }
 
-        static void SetPlatformSettings(TextureImporter importer) {
+        static async Task Reimport(TextureImporter importer) {
+            await Task.Delay(1);
+            importer.SaveAndReimport();
+        }
+
+        static void SetPlatformSettings(TextureImporter importer, PostprocessorAssetType assetType, string guid) {
+            var path = AssetDatabase.GUIDToAssetPath(guid);
             SoTexturePostprocessorBase soPostprocessor = null;
-            switch (importer.textureType) {
-                case TextureImporterType.Default:
-                    soPostprocessor = SoTexturePostprocessor.GetDefaultSoPostprocessor();
-                    break;
-                case TextureImporterType.Sprite:
-                    soPostprocessor = SoSpritePostprocessor.GetDefaultSoPostprocessor();
-                    break;
+            if (!string.IsNullOrEmpty(path)) {
+                soPostprocessor = AssetDatabase.LoadAssetAtPath<SoTexturePostprocessorBase>(path);
+            }
+
+            if (soPostprocessor == null) {
+                soPostprocessor = SoAssetPostprocessor.GetDefault(assetType) as SoTexturePostprocessorBase;
             }
 
             if (soPostprocessor != null) {

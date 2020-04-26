@@ -35,8 +35,10 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         private void OnPostprocessTexture(Texture2D texture) {
-            var importer = assetImporter as TextureImporter;
-            TextureAssetPostprocessor.OnPostprocessTexture(importer);
+            if (IsNewCreateFile(assetImporter.assetPath)) {
+                var importer = assetImporter as TextureImporter;
+                TextureAssetPostprocessor.OnPostprocessTexture(importer);
+            }
         }
 
         private void OnPostprocessMeshHierarchy(GameObject root) {
@@ -64,12 +66,6 @@ namespace LinChunJie.AssetPostprocessor {
             var metaFilePath = StringUtility.Contact(assetPath, ".meta");
             if (!File.Exists(metaFilePath)) {
                 return true;
-            }
-
-            var fileInfo = new FileInfo(metaFilePath);
-            if (fileInfo != null) {
-                var seconds = (DateTime.UtcNow - fileInfo.CreationTimeUtc).TotalSeconds;
-                return seconds < 3;
             }
 
             return false;

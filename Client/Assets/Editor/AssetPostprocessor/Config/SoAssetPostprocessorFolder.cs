@@ -14,7 +14,7 @@ namespace LinChunJie.AssetPostprocessor {
 
         [SerializeField] private List<AssetPostprocessorFolder> folders;
 
-        public void Set(AssetPostprocessorHelper.PostprocessorAssetType assetType, string path, string guid) {
+        public void Set(PostprocessorAssetType assetType, string path, string guid) {
             if (folders == null) {
                 folders = new List<AssetPostprocessorFolder>();
             }
@@ -38,7 +38,7 @@ namespace LinChunJie.AssetPostprocessor {
             AssetDatabase.SaveAssets();
         }
 
-        public void Remove(AssetPostprocessorHelper.PostprocessorAssetType assetType, string path) {
+        public void Remove(PostprocessorAssetType assetType, string path) {
             if (folders != null) {
                 var index = folders.FindIndex((x) => x.path == path && x.assetType == assetType);
                 if (index >= 0) {
@@ -48,18 +48,17 @@ namespace LinChunJie.AssetPostprocessor {
             }
         }
 
-        public string Get(AssetPostprocessorHelper.PostprocessorAssetType assetType, string path) {
-            if (folders != null) {
-                var index = folders.FindIndex((x) => x.path == path && x.assetType == assetType);
-                if (index >= 0) {
-                    return folders[index].guid;
-                }
+        public string Get(PostprocessorAssetType assetType, string path) {
+            var list = folders?.FindAll((x) => x.assetType == assetType && path.StartsWith(x.path));
+            if (list != null && list.Count > 0) {
+                list.Sort((lhs, rhs) => { return -lhs.path.Length.CompareTo(rhs.path.Length); });
+                return list[0].guid;
             }
 
             return string.Empty;
         }
 
-        public List<string> GetPaths(AssetPostprocessorHelper.PostprocessorAssetType assetType) {
+        public List<string> GetPaths(PostprocessorAssetType assetType) {
             var query = folders.FindAll((x) => x.assetType == assetType);
             List<string> paths = new List<string>();
             for (int i = 0; i < query.Count; i++) {
@@ -69,11 +68,26 @@ namespace LinChunJie.AssetPostprocessor {
             return paths;
         }
 
+        public bool ContainsOneOfFolders(PostprocessorAssetType assetType, List<string> folderPaths) {
+            if (folderPaths == null) {
+                return false;
+            }
+
+            var paths = GetPaths(assetType);
+            for (int i = 0; i < folderPaths.Count; i++) {
+                if (paths.Contains(folderPaths[i])) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public static void VerifyConfigs() {
             var so = GetSoAssetPostprocessorFolder();
             var folders = so.folders;
             var dirty = false;
-            Dictionary<AssetPostprocessorHelper.PostprocessorAssetType, string> defaultSoAssetPostprocessors = null;
+            Dictionary<PostprocessorAssetType, string> defaultSoAssetPostprocessors = null;
             List<AssetPostprocessorFolder> lostFolders = null;
             if (folders != null) {
                 foreach (var folder in folders) {
@@ -87,7 +101,7 @@ namespace LinChunJie.AssetPostprocessor {
                     var soPath = AssetDatabase.GUIDToAssetPath(folder.guid);
                     var soAssetPostprocessor = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessor>(soPath);
                     if (soAssetPostprocessor == null) {
-                        defaultSoAssetPostprocessors = defaultSoAssetPostprocessors ?? new Dictionary<AssetPostprocessorHelper.PostprocessorAssetType, string>();
+                        defaultSoAssetPostprocessors = defaultSoAssetPostprocessors ?? new Dictionary<PostprocessorAssetType, string>();
                         if (!defaultSoAssetPostprocessors.ContainsKey(folder.assetType)) {
                             var defaultSo = SoAssetPostprocessor.GetDefault(folder.assetType);
                             var assetPath = AssetDatabase.GetAssetPath(defaultSo);
@@ -138,7 +152,7 @@ namespace LinChunJie.AssetPostprocessor {
 
         [Serializable]
         class AssetPostprocessorFolder {
-            public AssetPostprocessorHelper.PostprocessorAssetType assetType;
+            public PostprocessorAssetType assetType;
             public string path;
             public string guid;
         }

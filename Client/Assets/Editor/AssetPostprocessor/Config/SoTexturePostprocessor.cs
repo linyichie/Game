@@ -9,8 +9,8 @@ using UnityEngine;
 
 namespace LinChunJie.AssetPostprocessor {
     public class SoTexturePostprocessor : SoTexturePostprocessorBase {
-        private static readonly string path = "Assets/Editor/AssetPostprocessor/Config/Sprite/New Postprocessor.asset";
-        private static readonly string defaultPath = "Assets/Editor/AssetPostprocessor/Config/Sprite/DefaultSoSpritePostprocessor.asset";
+        private static readonly string path = "Assets/Editor/AssetPostprocessor/Config/Texture/New Postprocessor.asset";
+        private static readonly string defaultPath = "Assets/Editor/AssetPostprocessor/Config/Texture/DefaultSoTexturePostprocessor.asset";
 
         [MenuItem("Tools/资源导入规范/Texture")]
         public static SoTexturePostprocessor Create() {

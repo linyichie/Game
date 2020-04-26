@@ -6,7 +6,7 @@ using UnityEngine;
 namespace LinChunJie.AssetPostprocessor {
     public class AssetPostprocessorSetTab {
         private IPostprocessorSetTab postprocessorSetTab;
-        private AssetPostprocessorHelper.PostprocessorAssetType assetType;
+        private PostprocessorAssetType assetType;
         private string soPostprocessorGuid = string.Empty;
 
         public void OnGUI(Rect pos) {
@@ -16,14 +16,14 @@ namespace LinChunJie.AssetPostprocessor {
             GUILayout.EndArea();
         }
 
-        public void SetPostprocessor(AssetPostprocessorHelper.PostprocessorAssetType assetType, string guid) {
+        public void SetPostprocessor(PostprocessorAssetType assetType, string guid) {
             if (this.assetType != assetType || soPostprocessorGuid != guid) {
                 this.assetType = assetType;
                 this.soPostprocessorGuid = guid;
                 switch (assetType) {
-                    case AssetPostprocessorHelper.PostprocessorAssetType.SpriteAtlas:
-                    case AssetPostprocessorHelper.PostprocessorAssetType.Sprite:
-                    case AssetPostprocessorHelper.PostprocessorAssetType.Texture:
+                    case PostprocessorAssetType.SpriteAtlas:
+                    case PostprocessorAssetType.Sprite:
+                    case PostprocessorAssetType.Texture:
                         if (!string.IsNullOrEmpty(guid)) {
                             postprocessorSetTab = new TextureBasePostprocessorTab();
                             postprocessorSetTab.Initialize(guid);

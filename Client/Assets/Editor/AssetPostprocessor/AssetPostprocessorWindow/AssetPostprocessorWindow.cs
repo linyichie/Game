@@ -37,14 +37,14 @@ namespace LinChunJie.AssetPostprocessor {
         private Rect horizontalLeftSplitterRect, horizontalRightSplitterRect, verticalSplitterRect;
         private Rect subRect;
 
-        private AssetPostprocessorHelper.PostprocessorAssetType selectAssetType = AssetPostprocessorHelper.PostprocessorAssetType.SpriteAtlas;
+        private PostprocessorAssetType selectAssetType = PostprocessorAssetType.SpriteAtlas;
 
         private AssetPostprocessorWindow() {
             toolBarRect = new Rect(20, splitterWidth, position.width, toolBarHeight);
             horizontalLeftSplitterPercent = 0.4f;
             horizontalRightSplitterPercent = 0.7f;
             verticalSplitterPercent = 0.5f;
-            assetTypeOptions = Enum.GetNames(typeof(AssetPostprocessorHelper.PostprocessorAssetType));
+            assetTypeOptions = Enum.GetNames(typeof(PostprocessorAssetType));
         }
 
         private void OnFocus() {
@@ -68,6 +68,7 @@ namespace LinChunJie.AssetPostprocessor {
             SoAssetPostprocessorFolder.VerifyConfigs();
             folderTab?.Refresh();
             configTab?.Refresh();
+            assetListTab?.Refresh();
         }
 
         private void OnGUI() {
@@ -77,7 +78,7 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         private void ShowToggle() {
-            selectAssetType = (AssetPostprocessorHelper.PostprocessorAssetType)GUI.Toolbar(toolBarRect, (int)selectAssetType, assetTypeOptions);
+            selectAssetType = (PostprocessorAssetType)GUI.Toolbar(toolBarRect, (int)selectAssetType, assetTypeOptions);
         }
 
         private void ShowSubTabs() {
@@ -86,7 +87,7 @@ namespace LinChunJie.AssetPostprocessor {
                 folderTab = folderTab ?? AssetPostprocessorFolderTab.Get(this);
                 configTab = configTab ?? AssetPostprocessorConfigTab.Get();
                 setTab = setTab ?? new AssetPostprocessorSetTab();
-                assetListTab = assetListTab ?? new AssetListTab();
+                assetListTab = assetListTab ?? AssetListTab.Get();
 
                 configTab.DeleteSoAssetPostprocessor += OnDeleteSoAssetPostprocessor;
             }
@@ -108,6 +109,7 @@ namespace LinChunJie.AssetPostprocessor {
             configTab.SetPostprocessorFolder(selectFolderPath);
             var selectGuid = configTab.GetSelectSoPostprocessorGuid();
             setTab.SetPostprocessor(selectAssetType, selectGuid);
+            assetListTab.SetFolder(selectAssetType, selectFolderPath);
 
             configTab.OnGUI(configTabRect);
             folderTab.OnGUI(assetFolderRect);
