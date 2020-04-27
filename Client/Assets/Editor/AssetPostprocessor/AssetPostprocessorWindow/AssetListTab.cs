@@ -1,21 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEditor.U2D;
 using UnityEngine;
-using UnityEngine.U2D;
+using Debug = UnityEngine.Debug;
 
 namespace LinChunJie.AssetPostprocessor {
     public class AssetListTab : TreeView {
-        private PostprocessorAssetType assetType = (PostprocessorAssetType) (-1);
+        private PostprocessorAssetType assetType = (PostprocessorAssetType)(-1);
         private string folder = string.Empty;
         private bool contextOnItem = false;
 
         private readonly SoAssetPostprocessorFolder postprocessorFolder;
-        private readonly List<string> paths = new List<string>();
         private readonly Texture2D warnIcon;
+        private readonly List<AssetListItem> listItems = new List<AssetListItem>();
+
+        private SoAssetPostprocessor soAssetPostprocessor;
 
         public static AssetListTab Get() {
             var treeView = new AssetListTab(new TreeViewState());
@@ -29,17 +33,14 @@ namespace LinChunJie.AssetPostprocessor {
             warnIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/AssetPostprocessor/Texture/Warn.png");
         }
 
+        public void OnLostFocus() { }
+
         protected override TreeViewItem BuildRoot() {
             var root = new TreeViewItem(-1, -1);
             root.children = new List<TreeViewItem>();
-            if (paths.Count > 0) {
-                var guid = postprocessorFolder.Get(this.assetType, this.folder);
-                var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                var so = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessor>(assetPath);
-                foreach (var path in paths) {
-                    var treeViewItem = AssetListItem.Get(this.assetType, path, 0, Path.GetFileNameWithoutExtension(path));
-                    treeViewItem.VerifyImporterSetting(so);
-                    root.AddChild(treeViewItem);
+            if(listItems.Count > 0) {
+                foreach(var item in listItems) {
+                    root.AddChild(item);
                 }
             }
 
@@ -55,9 +56,10 @@ namespace LinChunJie.AssetPostprocessor {
             var rect = args.rowRect;
             var item = args.item as AssetListItem;
             var iconRect = new Rect(rect.x + 1, rect.y + 1, rect.height - 2, rect.height - 2);
-            GUI.DrawTexture(iconRect, item.icon, ScaleMode.ScaleToFit);
+            //item.icon = item.icon ? item.icon : (AssetDatabase.GetCachedIcon(item.Path) as Texture2D);
+            //GUI.DrawTexture(iconRect, item.icon, ScaleMode.ScaleToFit);
             var labelRect = new Rect(rect.x + iconRect.xMax + 1, rect.y, rect.width - iconRect.width - 1, rect.height);
-            if (item.IsDirty) {
+            if(item.IsDirty) {
                 var warnRect = new Rect(rect.width - rect.height, rect.y + 1, rect.height - 2, rect.height - 2);
                 GUI.DrawTexture(warnRect, warnIcon, ScaleMode.ScaleToFit);
 
@@ -69,7 +71,7 @@ namespace LinChunJie.AssetPostprocessor {
 
         protected override void DoubleClickedItem(int id) {
             var item = FindItem(id, rootItem) as AssetListItem;
-            if (item != null) {
+            if(item != null) {
                 var o = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(item.Path);
                 EditorGUIUtility.PingObject(o);
                 Selection.activeObject = o;
@@ -77,7 +79,7 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         protected override void ContextClicked() {
-            if (contextOnItem) {
+            if(contextOnItem) {
                 contextOnItem = false;
                 return;
             }
@@ -88,25 +90,25 @@ namespace LinChunJie.AssetPostprocessor {
 
             var selectIds = GetSelection();
 
-            if (selectIds.Count > 0) {
+            if(selectIds.Count > 0) {
                 GenericMenu menu = new GenericMenu();
 
                 var isDirty = false;
-                for (int i = 0; i < selectIds.Count; i++) {
+                for(int i = 0; i < selectIds.Count; i++) {
                     var item = FindItem(selectIds[i], rootItem) as AssetListItem;
-                    if (item.IsDirty) {
+                    if(item.IsDirty) {
                         isDirty = true;
                         break;
                     }
                 }
 
-                if (isDirty) {
+                if(isDirty) {
                     menu.AddItem(new GUIContent("FixAndReimport"), false, OnFixAndReimport, selectIds);
                 } else {
                     menu.AddItem(new GUIContent("FixAndReimport"), false, null);
                 }
 
-                if (menu.GetItemCount() > 0) {
+                if(menu.GetItemCount() > 0) {
                     menu.ShowAsContext();
                 }
             }
@@ -114,42 +116,67 @@ namespace LinChunJie.AssetPostprocessor {
 
         private void OnFixAndReimport(object o) {
             var selectIds = o as IList<int>;
-            if (selectIds != null) {
-                var guid = postprocessorFolder.Get(this.assetType, this.folder);
-                var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                var so = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessor>(assetPath);
-                for (int i = 0; i < selectIds.Count; i++) {
+            if(selectIds != null) {
+                for(int i = 0; i < selectIds.Count; i++) {
                     var item = FindItem(selectIds[i], rootItem) as AssetListItem;
-                    item.FixAndReimport(so);
+                    item.FixAndReimport(soAssetPostprocessor);
                 }
+
                 AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
                 Repaint();
             }
         }
 
         public void SetFolder(PostprocessorAssetType assetType, string path) {
-            if (this.assetType != assetType || this.folder != path) {
+            if(this.assetType != assetType || this.folder != path) {
                 this.assetType = assetType;
                 this.folder = path;
+                var guid = postprocessorFolder.Get(this.assetType, this.folder);
+                var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                soAssetPostprocessor = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessor>(assetPath);
                 Refresh();
             }
         }
 
         public void Refresh() {
-            paths.Clear();
-            if (!string.IsNullOrEmpty(this.folder)) {
+            listItems.Clear();
+            if(!string.IsNullOrEmpty(this.folder)) {
                 var guids = AssetDatabase.FindAssets(Helper.GetAssetSearchFilterByAssetType(this.assetType), new string[] {
                     this.folder
                 });
-                if (guids != null) {
-                    List<string> directories = new List<string>();
-                    for (int i = 0; i < guids.Length; i++) {
-                        var path = AssetDatabase.GUIDToAssetPath(guids[i]);
-                        GetParentDirectories(this.folder, path, ref directories);
-                        if (directories.Count == 0 || !postprocessorFolder.ContainsOneOfFolders(this.assetType, directories)) {
-                            paths.Add(path);
+                if(guids != null) {
+                    var index = 0;
+                    var directories = new List<string>();
+                    List<Task> tasks = new List<Task>();
+                    var folders = postprocessorFolder.GetPaths(this.assetType);
+                    for(int i = 0; i < guids.Length; i++) {
+                        var path = AssetDatabase.GUIDToAssetPath(guids[index]);
+                        tasks.Add(new Task(guids[i], this.folder, this.assetType, folders));
+                    }
+
+                    foreach(var task in tasks) {
+                        ThreadPool.QueueUserWorkItem(x => { task.Begin(); });
+                    }
+
+                    var completeCount = 0;
+                    var taskTotal = tasks.Count;
+                    while(completeCount < taskTotal) {
+                        completeCount = 0;
+                        foreach(var task in tasks) {
+                            completeCount += task.IsDone ? 1 : 0;
+                        }
+                        EditorUtility.DisplayProgressBar("", StringUtility.Contact(completeCount, "/", taskTotal), completeCount / (float)taskTotal);
+                    }
+
+                    foreach(var task in tasks) {
+                        if(task.Item != null) {
+                            var item = task.Item;
+                            //item.VerifyImporterSetting(soAssetPostprocessor);
+                            listItems.Add(task.Item);
                         }
                     }
+
+                    EditorUtility.ClearProgressBar();
                 }
             }
 
@@ -157,28 +184,16 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         public void SoPostprocessorChanged(string guid) {
-            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-            var so = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessor>(assetPath);
-            for (int i = 0; i < rootItem.children.Count; i++) {
+            for(int i = 0; i < rootItem.children.Count; i++) {
                 var item = rootItem.children[i] as AssetListItem;
-                item.VerifyImporterSetting(so);
-            }
-        }
-
-        private void GetParentDirectories(string rootPath, string path, ref List<string> directories) {
-            directories.Clear();
-            path = Path.GetDirectoryName(path);
-            while (path.Length > rootPath.Length) {
-                path = path.Replace('\\', '/');
-                directories.Add(path);
-                path = path.Substring(0, path.LastIndexOf("/", StringComparison.Ordinal));
+                item.VerifyImporterSetting(soAssetPostprocessor);
             }
         }
 
         public bool IsAnyOfAssetDirty() {
-            for (int i = 0; i < rootItem.children.Count; i++) {
+            for(int i = 0; i < rootItem.children.Count; i++) {
                 var item = rootItem.children[i] as AssetListItem;
-                if (item.IsDirty) {
+                if(item.IsDirty) {
                     return true;
                 }
             }
@@ -187,203 +202,60 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         public void FixAllDirty() {
-            var guid = postprocessorFolder.Get(this.assetType, this.folder);
-            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-            var so = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessor>(assetPath);
-            for (int i = 0; i < rootItem.children.Count; i++) {
+            for(int i = 0; i < rootItem.children.Count; i++) {
                 var item = rootItem.children[i] as AssetListItem;
-                if (item.IsDirty) {
-                    item.FixAndReimport(so);
+                if(item.IsDirty) {
+                    item.FixAndReimport(soAssetPostprocessor);
                 }
             }
         }
-    }
 
-    public abstract class AssetListItem : TreeViewItem {
-        public readonly string Path;
-        public bool IsDirty { get; protected set; }
+        public class Task {
+            public bool IsDone = false;
+            public AssetListItem Item;
 
-        protected AssetListItem(string path, int depth, string displayName) : base(path.GetHashCode(), depth, displayName) {
-            this.Path = path;
-            icon = AssetDatabase.GetCachedIcon(path) as Texture2D;
-        }
+            private readonly string guid;
+            private readonly string path;
+            private readonly string folder;
+            private readonly List<string> folders;
+            private readonly PostprocessorAssetType assetType;
 
-        public abstract void VerifyImporterSetting(SoAssetPostprocessor so);
-
-        public abstract void FixAndReimport(SoAssetPostprocessor so);
-
-        public static AssetListItem Get(PostprocessorAssetType assetType, string path, int depth, string displayName) {
-            switch (assetType) {
-                case PostprocessorAssetType.SpriteAtlas:
-                    return new AssetListSpriteAtlasItem(path, depth, displayName);
-                case PostprocessorAssetType.Sprite:
-                    return new AssetListSpriteItem(path, depth, displayName);
-                case PostprocessorAssetType.Texture:
-                    return new AssetListTextureItem(path, depth, displayName);
-                case PostprocessorAssetType.Model:
-                    return new AssetListModelItem(path, depth, displayName);
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(assetType), assetType, null);
+            public Task(string guid, string folder, PostprocessorAssetType assetType, List<string> folders) {
+                this.guid = guid;
+                this.path = AssetDatabase.GUIDToAssetPath(this.guid);
+                this.folder = folder;
+                this.assetType = assetType;
+                this.folders = folders;
             }
 
-            return null;
-        }
-    }
+            private List<string> GetParentDirectories(string rootPath, string path) {
+                var directories = new List<string>();
+                path = Path.GetDirectoryName(path);
+                while(path.Length > rootPath.Length) {
+                    path = path.Replace('\\', '/');
+                    directories.Add(path);
+                    path = path.Substring(0, path.LastIndexOf("/", StringComparison.Ordinal));
+                }
 
-    public class AssetListTextureBaseItem : AssetListItem {
-        protected AssetListTextureBaseItem(string path, int depth, string displayName) : base(path, depth, displayName) {
-        }
-
-        public override void VerifyImporterSetting(SoAssetPostprocessor so) {
-            IsDirty = false;
-
-            var texturePostprocessorBase = so as SoTexturePostprocessorBase;
-            var importer = AssetImporter.GetAtPath(Path) as TextureImporter;
-
-            var soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformStandalone);
-            var texturePlatformSettings = importer.GetPlatformTextureSettings(Helper.PlatformStandalone);
-            if (!CompareTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings)) {
-                IsDirty = true;
+                return directories;
             }
 
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformAndroid);
-            texturePlatformSettings = importer.GetPlatformTextureSettings(Helper.PlatformAndroid);
-            if (!CompareTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings)) {
-                IsDirty = true;
+            public void Begin() {
+                var directories = GetParentDirectories(folder, path);
+                var contains = false;
+                for(int i = 0; i < directories.Count; i++) {
+                    if(folders.Contains(directories[i])) {
+                        contains = true;
+                        break;
+                    }
+                }
+
+                if(directories.Count == 0 || !contains) {
+                    Item = AssetListItem.Get(assetType, path, 0, Path.GetFileNameWithoutExtension(path));
+                }
+
+                IsDone = true;
             }
-
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformIPhone);
-            texturePlatformSettings = importer.GetPlatformTextureSettings(Helper.PlatformIPhone);
-            if (!CompareTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings)) {
-                IsDirty = true;
-            }
-        }
-
-        public override void FixAndReimport(SoAssetPostprocessor so) {
-            var texturePostprocessorBase = so as SoTexturePostprocessorBase;
-            var importer = AssetImporter.GetAtPath(Path) as TextureImporter;
-
-            var soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformStandalone);
-            var texturePlatformSettings = importer.GetPlatformTextureSettings(Helper.PlatformStandalone);
-            SetTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings);
-            importer.SetPlatformTextureSettings(texturePlatformSettings);
-
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformAndroid);
-            texturePlatformSettings = importer.GetPlatformTextureSettings(Helper.PlatformAndroid);
-            SetTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings);
-            importer.SetPlatformTextureSettings(texturePlatformSettings);
-
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformIPhone);
-            texturePlatformSettings = importer.GetPlatformTextureSettings(Helper.PlatformIPhone);
-            SetTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings);
-            importer.SetPlatformTextureSettings(texturePlatformSettings);
-
-            importer.SaveAndReimport();
-            // -- Todo 更新对应 Inspector 显示
-            VerifyImporterSetting(so);
-        }
-
-        private void SetTexturePlatformSetting(TexturePlatformSettings so, TextureImporterPlatformSettings texturePlatformSettings) {
-            texturePlatformSettings.format = (TextureImporterFormat) so.format;
-            texturePlatformSettings.maxTextureSize = so.maxTextureSize;
-            texturePlatformSettings.compressionQuality = (int) so.compressionQuality;
-        }
-
-        private bool CompareTexturePlatformSetting(TexturePlatformSettings so, TextureImporterPlatformSettings texturePlatformSettings) {
-            if ((int) so.format != (int) texturePlatformSettings.format || (int) so.compressionQuality != texturePlatformSettings.compressionQuality || so.maxTextureSize != texturePlatformSettings.maxTextureSize) {
-                return false;
-            }
-
-            return true;
-        }
-    }
-
-    public class AssetListSpriteAtlasItem : AssetListItem {
-        public AssetListSpriteAtlasItem(string path, int depth, string displayName) : base(path, depth, displayName) {
-        }
-
-        public override void VerifyImporterSetting(SoAssetPostprocessor so) {
-            IsDirty = false;
-
-            var texturePostprocessorBase = so as SoTexturePostprocessorBase;
-            var spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(Path);
-
-            var soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformStandalone);
-            var texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformStandalone);
-            if (!CompareTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings)) {
-                IsDirty = true;
-            }
-
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformAndroid);
-            texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformAndroid);
-            if (!CompareTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings)) {
-                IsDirty = true;
-            }
-
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformIPhone);
-            texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformIPhone);
-            if (!CompareTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings)) {
-                IsDirty = true;
-            }
-        }
-
-        public override void FixAndReimport(SoAssetPostprocessor so) {
-            var texturePostprocessorBase = so as SoTexturePostprocessorBase;
-            var spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(Path);
-
-            var soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformStandalone);
-            var texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformStandalone);
-            SetTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings);
-            spriteAtlas.SetPlatformSettings(texturePlatformSettings);
-
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformAndroid);
-            texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformAndroid);
-            SetTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings);
-            spriteAtlas.SetPlatformSettings(texturePlatformSettings);
-
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformIPhone);
-            texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformIPhone);
-            SetTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings);
-            spriteAtlas.SetPlatformSettings(texturePlatformSettings);
-
-            EditorUtility.SetDirty(spriteAtlas);
-            AssetDatabase.SaveAssets();
-            VerifyImporterSetting(so);
-        }
-
-        private void SetTexturePlatformSetting(TexturePlatformSettings so, TextureImporterPlatformSettings texturePlatformSettings) {
-            texturePlatformSettings.format = (TextureImporterFormat) so.format;
-            texturePlatformSettings.maxTextureSize = so.maxTextureSize;
-            texturePlatformSettings.compressionQuality = (int) so.compressionQuality;
-        }
-
-        private bool CompareTexturePlatformSetting(TexturePlatformSettings so, TextureImporterPlatformSettings texturePlatformSettings) {
-            var same = true;
-            same &= so.format == (int) texturePlatformSettings.format;
-            same &= (int) so.compressionQuality == texturePlatformSettings.compressionQuality;
-            same &= so.maxTextureSize == texturePlatformSettings.maxTextureSize;
-            return same;
-        }
-    }
-
-    public class AssetListSpriteItem : AssetListTextureBaseItem {
-        public AssetListSpriteItem(string path, int depth, string displayName) : base(path, depth, displayName) {
-        }
-    }
-
-    public class AssetListTextureItem : AssetListTextureBaseItem {
-        public AssetListTextureItem(string path, int depth, string displayName) : base(path, depth, displayName) {
-        }
-    }
-
-    public class AssetListModelItem : AssetListItem {
-        public AssetListModelItem(string path, int depth, string displayName) : base(path, depth, displayName) {
-        }
-
-        public override void VerifyImporterSetting(SoAssetPostprocessor so) {
-        }
-
-        public override void FixAndReimport(SoAssetPostprocessor so) {
         }
     }
 }

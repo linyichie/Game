@@ -68,21 +68,6 @@ namespace LinChunJie.AssetPostprocessor {
             return paths;
         }
 
-        public bool ContainsOneOfFolders(PostprocessorAssetType assetType, List<string> folderPaths) {
-            if(folderPaths == null) {
-                return false;
-            }
-
-            var paths = GetPaths(assetType);
-            for(int i = 0; i < folderPaths.Count; i++) {
-                if(paths.Contains(folderPaths[i])) {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
         public static void VerifyConfigs() {
             var so = GetSoAssetPostprocessorFolder();
             var folders = so.folders;

@@ -7,6 +7,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace LinChunJie.AssetPostprocessor {
+    [DisallowMultipleComponent]
     public class AssetPostprocessorWindow : EditorWindow {
         [MenuItem("Tools/资源导入工具")]
         private static void Open() {
@@ -51,6 +52,10 @@ namespace LinChunJie.AssetPostprocessor {
             Refresh();
         }
 
+        private void OnLostFocus() {
+            assetListTab?.OnLostFocus();
+        }
+
         private void OnEnable() {
             fixIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/AssetPostprocessor/Texture/Fix.png");
             subRect = GetSubWindowArea();
@@ -73,7 +78,6 @@ namespace LinChunJie.AssetPostprocessor {
             SoAssetPostprocessorFolder.VerifyConfigs();
             folderTab?.Refresh();
             configTab?.Refresh();
-            assetListTab?.Refresh();
         }
 
         private void OnGUI() {
