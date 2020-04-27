@@ -52,10 +52,6 @@ namespace LinChunJie.AssetPostprocessor {
             Refresh();
         }
 
-        private void OnLostFocus() {
-            assetListTab?.OnLostFocus();
-        }
-
         private void OnEnable() {
             fixIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/AssetPostprocessor/Texture/Fix.png");
             subRect = GetSubWindowArea();
@@ -65,11 +61,12 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         private void OnDestroy() {
-            if (configTab != null) {
+            if(configTab != null) {
                 configTab.DeleteSoAssetPostprocessor -= OnDeleteSoAssetPostprocessor;
+                configTab.OnChanged -= OnSoPostprocessorChanged;
             }
 
-            if (setTab != null) {
+            if(setTab != null) {
                 setTab.OnChanged -= OnSoPostprocessorChanged;
             }
         }
@@ -78,6 +75,7 @@ namespace LinChunJie.AssetPostprocessor {
             SoAssetPostprocessorFolder.VerifyConfigs();
             folderTab?.Refresh();
             configTab?.Refresh();
+            assetListTab?.Refresh();
         }
 
         private void OnGUI() {
@@ -87,19 +85,16 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         private void ShowToolbar() {
-            toolbarRect = new Rect(20, splitterWidth, position.width, toolBarHeight);
-            GUILayout.BeginArea(toolbarRect);
-            GUILayout.BeginHorizontal();
-            selectAssetType = (PostprocessorAssetType) GUILayout.Toolbar((int) selectAssetType, assetTypeOptions, GUILayout.Width(assetTypeOptions.Length * 80));
-            ShowFixTool();
-            GUILayout.EndHorizontal();
-            GUILayout.EndArea();
+            toolbarRect = new Rect(20, splitterWidth, 80 * assetTypeOptions.Length, toolBarHeight);
+            selectAssetType = (PostprocessorAssetType)GUI.Toolbar(toolbarRect, (int)selectAssetType, assetTypeOptions);
+            ShowFixTool(toolbarRect);
         }
 
-        private void ShowFixTool() {
+        private void ShowFixTool(Rect rect) {
             var isDirty = assetListTab?.IsAnyOfAssetDirty();
-            if (isDirty.HasValue && isDirty.Value) {
-                if (GUILayout.Button(fixIcon, GUILayout.Height(toolBarHeight), GUILayout.Width(fixIcon.width))) {
+            var buttonRect = new Rect(rect.xMax + splitterWidth, splitterWidth, fixIcon.width, toolBarHeight);
+            if(isDirty.HasValue && isDirty.Value) {
+                if(GUI.Button(buttonRect, fixIcon)) {
                     assetListTab.FixAllDirty();
                 }
             }
@@ -107,13 +102,14 @@ namespace LinChunJie.AssetPostprocessor {
 
         private void ShowSubTabs() {
             subRect = GetSubWindowArea();
-            if (configTab == null) {
+            if(configTab == null) {
                 folderTab = folderTab ?? AssetPostprocessorFolderTab.Get(this);
                 configTab = configTab ?? AssetPostprocessorConfigTab.Get();
                 setTab = setTab ?? new AssetPostprocessorSetTab();
                 assetListTab = assetListTab ?? AssetListTab.Get();
 
                 configTab.DeleteSoAssetPostprocessor += OnDeleteSoAssetPostprocessor;
+                configTab.OnChanged += OnSoPostprocessorChanged;
                 setTab.OnChanged += OnSoPostprocessorChanged;
             }
 
@@ -151,69 +147,69 @@ namespace LinChunJie.AssetPostprocessor {
             var defaultSo = SoAssetPostprocessor.GetDefault(selectAssetType);
             var defaultGuid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(defaultSo));
             var paths = so.GetPaths(selectAssetType);
-            for (int i = 0; i < paths.Count; i++) {
+            for(int i = 0; i < paths.Count; i++) {
                 var path = paths[i];
                 var guid = so.Get(selectAssetType, path);
-                if (guid == deleteGuid) {
+                if(guid == deleteGuid) {
                     so.Set(selectAssetType, path, defaultGuid);
                 }
             }
         }
 
         private void HandleHorizontalResize() {
-            horizontalLeftSplitterRect.x = (int) (subRect.x + subRect.width * horizontalLeftSplitterPercent);
-            horizontalRightSplitterRect.x = (int) (subRect.x + subRect.width * horizontalRightSplitterPercent - splitterWidth);
+            horizontalLeftSplitterRect.x = (int)(subRect.x + subRect.width * horizontalLeftSplitterPercent);
+            horizontalRightSplitterRect.x = (int)(subRect.x + subRect.width * horizontalRightSplitterPercent - splitterWidth);
 
             EditorGUIUtility.AddCursorRect(horizontalLeftSplitterRect, MouseCursor.ResizeHorizontal);
-            if (Event.current.type == EventType.MouseDown && horizontalLeftSplitterRect.Contains(Event.current.mousePosition)) {
+            if(Event.current.type == EventType.MouseDown && horizontalLeftSplitterRect.Contains(Event.current.mousePosition)) {
                 resizingHorizontalLeftSplitter = true;
             }
 
             EditorGUIUtility.AddCursorRect(horizontalRightSplitterRect, MouseCursor.ResizeHorizontal);
-            if (Event.current.type == EventType.MouseDown && horizontalRightSplitterRect.Contains(Event.current.mousePosition)) {
+            if(Event.current.type == EventType.MouseDown && horizontalRightSplitterRect.Contains(Event.current.mousePosition)) {
                 resizingHorizontalRightSplitter = true;
             }
 
-            if (resizingHorizontalLeftSplitter) {
+            if(resizingHorizontalLeftSplitter) {
                 horizontalLeftSplitterPercent = Mathf.Clamp(Event.current.mousePosition.x / subRect.width, 0.1f, horizontalRightSplitterPercent - 0.1f);
-                horizontalLeftSplitterRect.x = (int) (subRect.x + subRect.width * horizontalLeftSplitterPercent);
+                horizontalLeftSplitterRect.x = (int)(subRect.x + subRect.width * horizontalLeftSplitterPercent);
             }
 
-            if (resizingHorizontalRightSplitter) {
+            if(resizingHorizontalRightSplitter) {
                 horizontalRightSplitterPercent = Mathf.Clamp(Event.current.mousePosition.x / subRect.width, horizontalLeftSplitterPercent + 0.1f, 0.9f);
-                horizontalRightSplitterRect.x = (int) (subRect.x + subRect.width * horizontalRightSplitterPercent - splitterWidth);
+                horizontalRightSplitterRect.x = (int)(subRect.x + subRect.width * horizontalRightSplitterPercent - splitterWidth);
             }
 
-            if (resizingHorizontalLeftSplitter || resizingHorizontalRightSplitter) {
+            if(resizingHorizontalLeftSplitter || resizingHorizontalRightSplitter) {
                 Repaint();
             }
 
-            if (Event.current.type == EventType.MouseUp) {
+            if(Event.current.type == EventType.MouseUp) {
                 resizingHorizontalLeftSplitter = false;
                 resizingHorizontalRightSplitter = false;
             }
         }
 
         private void HandleVerticalResize() {
-            verticalSplitterRect.x = (int) (subRect.x + subRect.width * horizontalLeftSplitterPercent + splitterWidth);
-            verticalSplitterRect.y = (int) (subRect.y + subRect.height * verticalSplitterPercent);
-            verticalSplitterRect.width = (int) (horizontalRightSplitterRect.x - horizontalLeftSplitterRect.x - splitterWidth);
+            verticalSplitterRect.x = (int)(subRect.x + subRect.width * horizontalLeftSplitterPercent + splitterWidth);
+            verticalSplitterRect.y = (int)(subRect.y + subRect.height * verticalSplitterPercent);
+            verticalSplitterRect.width = (int)(horizontalRightSplitterRect.x - horizontalLeftSplitterRect.x - splitterWidth);
 
             EditorGUIUtility.AddCursorRect(verticalSplitterRect, MouseCursor.ResizeVertical);
-            if (Event.current.type == EventType.MouseDown && verticalSplitterRect.Contains(Event.current.mousePosition)) {
+            if(Event.current.type == EventType.MouseDown && verticalSplitterRect.Contains(Event.current.mousePosition)) {
                 resizingVerticalSplitter = true;
             }
 
-            if (resizingVerticalSplitter) {
+            if(resizingVerticalSplitter) {
                 verticalSplitterPercent = Mathf.Clamp((Event.current.mousePosition.y - subRect.y) / subRect.height, 0.25f, 0.75f);
-                verticalSplitterRect.y = (int) (subRect.y + subRect.height * verticalSplitterPercent);
+                verticalSplitterRect.y = (int)(subRect.y + subRect.height * verticalSplitterPercent);
             }
 
-            if (resizingVerticalSplitter) {
+            if(resizingVerticalSplitter) {
                 Repaint();
             }
 
-            if (Event.current.type == EventType.MouseUp) {
+            if(Event.current.type == EventType.MouseUp) {
                 resizingVerticalSplitter = false;
             }
         }

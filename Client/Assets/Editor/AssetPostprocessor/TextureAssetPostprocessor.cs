@@ -9,20 +9,20 @@ using UnityEngine;
 namespace LinChunJie.AssetPostprocessor {
     public static class TextureAssetPostprocessor {
         public static void OnPostprocessTexture(TextureImporter importer) {
-            var assetType = (PostprocessorAssetType) (-1);
-            if (importer.assetPath.Contains("Sprite")) {
+            var assetType = (PostprocessorAssetType)(-1);
+            if(importer.assetPath.Contains("Sprite")) {
                 assetType = PostprocessorAssetType.Sprite;
-            } else if (importer.assetPath.Contains("Texture")) {
+            } else if(importer.assetPath.Contains("Texture")) {
                 assetType = PostprocessorAssetType.Texture;
             }
 
-            if (assetType != PostprocessorAssetType.Sprite && assetType != PostprocessorAssetType.Texture) {
+            if(assetType != PostprocessorAssetType.Sprite && assetType != PostprocessorAssetType.Texture) {
                 return;
             }
 
             var postprocessorFolder = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();
             var guid = postprocessorFolder.Get(assetType, importer.assetPath);
-            if (string.IsNullOrEmpty(guid)) {
+            if(string.IsNullOrEmpty(guid)) {
                 return;
             }
 
@@ -46,15 +46,15 @@ namespace LinChunJie.AssetPostprocessor {
         static void SetPlatformSettings(TextureImporter importer, PostprocessorAssetType assetType, string guid) {
             var path = AssetDatabase.GUIDToAssetPath(guid);
             SoTexturePostprocessorBase soPostprocessor = null;
-            if (!string.IsNullOrEmpty(path)) {
+            if(!string.IsNullOrEmpty(path)) {
                 soPostprocessor = AssetDatabase.LoadAssetAtPath<SoTexturePostprocessorBase>(path);
             }
 
-            if (soPostprocessor == null) {
+            if(soPostprocessor == null) {
                 soPostprocessor = SoAssetPostprocessor.GetDefault(assetType) as SoTexturePostprocessorBase;
             }
 
-            if (soPostprocessor != null) {
+            if(soPostprocessor != null) {
                 SetPlatformSettings(Helper.PlatformStandalone, importer, soPostprocessor);
                 SetPlatformSettings(Helper.PlatformIPhone, importer, soPostprocessor);
                 SetPlatformSettings(Helper.PlatformAndroid, importer, soPostprocessor);
@@ -64,11 +64,11 @@ namespace LinChunJie.AssetPostprocessor {
         static void SetPlatformSettings(string platform, TextureImporter importer, SoTexturePostprocessorBase soPostprocessor) {
             var soPlatformSettings = soPostprocessor.GetPlatformSettings(platform);
             var platformSettings = importer.GetPlatformTextureSettings(platform);
-            platformSettings.overridden = true;
-            platformSettings.format = (TextureImporterFormat) soPlatformSettings.format;
-            platformSettings.maxTextureSize = soPlatformSettings.maxTextureSize;
-            if (platform != Helper.PlatformStandalone) {
-                platformSettings.compressionQuality = (int) soPlatformSettings.compressionQuality;
+            platformSettings.overridden = soPlatformSettings.overridden;
+            if(soPlatformSettings.overridden) {
+                platformSettings.format = (TextureImporterFormat)soPlatformSettings.format;
+                platformSettings.maxTextureSize = soPlatformSettings.maxTextureSize;
+                platformSettings.compressionQuality = (int)soPlatformSettings.compressionQuality;
             }
 
             importer.SetPlatformTextureSettings(platformSettings);

@@ -35,6 +35,7 @@ namespace LinChunJie.AssetPostprocessor {
     [Serializable]
     public class TexturePlatformSettings {
         public string platform;
+        public bool overridden = true;
         public int maxTextureSize = 2048;
         public int format = (int) TextureImporterFormat.Automatic;
         public UnityEditor.TextureCompressionQuality compressionQuality = UnityEditor.TextureCompressionQuality.Normal;

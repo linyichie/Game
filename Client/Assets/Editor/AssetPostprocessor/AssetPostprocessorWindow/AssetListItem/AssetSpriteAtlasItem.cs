@@ -15,21 +15,15 @@ namespace LinChunJie.AssetPostprocessor {
             var texturePostprocessorBase = so as SoTexturePostprocessorBase;
             var spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(Path);
 
-            var soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformStandalone);
-            var texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformStandalone);
-            if(!CompareTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings)) {
+            if(!CompareTexturePlatformSetting(Helper.PlatformStandalone, texturePostprocessorBase, spriteAtlas)) {
                 IsDirty = true;
             }
 
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformAndroid);
-            texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformAndroid);
-            if(!CompareTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings)) {
+            if(!CompareTexturePlatformSetting(Helper.PlatformAndroid, texturePostprocessorBase, spriteAtlas)) {
                 IsDirty = true;
             }
 
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformIPhone);
-            texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformIPhone);
-            if(!CompareTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings)) {
+            if(!CompareTexturePlatformSetting(Helper.PlatformIPhone, texturePostprocessorBase, spriteAtlas)) {
                 IsDirty = true;
             }
         }
@@ -37,38 +31,34 @@ namespace LinChunJie.AssetPostprocessor {
         public override void FixAndReimport(SoAssetPostprocessor so) {
             var texturePostprocessorBase = so as SoTexturePostprocessorBase;
             var spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(Path);
-
-            var soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformStandalone);
-            var texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformStandalone);
-            SetTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings);
-            spriteAtlas.SetPlatformSettings(texturePlatformSettings);
-
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformAndroid);
-            texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformAndroid);
-            SetTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings);
-            spriteAtlas.SetPlatformSettings(texturePlatformSettings);
-
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformIPhone);
-            texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformIPhone);
-            SetTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings);
-            spriteAtlas.SetPlatformSettings(texturePlatformSettings);
-
+            
+            SetTexturePlatformSetting(Helper.PlatformStandalone, texturePostprocessorBase, spriteAtlas);
+            SetTexturePlatformSetting(Helper.PlatformAndroid, texturePostprocessorBase, spriteAtlas);
+            SetTexturePlatformSetting(Helper.PlatformIPhone, texturePostprocessorBase, spriteAtlas);
+            
             EditorUtility.SetDirty(spriteAtlas);
-            AssetDatabase.SaveAssets();
-            VerifyImporterSetting(so);
         }
 
-        private void SetTexturePlatformSetting(TexturePlatformSettings so, TextureImporterPlatformSettings texturePlatformSettings) {
+        private void SetTexturePlatformSetting(string platform, SoTexturePostprocessorBase texturePostprocessorBase, SpriteAtlas spriteAtlas) {
+            var so = texturePostprocessorBase.GetPlatformSettings(platform);
+            var texturePlatformSettings = spriteAtlas.GetPlatformSettings(platform);
+            texturePlatformSettings.overridden = so.overridden;
             texturePlatformSettings.format = (TextureImporterFormat)so.format;
             texturePlatformSettings.maxTextureSize = so.maxTextureSize;
             texturePlatformSettings.compressionQuality = (int)so.compressionQuality;
+            spriteAtlas.SetPlatformSettings(texturePlatformSettings);
         }
 
-        private bool CompareTexturePlatformSetting(TexturePlatformSettings so, TextureImporterPlatformSettings texturePlatformSettings) {
+        private bool CompareTexturePlatformSetting(string platform, SoTexturePostprocessorBase texturePostprocessorBase, SpriteAtlas spriteAtlas) {
+            var so = texturePostprocessorBase.GetPlatformSettings(platform);
+            var texturePlatformSettings = spriteAtlas.GetPlatformSettings(platform);
             var same = true;
-            same &= so.format == (int)texturePlatformSettings.format;
-            same &= (int)so.compressionQuality == texturePlatformSettings.compressionQuality;
-            same &= so.maxTextureSize == texturePlatformSettings.maxTextureSize;
+            same &= so.overridden == texturePlatformSettings.overridden;
+            if(so.overridden && texturePlatformSettings.overridden) {
+                same &= so.format == (int)texturePlatformSettings.format;
+                same &= (int)so.compressionQuality == texturePlatformSettings.compressionQuality;
+                same &= so.maxTextureSize == texturePlatformSettings.maxTextureSize;
+            }
             return same;
         }
     }

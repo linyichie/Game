@@ -13,11 +13,10 @@ namespace LinChunJie.AssetPostprocessor {
     public class AssetListTab : TreeView {
         private PostprocessorAssetType assetType = (PostprocessorAssetType)(-1);
         private string folder = string.Empty;
-        private bool contextOnItem = false;
 
         private readonly SoAssetPostprocessorFolder postprocessorFolder;
         private readonly Texture2D warnIcon;
-        private readonly List<AssetListItem> listItems = new List<AssetListItem>();
+        private readonly List<AssetListItem> treeViewItems = new List<AssetListItem>();
 
         private SoAssetPostprocessor soAssetPostprocessor;
 
@@ -33,13 +32,11 @@ namespace LinChunJie.AssetPostprocessor {
             warnIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/AssetPostprocessor/Texture/Warn.png");
         }
 
-        public void OnLostFocus() { }
-
         protected override TreeViewItem BuildRoot() {
             var root = new TreeViewItem(-1, -1);
             root.children = new List<TreeViewItem>();
-            if(listItems.Count > 0) {
-                foreach(var item in listItems) {
+            if(treeViewItems.Count > 0) {
+                foreach(var item in treeViewItems) {
                     root.AddChild(item);
                 }
             }
@@ -56,8 +53,8 @@ namespace LinChunJie.AssetPostprocessor {
             var rect = args.rowRect;
             var item = args.item as AssetListItem;
             var iconRect = new Rect(rect.x + 1, rect.y + 1, rect.height - 2, rect.height - 2);
-            //item.icon = item.icon ? item.icon : (AssetDatabase.GetCachedIcon(item.Path) as Texture2D);
-            //GUI.DrawTexture(iconRect, item.icon, ScaleMode.ScaleToFit);
+            item.icon = item.icon ? item.icon : (AssetDatabase.GetCachedIcon(item.Path) as Texture2D);
+            GUI.DrawTexture(iconRect, item.icon, ScaleMode.ScaleToFit);
             var labelRect = new Rect(rect.x + iconRect.xMax + 1, rect.y, rect.width - iconRect.width - 1, rect.height);
             if(item.IsDirty) {
                 var warnRect = new Rect(rect.width - rect.height, rect.y + 1, rect.height - 2, rect.height - 2);
@@ -78,16 +75,7 @@ namespace LinChunJie.AssetPostprocessor {
             }
         }
 
-        protected override void ContextClicked() {
-            if(contextOnItem) {
-                contextOnItem = false;
-                return;
-            }
-        }
-
         protected override void ContextClickedItem(int id) {
-            contextOnItem = true;
-
             var selectIds = GetSelection();
 
             if(selectIds.Count > 0) {
@@ -117,13 +105,15 @@ namespace LinChunJie.AssetPostprocessor {
         private void OnFixAndReimport(object o) {
             var selectIds = o as IList<int>;
             if(selectIds != null) {
+                List<AssetListItem> dirtyItems = new List<AssetListItem>();
                 for(int i = 0; i < selectIds.Count; i++) {
                     var item = FindItem(selectIds[i], rootItem) as AssetListItem;
-                    item.FixAndReimport(soAssetPostprocessor);
+                    if(item.IsDirty) {
+                        dirtyItems.Add(item);
+                    }
                 }
-
-                AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
-                Repaint();
+                Selection.activeObject = null;
+                FixDelay(dirtyItems);
             }
         }
 
@@ -139,19 +129,18 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         public void Refresh() {
-            listItems.Clear();
+            treeViewItems.Clear();
             if(!string.IsNullOrEmpty(this.folder)) {
-                var guids = AssetDatabase.FindAssets(Helper.GetAssetSearchFilterByAssetType(this.assetType), new string[] {
+                var assetGuids = AssetDatabase.FindAssets(Helper.GetAssetSearchFilterByAssetType(this.assetType), new string[] {
                     this.folder
                 });
-                if(guids != null) {
+                if(assetGuids != null) {
                     var index = 0;
                     var directories = new List<string>();
                     List<Task> tasks = new List<Task>();
                     var folders = postprocessorFolder.GetPaths(this.assetType);
-                    for(int i = 0; i < guids.Length; i++) {
-                        var path = AssetDatabase.GUIDToAssetPath(guids[index]);
-                        tasks.Add(new Task(guids[i], this.folder, this.assetType, folders));
+                    for(int i = 0; i < assetGuids.Length; i++) {
+                        tasks.Add(new Task(assetGuids[i], this.folder, this.assetType, folders));
                     }
 
                     foreach(var task in tasks) {
@@ -165,18 +154,15 @@ namespace LinChunJie.AssetPostprocessor {
                         foreach(var task in tasks) {
                             completeCount += task.IsDone ? 1 : 0;
                         }
-                        EditorUtility.DisplayProgressBar("", StringUtility.Contact(completeCount, "/", taskTotal), completeCount / (float)taskTotal);
                     }
 
                     foreach(var task in tasks) {
                         if(task.Item != null) {
                             var item = task.Item;
-                            //item.VerifyImporterSetting(soAssetPostprocessor);
-                            listItems.Add(task.Item);
+                            item.VerifyImporterSetting(soAssetPostprocessor);
+                            treeViewItems.Add(task.Item);
                         }
                     }
-
-                    EditorUtility.ClearProgressBar();
                 }
             }
 
@@ -184,6 +170,8 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         public void SoPostprocessorChanged(string guid) {
+            var assetPath = AssetDatabase.GUIDToAssetPath(guid);
+            soAssetPostprocessor = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessor>(assetPath);
             for(int i = 0; i < rootItem.children.Count; i++) {
                 var item = rootItem.children[i] as AssetListItem;
                 item.VerifyImporterSetting(soAssetPostprocessor);
@@ -202,12 +190,33 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         public void FixAllDirty() {
+            List<AssetListItem> dirtyItems = new List<AssetListItem>();
             for(int i = 0; i < rootItem.children.Count; i++) {
                 var item = rootItem.children[i] as AssetListItem;
                 if(item.IsDirty) {
-                    item.FixAndReimport(soAssetPostprocessor);
+                    dirtyItems.Add(item);
                 }
             }
+            Selection.activeObject = null;
+            FixDelay(dirtyItems);
+        }
+
+        private async System.Threading.Tasks.Task FixDelay(List<AssetListItem> items) {
+            await System.Threading.Tasks.Task.Delay(1);
+            var index = 0;
+            EditorApplication.update = () => {
+                var item = items[index];
+                var isCancel = EditorUtility.DisplayCancelableProgressBar("Fix...", StringUtility.Contact(index, "/", items.Count), index / (float)items.Count);
+                if(item.IsDirty) {
+                    item.FixAndReimport(soAssetPostprocessor);
+                }
+                index++;
+                if(isCancel || index >= items.Count) {
+                    EditorApplication.update = null;
+                    EditorUtility.ClearProgressBar();
+                    AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+                }
+            };
         }
 
         public class Task {

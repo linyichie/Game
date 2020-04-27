@@ -11,15 +11,16 @@ using Object = System.Object;
 namespace LinChunJie.AssetPostprocessor {
     public class AssetPostprocessorConfigTab : TreeView {
         private readonly List<string> paths = new List<string>();
-        private PostprocessorAssetType assetType = (PostprocessorAssetType) (-1);
         private readonly SoAssetPostprocessorFolder soAssetPostprocessorFolder;
+        
+        private PostprocessorAssetType assetType = (PostprocessorAssetType) (-1);
         private Styles styles;
         private string folderPath;
         private string postprocessorConfigGuid = string.Empty;
         private bool contextOnItem = false;
 
-        public event Action SelectChanged;
         public event Action<string> DeleteSoAssetPostprocessor;
+        public event Action<string> OnChanged;
 
         class Styles {
             public readonly Texture checkIcon;
@@ -116,14 +117,16 @@ namespace LinChunJie.AssetPostprocessor {
 
             if (selectIds.Count > 0) {
                 GenericMenu menu = new GenericMenu();
-
-                if (!string.IsNullOrEmpty(postprocessorConfigGuid)) {
-                    menu.AddItem(new GUIContent("Set as Config"), false, OnUseConfig, selectIds);
-                }
-
                 menu.AddItem(new GUIContent("Duplicate"), false, OnDuplicate, selectIds);
 
                 var item = FindItem(selectIds[0], rootItem) as AssetPostprocessorConfigItem;
+                if (!string.IsNullOrEmpty(postprocessorConfigGuid)) {
+                    if(item.Guid == postprocessorConfigGuid) {
+                        menu.AddItem(new GUIContent("Set as Config"), false, null);
+                    } else {
+                        menu.AddItem(new GUIContent("Set as Config"), false, OnChangeConfig, selectIds);
+                    }
+                }
                 if (!item.IsDefault) {
                     menu.AddItem(new GUIContent("Delete"), false, OnDeleteConfig, selectIds);
                     menu.AddItem(new GUIContent("Rename"), false, OnRename, selectIds);
@@ -179,12 +182,6 @@ namespace LinChunJie.AssetPostprocessor {
             }
         }
 
-        protected override void SelectionChanged(IList<int> selectedIds) {
-            if (selectedIds != null && selectedIds.Count > 0) {
-                SelectChanged?.Invoke();
-            }
-        }
-
         private void OnDuplicate(object o) {
             var selectIds = o as IList<int>;
             if (selectIds != null && selectIds.Count == 1) {
@@ -216,12 +213,13 @@ namespace LinChunJie.AssetPostprocessor {
             }
         }
 
-        private void OnUseConfig(object o) {
+        private void OnChangeConfig(object o) {
             var selectIds = o as IList<int>;
             if (selectIds != null && selectIds.Count == 1) {
                 var item = FindItem(selectIds[0], rootItem) as AssetPostprocessorConfigItem;
                 soAssetPostprocessorFolder.Set(this.assetType, folderPath, item.Guid);
                 postprocessorConfigGuid = item.Guid;
+                OnChanged?.Invoke(postprocessorConfigGuid);
             }
         }
 

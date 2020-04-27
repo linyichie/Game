@@ -57,12 +57,15 @@ namespace LinChunJie.AssetPostprocessor {
             using (new EditorGUI.DisabledScope(!allowEdit)) {
                 var selectPlatform = Helper.Platforms[platformIndex];
                 var platformSetting = so.GetPlatformSettings(selectPlatform);
-                platformSetting.maxTextureSize = EditorGUILayout.IntPopup(styles.TextureSizeLabel, platformSetting.maxTextureSize, Helper.TextureSizeOptionLabels, Helper.TextureSizeOptions);
+                platformSetting.overridden = EditorGUILayout.Toggle(StringUtility.Contact("Override for ", platformSetting.platform), platformSetting.overridden);
+                using(new EditorGUI.DisabledScope(!platformSetting.overridden)) {
+                    platformSetting.maxTextureSize = EditorGUILayout.IntPopup(styles.TextureSizeLabel, platformSetting.maxTextureSize, Helper.TextureSizeOptionLabels, Helper.TextureSizeOptions);
 
-                var textureFormatValue = Helper.GetFormatValues(platformSetting.platform);
-                platformSetting.format = EditorGUILayout.IntPopup(styles.FormatLabel, platformSetting.format, textureFormatValue.FormatStrings, textureFormatValue.FormatValues);
+                    var textureFormatValue = Helper.GetFormatValues(platformSetting.platform);
+                    platformSetting.format = EditorGUILayout.IntPopup(styles.FormatLabel, platformSetting.format, textureFormatValue.FormatStrings, textureFormatValue.FormatValues);
 
-                platformSetting.compressionQuality = (UnityEditor.TextureCompressionQuality) EditorGUILayout.EnumPopup(styles.CompressionQualityLabel, platformSetting.compressionQuality);
+                    platformSetting.compressionQuality = (UnityEditor.TextureCompressionQuality) EditorGUILayout.EnumPopup(styles.CompressionQualityLabel, platformSetting.compressionQuality);
+                }
             }
 
             if (EditorGUI.EndChangeCheck()) {

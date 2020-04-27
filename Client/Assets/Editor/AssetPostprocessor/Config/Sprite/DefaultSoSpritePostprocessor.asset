@@ -14,14 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   platformSettings:
   - platform: Standalone
-    maxTextureSize: 1024
+    overridden: 1
+    maxTextureSize: 2048
     format: 4
     compressionQuality: 50
   - platform: iPhone
+    overridden: 1
     maxTextureSize: 2048
     format: 50
     compressionQuality: 50
   - platform: Android
+    overridden: 1
     maxTextureSize: 2048
     format: 47
     compressionQuality: 50
