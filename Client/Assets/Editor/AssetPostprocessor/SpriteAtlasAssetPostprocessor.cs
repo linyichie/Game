@@ -7,39 +7,37 @@ using UnityEngine.U2D;
 
 namespace LinChunJie.AssetPostprocessor {
     public static class SpriteAtlasAssetPostprocessor {
-        private static SpriteAtlas spriteAtlas;
-
         public static void OnPostprocessSpriteAtlas(string assetPath) {
-            spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(assetPath);
-            if (!CustomAssetPostprocessor.IsNewCreateFile(assetPath)) {
+            var spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(assetPath);
+            if(!CustomAssetPostprocessor.IsNewCreateFile(assetPath)) {
                 return;
             }
-            
+
             var postprocessorFolder = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();
             var guid = postprocessorFolder.Get(PostprocessorAssetType.SpriteAtlas, assetPath);
-            if (string.IsNullOrEmpty(guid)) {
+            if(string.IsNullOrEmpty(guid)) {
                 return;
             }
 
             var path = AssetDatabase.GUIDToAssetPath(guid);
-            var so = AssetDatabase.LoadAssetAtPath<SoSpritePostprocessor>(path);
-            if (so == null) {
-                so = SoAssetPostprocessor.GetDefault(PostprocessorAssetType.SpriteAtlas) as SoSpritePostprocessor;
+            var so = AssetDatabase.LoadAssetAtPath<SoSpriteAtlasPostprocessor>(path);
+            if(so == null) {
+                so = SoAssetPostprocessor.GetDefault(PostprocessorAssetType.SpriteAtlas) as SoSpriteAtlasPostprocessor;
             }
 
-            SetIncludeInBuild();
-            SetPackingSettings();
-            SetTextureSettings();
-            SetPlatformSettings(so);
+            SetIncludeInBuild(spriteAtlas);
+            SetPackingSettings(spriteAtlas);
+            SetTextureSettings(spriteAtlas);
+            SetPlatformSettings(spriteAtlas, so);
             EditorUtility.SetDirty(spriteAtlas);
             AssetDatabase.SaveAssets();
         }
 
-        static void SetIncludeInBuild() {
+        public static void SetIncludeInBuild(SpriteAtlas spriteAtlas) {
             spriteAtlas.SetIncludeInBuild(true);
         }
 
-        static void SetPackingSettings() {
+        public static void SetPackingSettings(SpriteAtlas spriteAtlas) {
             var packSettings = spriteAtlas.GetPackingSettings();
             packSettings.enableRotation = false;
             packSettings.enableTightPacking = false;
@@ -47,7 +45,7 @@ namespace LinChunJie.AssetPostprocessor {
             spriteAtlas.SetPackingSettings(packSettings);
         }
 
-        static void SetTextureSettings() {
+        public static void SetTextureSettings(SpriteAtlas spriteAtlas) {
             var textureSettings = spriteAtlas.GetTextureSettings();
             textureSettings.readable = false;
             textureSettings.generateMipMaps = false;
@@ -55,28 +53,41 @@ namespace LinChunJie.AssetPostprocessor {
             spriteAtlas.SetTextureSettings(textureSettings);
         }
 
-        static void SetPlatformSettings(SoSpritePostprocessor so) {
-            //-- Standalone
-            SetPlatformSettings(Helper.PlatformStandalone, so);
-
-            //-- iPhone
-            SetPlatformSettings(Helper.PlatformIPhone, so);
-
-            //-- Android
-            SetPlatformSettings(Helper.PlatformAndroid, so);
+        public static void SetPlatformSettings(SpriteAtlas spriteAtlas, SoSpriteAtlasPostprocessor so) {
+            SetPlatformSettings(Helper.PlatformStandalone, spriteAtlas, so);
+            SetPlatformSettings(Helper.PlatformIPhone, spriteAtlas, so);
+            SetPlatformSettings(Helper.PlatformAndroid, spriteAtlas, so);
         }
 
-        static void SetPlatformSettings(string platform, SoSpritePostprocessor so) {
+        static void SetPlatformSettings(string platform, SpriteAtlas spriteAtlas, SoSpriteAtlasPostprocessor so) {
             var soPlatformSettings = so.GetPlatformSettings(platform);
             var platformSettings = spriteAtlas.GetPlatformSettings(platform);
-            platformSettings.overridden = true;
-            platformSettings.format = (TextureImporterFormat) soPlatformSettings.format;
+            platformSettings.overridden = soPlatformSettings.overridden;
+            platformSettings.format = (TextureImporterFormat)soPlatformSettings.format;
             platformSettings.maxTextureSize = soPlatformSettings.maxTextureSize;
-            if (platform != Helper.PlatformStandalone) {
-                platformSettings.compressionQuality = (int) soPlatformSettings.compressionQuality;
+            platformSettings.compressionQuality = (int)soPlatformSettings.compressionQuality;
+            spriteAtlas.SetPlatformSettings(platformSettings);
+        }
+
+        public static bool CompareSettings(SpriteAtlas spriteAtlas, SoSpriteAtlasPostprocessor so) {
+            var same = ComparePlatformSetting(Helper.PlatformStandalone, so, spriteAtlas);
+            same &= ComparePlatformSetting(Helper.PlatformAndroid, so, spriteAtlas);
+            same &= ComparePlatformSetting(Helper.PlatformIPhone, so, spriteAtlas);
+            return same;
+        }
+
+        static bool ComparePlatformSetting(string platform, SoSpriteAtlasPostprocessor texturePostprocessorBase, SpriteAtlas spriteAtlas) {
+            var so = texturePostprocessorBase.GetPlatformSettings(platform);
+            var texturePlatformSettings = spriteAtlas.GetPlatformSettings(platform);
+            var same = true;
+            same &= so.overridden == texturePlatformSettings.overridden;
+            if(so.overridden && texturePlatformSettings.overridden) {
+                same &= so.format == (int)texturePlatformSettings.format;
+                same &= (int)so.compressionQuality == texturePlatformSettings.compressionQuality;
+                same &= so.maxTextureSize == texturePlatformSettings.maxTextureSize;
             }
 
-            spriteAtlas.SetPlatformSettings(platformSettings);
+            return same;
         }
     }
 }

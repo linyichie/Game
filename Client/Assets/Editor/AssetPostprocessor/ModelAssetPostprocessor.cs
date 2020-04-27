@@ -27,7 +27,7 @@ namespace LinChunJie.AssetPostprocessor {
             Reimport(importer);
         }
 
-        static void SetSceneSettings(ModelImporter importer, SoModelPostprocessor so) {
+        public static void SetSceneSettings(ModelImporter importer, SoModelPostprocessor so) {
             importer.globalScale = so.GlobalScale;
             importer.importBlendShapes = so.ImportBlendShapes;
             importer.importVisibility = so.ImportVisibility;
@@ -35,12 +35,12 @@ namespace LinChunJie.AssetPostprocessor {
             importer.importLights = so.ImportLights;
         }
 
-        static void SetMeshSettings(ModelImporter importer, SoModelPostprocessor so) {
+        public static void SetMeshSettings(ModelImporter importer, SoModelPostprocessor so) {
             importer.meshCompression = so.MeshCompression;
             importer.isReadable = so.IsReadable;
         }
 
-        static void SetMaterialSettings(ModelImporter importer, SoModelPostprocessor so) {
+        public static void SetMaterialSettings(ModelImporter importer, SoModelPostprocessor so) {
             importer.importMaterials = so.ImportMaterials;
             if (importer.importMaterials && so.SetMaterialMissing) {
                 RemoveImportMaterial(importer);
@@ -87,7 +87,7 @@ namespace LinChunJie.AssetPostprocessor {
             }
         }
 
-        static void SetAnimationSettings(ModelImporter importer, SoModelPostprocessor so) {
+        public static void SetAnimationSettings(ModelImporter importer, SoModelPostprocessor so) {
             importer.animationType = so.AnimationType;
             importer.importAnimation = so.ImportAnimation;
             if (importer.importAnimation) {

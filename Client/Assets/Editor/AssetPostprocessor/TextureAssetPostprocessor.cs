@@ -25,25 +25,7 @@ namespace LinChunJie.AssetPostprocessor {
             if(string.IsNullOrEmpty(guid)) {
                 return;
             }
-
-            importer.textureType = assetType == PostprocessorAssetType.Sprite ? TextureImporterType.Sprite : TextureImporterType.Default;
-            importer.alphaIsTransparency = importer.DoesSourceTextureHaveAlpha();
-            importer.sRGBTexture = true;
-            importer.isReadable = false;
-            importer.mipmapEnabled = false;
-            importer.streamingMipmaps = false;
-            importer.filterMode = FilterMode.Bilinear;
-            importer.wrapMode = TextureWrapMode.Clamp;
-            SetPlatformSettings(importer, assetType, guid);
-            Reimport(importer);
-        }
-
-        static async Task Reimport(TextureImporter importer) {
-            await Task.Delay(1);
-            importer.SaveAndReimport();
-        }
-
-        static void SetPlatformSettings(TextureImporter importer, PostprocessorAssetType assetType, string guid) {
+            
             var path = AssetDatabase.GUIDToAssetPath(guid);
             SoTexturePostprocessorBase soPostprocessor = null;
             if(!string.IsNullOrEmpty(path)) {
@@ -54,11 +36,26 @@ namespace LinChunJie.AssetPostprocessor {
                 soPostprocessor = SoAssetPostprocessor.GetDefault(assetType) as SoTexturePostprocessorBase;
             }
 
-            if(soPostprocessor != null) {
-                SetPlatformSettings(Helper.PlatformStandalone, importer, soPostprocessor);
-                SetPlatformSettings(Helper.PlatformIPhone, importer, soPostprocessor);
-                SetPlatformSettings(Helper.PlatformAndroid, importer, soPostprocessor);
-            }
+            importer.textureType = assetType == PostprocessorAssetType.Sprite ? TextureImporterType.Sprite : TextureImporterType.Default;
+            SetDefaultSettings(importer);
+            SetPlatformSettings(importer, soPostprocessor);
+            Reimport(importer);
+        }
+
+        public static void SetDefaultSettings(TextureImporter importer) {
+            importer.alphaIsTransparency = importer.DoesSourceTextureHaveAlpha();
+            importer.sRGBTexture = true;
+            importer.isReadable = false;
+            importer.mipmapEnabled = false;
+            importer.streamingMipmaps = false;
+            importer.filterMode = FilterMode.Bilinear;
+            importer.wrapMode = TextureWrapMode.Clamp;
+        }
+
+        public static void SetPlatformSettings(TextureImporter importer, SoTexturePostprocessorBase so) {
+            SetPlatformSettings(Helper.PlatformStandalone, importer, so);
+            SetPlatformSettings(Helper.PlatformIPhone, importer, so);
+            SetPlatformSettings(Helper.PlatformAndroid, importer, so);
         }
 
         static void SetPlatformSettings(string platform, TextureImporter importer, SoTexturePostprocessorBase soPostprocessor) {
@@ -72,6 +69,32 @@ namespace LinChunJie.AssetPostprocessor {
             }
 
             importer.SetPlatformTextureSettings(platformSettings);
+        }
+
+        public static bool CompareSettings(TextureImporter importer, SoTexturePostprocessorBase soPostprocessor) {
+            var same = ComparePlatformSetting(Helper.PlatformStandalone, soPostprocessor, importer);
+            same &= ComparePlatformSetting(Helper.PlatformAndroid, soPostprocessor, importer);
+            same &= ComparePlatformSetting(Helper.PlatformIPhone, soPostprocessor, importer);
+            return same;
+        }
+        
+        static bool ComparePlatformSetting(string platform, SoTexturePostprocessorBase texturePostprocessorBase, TextureImporter importer) {
+            var so = texturePostprocessorBase.GetPlatformSettings(platform);
+            var texturePlatformSettings = importer.GetPlatformTextureSettings(platform);
+            var same = true;
+            same &= so.overridden == texturePlatformSettings.overridden;
+            if(so.overridden && texturePlatformSettings.overridden) {
+                same &= so.format == (int)texturePlatformSettings.format;
+                same &= (int)so.compressionQuality == texturePlatformSettings.compressionQuality;
+                same &= so.maxTextureSize == texturePlatformSettings.maxTextureSize;
+            }
+
+            return same;
+        }
+        
+        static async Task Reimport(TextureImporter importer) {
+            await Task.Delay(1);
+            importer.SaveAndReimport();
         }
     }
 }
