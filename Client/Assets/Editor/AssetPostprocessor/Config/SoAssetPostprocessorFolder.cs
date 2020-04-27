@@ -14,7 +14,7 @@ namespace LinChunJie.AssetPostprocessor {
 
         [SerializeField] private List<AssetPostprocessorFolder> folders;
 
-        public void Set(PostprocessorAssetType assetType, string path, string guid) {
+        public void Set(PostprocessorAssetType assetType, string path, string guid, bool forceUpdate = true) {
             if(folders == null) {
                 folders = new List<AssetPostprocessorFolder>();
             }
@@ -35,7 +35,9 @@ namespace LinChunJie.AssetPostprocessor {
             }
 
             EditorUtility.SetDirty(this);
-            AssetDatabase.SaveAssets();
+            if(forceUpdate) {
+                AssetDatabase.SaveAssets();
+            }
         }
 
         public void Remove(PostprocessorAssetType assetType, string path) {

@@ -19,6 +19,7 @@ namespace LinChunJie.AssetPostprocessor {
         private readonly List<AssetListItem> treeViewItems = new List<AssetListItem>();
 
         private SoAssetPostprocessor soAssetPostprocessor;
+        private SearchField searchField;
 
         public static AssetListTab Get() {
             var treeView = new AssetListTab(new TreeViewState());
@@ -30,6 +31,7 @@ namespace LinChunJie.AssetPostprocessor {
             showAlternatingRowBackgrounds = true;
             postprocessorFolder = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();
             warnIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/AssetPostprocessor/Texture/Warn.png");
+            searchField = new SearchField();
         }
 
         protected override TreeViewItem BuildRoot() {
@@ -46,7 +48,9 @@ namespace LinChunJie.AssetPostprocessor {
 
         public override void OnGUI(Rect pos) {
             GUI.Box(pos, string.Empty, GUI.skin.box);
-            base.OnGUI(new Rect(pos.x + 1, pos.y + 1, pos.width - 2, pos.height - 2));
+            var searchFieldRect = new Rect(pos.x + 10, pos.y + 10, pos.width - 20, 20);
+            searchString = searchField.OnGUI(searchFieldRect, searchString);
+            base.OnGUI(new Rect(pos.x + 1, searchFieldRect.yMax + 3, pos.width - 2, pos.height - searchFieldRect.height - 20 - 3));
         }
 
         protected override void RowGUI(RowGUIArgs args) {

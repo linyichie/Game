@@ -11,6 +11,7 @@ namespace LinChunJie.AssetPostprocessor {
         private readonly EditorWindow parent;
         private readonly List<Folder> folders = new List<Folder>();
         private readonly SoAssetPostprocessorFolder soAssetPostprocessorFolder;
+        private SearchField searchField;
         private PostprocessorAssetType assetType = (PostprocessorAssetType) (-1);
         private List<string> paths = new List<string>();
         private bool dirty = false;
@@ -34,6 +35,17 @@ namespace LinChunJie.AssetPostprocessor {
             public string path;
             public Folder parent;
             public List<Folder> childs;
+
+            public static void Sort(List<Folder> folders) {
+                folders.Sort((lhs, rhs) => {
+                    return lhs.path.CompareTo(rhs.path);
+                });
+                foreach(var folder in folders) {
+                    if(folder.childs != null) {
+                        Sort(folder.childs);
+                    }
+                }
+            }
         }
 
         public static AssetPostprocessorFolderTab Get(EditorWindow parent) {
@@ -46,6 +58,7 @@ namespace LinChunJie.AssetPostprocessor {
             this.parent = parent;
             showAlternatingRowBackgrounds = true;
             soAssetPostprocessorFolder = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();
+            searchField = new SearchField();
         }
 
         protected override TreeViewItem BuildRoot() {
@@ -59,6 +72,8 @@ namespace LinChunJie.AssetPostprocessor {
                     });
                 }
             }
+            
+            Folder.Sort(folders);
 
             foreach (var folder in folders) {
                 CreateTreeItem(root, folder);
@@ -114,7 +129,9 @@ namespace LinChunJie.AssetPostprocessor {
                 if (!rootItem.hasChildren) {
                     GUI.Label(pos, "拖动文件夹至此添加配置", styles.dragDropLabelStyle);
                 } else {
-                    base.OnGUI(new Rect(pos.x + 1, pos.y + 1, pos.width - 2, pos.height - 2));
+                    var searchFieldRect = new Rect(pos.x + 10, pos.y + 10, pos.width - 20, 20);
+                    searchString = searchField.OnGUI(searchFieldRect, searchString);
+                    base.OnGUI(new Rect(pos.x + 1, searchFieldRect.yMax + 3, pos.width - 2, pos.height - searchFieldRect.height - 20 - 3));
                     if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && pos.Contains(Event.current.mousePosition)) {
                         SetSelection(new int[0], TreeViewSelectionOptions.FireSelectionChanged);
                     }
@@ -122,6 +139,7 @@ namespace LinChunJie.AssetPostprocessor {
             }
 
             if (dirty) {
+                dirty = false;
                 Reload();
             }
         }
@@ -164,7 +182,7 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         protected override bool CanMultiSelect(TreeViewItem item) {
-            return false;
+            return true;
         }
 
         private void OnRemoveFolder(object @object) {
@@ -216,9 +234,10 @@ namespace LinChunJie.AssetPostprocessor {
                 }
 
                 this.paths.Add(path);
-                soAssetPostprocessorFolder.Set(this.assetType, path, guid);
+                soAssetPostprocessorFolder.Set(this.assetType, path, guid, false);
                 dirty = true;
             }
+            AssetDatabase.SaveAssets();
         }
 
         public string GetSelectPostprocessorFolder() {
