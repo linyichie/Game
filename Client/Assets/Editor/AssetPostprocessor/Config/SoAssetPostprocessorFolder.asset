@@ -31,3 +31,6 @@ MonoBehaviour:
   - assetType: 0
     path: Assets/AddressableAssets/UI/Atlas
     guid: eb3639e085a5eb44f8c4e30a914e4b5a
+  - assetType: 3
+    path: Assets/Art/Fashion/Arms
+    guid: c30c36d581454344ab8bd98b5ddc06fb

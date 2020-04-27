@@ -14,24 +14,11 @@ namespace LinChunJie.AssetPostprocessor {
             }
         }
 
-        private void OnPostprocessAnimation(GameObject root, AnimationClip clip) {
-        }
-
-        private void OnPostprocessAudio(AudioClip arg) {
-        }
-
-        private void OnPostprocessCubemap(Cubemap texture) {
-        }
-
-        private void OnPostprocessMaterial(Material material) {
-        }
-
         private void OnPostprocessModel(GameObject g) {
-        }
-
-        private void OnPostprocessSprites(Texture2D texture, Sprite[] sprites) {
-            //var importer = assetImporter as TextureImporter;
-            //TextureAssetPostprocessor.OnPostprocessTexture(importer);
+            if (IsNewCreateFile(assetImporter.assetPath)) {
+                var importer = assetImporter as ModelImporter;
+                ModelAssetPostprocessor.OnPostprocessModel(importer);
+            }
         }
 
         private void OnPostprocessTexture(Texture2D texture) {
@@ -39,21 +26,6 @@ namespace LinChunJie.AssetPostprocessor {
                 var importer = assetImporter as TextureImporter;
                 TextureAssetPostprocessor.OnPostprocessTexture(importer);
             }
-        }
-
-        private void OnPostprocessMeshHierarchy(GameObject root) {
-        }
-
-        private void OnPostprocessSpeedTree(GameObject arg) {
-        }
-
-        private void OnPostprocessAssetbundleNameChanged(string assetPath, string previousAssetBundleName, string newAssetBundleName) {
-        }
-
-        private void OnPostprocessGameObjectWithUserProperties(GameObject go, string[] propNames, object[] values) {
-        }
-
-        private void OnPostprocessGameObjectWithAnimatedUserProperties(GameObject gameObject, EditorCurveBinding[] bindings) {
         }
 
         private static void OnPoseprocessWithExtension(string assetName) {

@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Threading.Tasks;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+using Object = System.Object;
 
 namespace LinChunJie.AssetPostprocessor {
     public class AssetPostprocessorConfigTab : TreeView {
@@ -119,6 +121,8 @@ namespace LinChunJie.AssetPostprocessor {
                     menu.AddItem(new GUIContent("Set as Config"), false, OnUseConfig, selectIds);
                 }
 
+                menu.AddItem(new GUIContent("Duplicate"), false, OnDuplicate, selectIds);
+
                 var item = FindItem(selectIds[0], rootItem) as AssetPostprocessorConfigItem;
                 if (!item.IsDefault) {
                     menu.AddItem(new GUIContent("Delete"), false, OnDeleteConfig, selectIds);
@@ -137,7 +141,7 @@ namespace LinChunJie.AssetPostprocessor {
 
         protected override void DoubleClickedItem(int id) {
             var item = FindItem(id, rootItem) as AssetPostprocessorConfigItem;
-            if(item != null) {
+            if (item != null) {
                 var o = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(item.Path);
                 EditorGUIUtility.PingObject(o);
                 Selection.activeObject = o;
@@ -181,7 +185,22 @@ namespace LinChunJie.AssetPostprocessor {
             }
         }
 
-        private void OnCreate(object @object) {
+        private void OnDuplicate(object o) {
+            var selectIds = o as IList<int>;
+            if (selectIds != null && selectIds.Count == 1) {
+                var item = FindItem(selectIds[0], rootItem) as AssetPostprocessorConfigItem;
+                var newPath = AssetDatabase.GenerateUniqueAssetPath(item.Path);
+                if (newPath.Length != 0) {
+                    var success = AssetDatabase.CopyAsset(item.Path, newPath);
+                    if (success) {
+                        paths.Add(newPath);
+                        Reload();
+                    }
+                }
+            }
+        }
+
+        private void OnCreate(object o) {
             var so = SoAssetPostprocessor.Create(this.assetType);
             var path = AssetDatabase.GetAssetPath(so);
             var hashCode = path.GetHashCode();
@@ -190,15 +209,15 @@ namespace LinChunJie.AssetPostprocessor {
             BeginRename(FindItem(hashCode, rootItem), 0.25f);
         }
 
-        private void OnRename(object @object) {
-            var selectIds = @object as IList<int>;
+        private void OnRename(object o) {
+            var selectIds = o as IList<int>;
             if (selectIds != null && selectIds.Count > 0) {
                 BeginRename(FindItem(selectIds[0], rootItem));
             }
         }
 
-        private void OnUseConfig(object @object) {
-            var selectIds = @object as IList<int>;
+        private void OnUseConfig(object o) {
+            var selectIds = o as IList<int>;
             if (selectIds != null && selectIds.Count == 1) {
                 var item = FindItem(selectIds[0], rootItem) as AssetPostprocessorConfigItem;
                 soAssetPostprocessorFolder.Set(this.assetType, folderPath, item.Guid);
@@ -217,7 +236,7 @@ namespace LinChunJie.AssetPostprocessor {
                     soAssetPostprocessorFolder.Set(this.assetType, this.folderPath, guid);
                     postprocessorConfigGuid = guid;
                 }
-                
+
                 paths.Remove(item.Path);
                 DeleteSoAssetPostprocessor?.Invoke(item.Guid);
                 AssetDatabase.DeleteAsset(item.Path);

@@ -38,55 +38,14 @@ namespace LinChunJie.AssetPostprocessor {
 
     [CustomEditor(typeof(SoTexturePostprocessorBase))]
     public class SoTexturePostprocessorBaseInspector : Editor {
-        class Styles {
-            public readonly string TextureSizeLabel = "Max Texture Size";
-
-            public readonly string FormatLabel = "Format";
-
-            public readonly string CompressionQualityLabel = "Compressor Quality";
-        }
-
-        private int selectPlatformIndex = 0;
-
-        private Styles styles;
-        private AssetPostprocessorHelper helper;
+        private IAssetPostprocessorWidget postprocessorWidget;
 
         private void OnEnable() {
-            styles = styles ?? new Styles();
-            helper = helper ?? new AssetPostprocessorHelper();
-            selectPlatformIndex = Array.FindIndex(AssetPostprocessorHelper.Platforms, (x) => { return x == AssetPostprocessorHelper.SelectPlatform; });
-            selectPlatformIndex = selectPlatformIndex == -1 ? 0 : selectPlatformIndex;
-        }
-
-        private void OnDisable() {
+            postprocessorWidget = postprocessorWidget ?? new TexturePostprocessorBaseWidget(this.target as SoTexturePostprocessorBase, false);
         }
 
         public override void OnInspectorGUI() {
-            var config = target as SoTexturePostprocessorBase;
-            GUILayout.BeginVertical(EditorStyles.helpBox);
-            GUILayout.BeginHorizontal();
-            {
-                for (int i = 0; i < AssetPostprocessorHelper.Platforms.Length; i++) {
-                    if (GUILayout.Toggle(selectPlatformIndex == i, AssetPostprocessorHelper.Platforms[i], EditorStyles.toolbarButton)) {
-                        selectPlatformIndex = i;
-                        AssetPostprocessorHelper.SelectPlatform = AssetPostprocessorHelper.Platforms[i];
-                    }
-                }
-            }
-            GUILayout.EndHorizontal();
-
-            using (new EditorGUI.DisabledScope(true)) {
-                var selectPlatform = AssetPostprocessorHelper.Platforms[selectPlatformIndex];
-                var platformSetting = config.GetPlatformSettings(selectPlatform);
-                platformSetting.maxTextureSize = EditorGUILayout.IntPopup(styles.TextureSizeLabel, platformSetting.maxTextureSize, helper.TextureSizeOptionLabels, helper.TextureSizeOptions);
-
-                var textureFormatValue = helper.GetFormatValues(platformSetting.platform);
-                platformSetting.format = EditorGUILayout.IntPopup(styles.FormatLabel, platformSetting.format, textureFormatValue.FormatStrings, textureFormatValue.FormatValues);
-
-                platformSetting.compressionQuality = (UnityEditor.TextureCompressionQuality) EditorGUILayout.EnumPopup(styles.CompressionQualityLabel, platformSetting.compressionQuality);
-            }
-
-            GUILayout.EndVertical();
+            postprocessorWidget.OnGUI();
         }
     }
 }

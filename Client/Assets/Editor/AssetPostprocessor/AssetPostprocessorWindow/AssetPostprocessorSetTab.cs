@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace LinChunJie.AssetPostprocessor {
     public class AssetPostprocessorSetTab {
-        private IPostprocessorSetTab postprocessorSetTab;
+        private IAssetPostprocessorWidget postprocessorWidget;
         private PostprocessorAssetType assetType;
         private string guid = string.Empty;
         public event Action<string> OnChanged;
@@ -14,7 +14,7 @@ namespace LinChunJie.AssetPostprocessor {
         public void OnGUI(Rect pos) {
             GUI.Box(pos, string.Empty);
             GUILayout.BeginArea(new Rect(pos.x + 3, pos.y + 3, pos.width - 6, pos.height - 6));
-            postprocessorSetTab?.OnGUI(pos);
+            postprocessorWidget?.OnGUI();
             GUILayout.EndArea();
         }
 
@@ -22,21 +22,20 @@ namespace LinChunJie.AssetPostprocessor {
             if (this.assetType != assetType || this.guid != guid) {
                 this.assetType = assetType;
                 this.guid = guid;
+                postprocessorWidget = null;
                 switch (assetType) {
                     case PostprocessorAssetType.SpriteAtlas:
                     case PostprocessorAssetType.Sprite:
                     case PostprocessorAssetType.Texture:
-                        if (!string.IsNullOrEmpty(guid)) {
-                            postprocessorSetTab = new TextureBasePostprocessorTab();
-                            postprocessorSetTab.Initialize(guid);
-                            postprocessorSetTab.OnChanged += HandleOnChanged;
-                        } else {
-                            postprocessorSetTab = null;
-                        }
+                        postprocessorWidget = new TexturePostprocessorBaseWidget(this.guid, true);
                         break;
-                    default:
-                        postprocessorSetTab = null;
+                    case PostprocessorAssetType.Model:
+                        postprocessorWidget = new ModelPostprocessorWidget(this.guid, true);
                         break;
+                }
+
+                if (postprocessorWidget != null) {
+                    postprocessorWidget.OnChanged += HandleOnChanged;
                 }
             }
         }

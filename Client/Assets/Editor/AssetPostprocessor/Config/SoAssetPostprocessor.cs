@@ -14,7 +14,7 @@ namespace LinChunJie.AssetPostprocessor {
                 case PostprocessorAssetType.Texture:
                     return SoTexturePostprocessor.Create();
                 case PostprocessorAssetType.Model:
-                    break;
+                    return SoModelPostprocessor.Create();
             }
 
             return null;
@@ -29,7 +29,7 @@ namespace LinChunJie.AssetPostprocessor {
                 case PostprocessorAssetType.Texture:
                     return SoTexturePostprocessor.GetDefaultSoPostprocessor();
                 case PostprocessorAssetType.Model:
-                    break;
+                    return SoModelPostprocessor.GetDefaultSoPostprocessor();
             }
 
             return null;

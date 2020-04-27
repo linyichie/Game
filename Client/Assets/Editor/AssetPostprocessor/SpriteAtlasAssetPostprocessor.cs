@@ -9,15 +9,28 @@ namespace LinChunJie.AssetPostprocessor {
     public static class SpriteAtlasAssetPostprocessor {
         private static SpriteAtlas spriteAtlas;
 
-        public static void OnPostprocessSpriteAtlas(string assetName) {
-            spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(assetName);
-            if (!CustomAssetPostprocessor.IsNewCreateFile(assetName)) {
+        public static void OnPostprocessSpriteAtlas(string assetPath) {
+            spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(assetPath);
+            if (!CustomAssetPostprocessor.IsNewCreateFile(assetPath)) {
                 return;
+            }
+            
+            var postprocessorFolder = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();
+            var guid = postprocessorFolder.Get(PostprocessorAssetType.SpriteAtlas, assetPath);
+            if (string.IsNullOrEmpty(guid)) {
+                return;
+            }
+
+            var path = AssetDatabase.GUIDToAssetPath(guid);
+            var so = AssetDatabase.LoadAssetAtPath<SoSpritePostprocessor>(path);
+            if (so == null) {
+                so = SoAssetPostprocessor.GetDefault(PostprocessorAssetType.SpriteAtlas) as SoSpritePostprocessor;
             }
 
             SetIncludeInBuild();
             SetPackingSettings();
-            SetPlatformSettings();
+            SetTextureSettings();
+            SetPlatformSettings(so);
             EditorUtility.SetDirty(spriteAtlas);
             AssetDatabase.SaveAssets();
         }
@@ -42,20 +55,19 @@ namespace LinChunJie.AssetPostprocessor {
             spriteAtlas.SetTextureSettings(textureSettings);
         }
 
-        static void SetPlatformSettings() {
+        static void SetPlatformSettings(SoSpritePostprocessor so) {
             //-- Standalone
-            SetPlatformSettings(AssetPostprocessorHelper.PlatformStandalone);
+            SetPlatformSettings(AssetPostprocessorHelper.PlatformStandalone, so);
 
             //-- iPhone
-            SetPlatformSettings(AssetPostprocessorHelper.PlatformIPhone);
+            SetPlatformSettings(AssetPostprocessorHelper.PlatformIPhone, so);
 
             //-- Android
-            SetPlatformSettings(AssetPostprocessorHelper.PlatformAndroid);
+            SetPlatformSettings(AssetPostprocessorHelper.PlatformAndroid, so);
         }
 
-        static void SetPlatformSettings(string platform) {
-            var soImporter = SoSpriteAtlasPostprocessor.GetDefaultSoPostprocessor();
-            var soPlatformSettings = soImporter.GetPlatformSettings(platform);
+        static void SetPlatformSettings(string platform, SoSpritePostprocessor so) {
+            var soPlatformSettings = so.GetPlatformSettings(platform);
             var platformSettings = spriteAtlas.GetPlatformSettings(platform);
             platformSettings.overridden = true;
             platformSettings.format = (TextureImporterFormat) soPlatformSettings.format;
