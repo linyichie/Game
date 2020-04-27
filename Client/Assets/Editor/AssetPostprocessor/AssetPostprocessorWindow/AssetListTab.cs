@@ -138,7 +138,7 @@ namespace LinChunJie.AssetPostprocessor {
         public void Refresh() {
             paths.Clear();
             if (!string.IsNullOrEmpty(this.folder)) {
-                var guids = AssetDatabase.FindAssets(AssetPostprocessorHelper.GetAssetSearchFilterByAssetType(this.assetType), new string[] {
+                var guids = AssetDatabase.FindAssets(Helper.GetAssetSearchFilterByAssetType(this.assetType), new string[] {
                     this.folder
                 });
                 if (guids != null) {
@@ -240,20 +240,20 @@ namespace LinChunJie.AssetPostprocessor {
             var texturePostprocessorBase = so as SoTexturePostprocessorBase;
             var importer = AssetImporter.GetAtPath(Path) as TextureImporter;
 
-            var soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(AssetPostprocessorHelper.PlatformStandalone);
-            var texturePlatformSettings = importer.GetPlatformTextureSettings(AssetPostprocessorHelper.PlatformStandalone);
+            var soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformStandalone);
+            var texturePlatformSettings = importer.GetPlatformTextureSettings(Helper.PlatformStandalone);
             if (!CompareTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings)) {
                 IsDirty = true;
             }
 
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(AssetPostprocessorHelper.PlatformAndroid);
-            texturePlatformSettings = importer.GetPlatformTextureSettings(AssetPostprocessorHelper.PlatformAndroid);
+            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformAndroid);
+            texturePlatformSettings = importer.GetPlatformTextureSettings(Helper.PlatformAndroid);
             if (!CompareTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings)) {
                 IsDirty = true;
             }
 
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(AssetPostprocessorHelper.PlatformIPhone);
-            texturePlatformSettings = importer.GetPlatformTextureSettings(AssetPostprocessorHelper.PlatformIPhone);
+            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformIPhone);
+            texturePlatformSettings = importer.GetPlatformTextureSettings(Helper.PlatformIPhone);
             if (!CompareTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings)) {
                 IsDirty = true;
             }
@@ -263,18 +263,18 @@ namespace LinChunJie.AssetPostprocessor {
             var texturePostprocessorBase = so as SoTexturePostprocessorBase;
             var importer = AssetImporter.GetAtPath(Path) as TextureImporter;
 
-            var soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(AssetPostprocessorHelper.PlatformStandalone);
-            var texturePlatformSettings = importer.GetPlatformTextureSettings(AssetPostprocessorHelper.PlatformStandalone);
+            var soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformStandalone);
+            var texturePlatformSettings = importer.GetPlatformTextureSettings(Helper.PlatformStandalone);
             SetTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings);
             importer.SetPlatformTextureSettings(texturePlatformSettings);
 
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(AssetPostprocessorHelper.PlatformAndroid);
-            texturePlatformSettings = importer.GetPlatformTextureSettings(AssetPostprocessorHelper.PlatformAndroid);
+            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformAndroid);
+            texturePlatformSettings = importer.GetPlatformTextureSettings(Helper.PlatformAndroid);
             SetTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings);
             importer.SetPlatformTextureSettings(texturePlatformSettings);
 
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(AssetPostprocessorHelper.PlatformIPhone);
-            texturePlatformSettings = importer.GetPlatformTextureSettings(AssetPostprocessorHelper.PlatformIPhone);
+            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformIPhone);
+            texturePlatformSettings = importer.GetPlatformTextureSettings(Helper.PlatformIPhone);
             SetTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings);
             importer.SetPlatformTextureSettings(texturePlatformSettings);
 
@@ -283,13 +283,13 @@ namespace LinChunJie.AssetPostprocessor {
             VerifyImporterSetting(so);
         }
 
-        private void SetTexturePlatformSetting(AssetPostprocessorHelper.TexturePlatformSettings so, TextureImporterPlatformSettings texturePlatformSettings) {
+        private void SetTexturePlatformSetting(TexturePlatformSettings so, TextureImporterPlatformSettings texturePlatformSettings) {
             texturePlatformSettings.format = (TextureImporterFormat) so.format;
             texturePlatformSettings.maxTextureSize = so.maxTextureSize;
             texturePlatformSettings.compressionQuality = (int) so.compressionQuality;
         }
 
-        private bool CompareTexturePlatformSetting(AssetPostprocessorHelper.TexturePlatformSettings so, TextureImporterPlatformSettings texturePlatformSettings) {
+        private bool CompareTexturePlatformSetting(TexturePlatformSettings so, TextureImporterPlatformSettings texturePlatformSettings) {
             if ((int) so.format != (int) texturePlatformSettings.format || (int) so.compressionQuality != texturePlatformSettings.compressionQuality || so.maxTextureSize != texturePlatformSettings.maxTextureSize) {
                 return false;
             }
@@ -308,20 +308,20 @@ namespace LinChunJie.AssetPostprocessor {
             var texturePostprocessorBase = so as SoTexturePostprocessorBase;
             var spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(Path);
 
-            var soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(AssetPostprocessorHelper.PlatformStandalone);
-            var texturePlatformSettings = spriteAtlas.GetPlatformSettings(AssetPostprocessorHelper.PlatformStandalone);
+            var soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformStandalone);
+            var texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformStandalone);
             if (!CompareTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings)) {
                 IsDirty = true;
             }
 
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(AssetPostprocessorHelper.PlatformAndroid);
-            texturePlatformSettings = spriteAtlas.GetPlatformSettings(AssetPostprocessorHelper.PlatformAndroid);
+            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformAndroid);
+            texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformAndroid);
             if (!CompareTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings)) {
                 IsDirty = true;
             }
 
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(AssetPostprocessorHelper.PlatformIPhone);
-            texturePlatformSettings = spriteAtlas.GetPlatformSettings(AssetPostprocessorHelper.PlatformIPhone);
+            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformIPhone);
+            texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformIPhone);
             if (!CompareTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings)) {
                 IsDirty = true;
             }
@@ -331,18 +331,18 @@ namespace LinChunJie.AssetPostprocessor {
             var texturePostprocessorBase = so as SoTexturePostprocessorBase;
             var spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(Path);
 
-            var soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(AssetPostprocessorHelper.PlatformStandalone);
-            var texturePlatformSettings = spriteAtlas.GetPlatformSettings(AssetPostprocessorHelper.PlatformStandalone);
+            var soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformStandalone);
+            var texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformStandalone);
             SetTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings);
             spriteAtlas.SetPlatformSettings(texturePlatformSettings);
 
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(AssetPostprocessorHelper.PlatformAndroid);
-            texturePlatformSettings = spriteAtlas.GetPlatformSettings(AssetPostprocessorHelper.PlatformAndroid);
+            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformAndroid);
+            texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformAndroid);
             SetTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings);
             spriteAtlas.SetPlatformSettings(texturePlatformSettings);
 
-            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(AssetPostprocessorHelper.PlatformIPhone);
-            texturePlatformSettings = spriteAtlas.GetPlatformSettings(AssetPostprocessorHelper.PlatformIPhone);
+            soTexturePlatformSettings = texturePostprocessorBase.GetPlatformSettings(Helper.PlatformIPhone);
+            texturePlatformSettings = spriteAtlas.GetPlatformSettings(Helper.PlatformIPhone);
             SetTexturePlatformSetting(soTexturePlatformSettings, texturePlatformSettings);
             spriteAtlas.SetPlatformSettings(texturePlatformSettings);
 
@@ -351,13 +351,13 @@ namespace LinChunJie.AssetPostprocessor {
             VerifyImporterSetting(so);
         }
 
-        private void SetTexturePlatformSetting(AssetPostprocessorHelper.TexturePlatformSettings so, TextureImporterPlatformSettings texturePlatformSettings) {
+        private void SetTexturePlatformSetting(TexturePlatformSettings so, TextureImporterPlatformSettings texturePlatformSettings) {
             texturePlatformSettings.format = (TextureImporterFormat) so.format;
             texturePlatformSettings.maxTextureSize = so.maxTextureSize;
             texturePlatformSettings.compressionQuality = (int) so.compressionQuality;
         }
 
-        private bool CompareTexturePlatformSetting(AssetPostprocessorHelper.TexturePlatformSettings so, TextureImporterPlatformSettings texturePlatformSettings) {
+        private bool CompareTexturePlatformSetting(TexturePlatformSettings so, TextureImporterPlatformSettings texturePlatformSettings) {
             var same = true;
             same &= so.format == (int) texturePlatformSettings.format;
             same &= (int) so.compressionQuality == texturePlatformSettings.compressionQuality;

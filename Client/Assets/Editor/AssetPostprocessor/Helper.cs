@@ -11,32 +11,36 @@ namespace LinChunJie.AssetPostprocessor {
         Texture = 2,
         Model = 3,
     }
+    
+    public enum TextureImporterFormatStandalone {
+        RGBA32 = TextureImporterFormat.RGBA32,
+    }
 
-    public class AssetPostprocessorHelper {
-        public enum TextureImporterFormatStandalone {
-            RGBA32 = TextureImporterFormat.RGBA32,
-        }
+    public enum TextureImporterFormatIPhone {
+        RGBA32 = TextureImporterFormat.RGBA32,
+#if UNITY_2019_2_OR_NEWER
+        ASTC_6X6 = TextureImporterFormat.ASTC_6x6,
+#elif UNITY_2018_4_OR_NEWER
+        ASTC_6X6 = TextureImporterFormat.ASTC_RGBA_6x6,
+#endif
+        PVRTC_RGB4 = TextureImporterFormat.PVRTC_RGB4,
+    }
 
-        public enum TextureImporterFormatIPhone {
-            RGBA32 = TextureImporterFormat.RGBA32,
-            ASTC_6X6 = TextureImporterFormat.ASTC_6x6,
-            PVRTC_RGB4 = TextureImporterFormat.PVRTC_RGB4,
-        }
+    public enum TextureImporterFormatAndroid {
+        RGBA32 = TextureImporterFormat.RGBA32,
+        ETC2_RGBA8 = TextureImporterFormat.ETC2_RGBA8,
+        ETC2_RGB4 = TextureImporterFormat.ETC2_RGB4,
+    }
 
-        public enum TextureImporterFormatAndroid {
-            RGBA32 = TextureImporterFormat.RGBA32,
-            ETC2_RGBA8 = TextureImporterFormat.ETC2_RGBA8,
-            ETC2_RGB4 = TextureImporterFormat.ETC2_RGB4,
-        }
+    [Serializable]
+    public class TexturePlatformSettings {
+        public string platform;
+        public int maxTextureSize = 2048;
+        public int format = (int) TextureImporterFormat.Automatic;
+        public UnityEditor.TextureCompressionQuality compressionQuality = UnityEditor.TextureCompressionQuality.Normal;
+    }
 
-        [Serializable]
-        public class TexturePlatformSettings {
-            public string platform;
-            public int maxTextureSize = 2048;
-            public int format = (int) TextureImporterFormat.Automatic;
-            public UnityEditor.TextureCompressionQuality compressionQuality = UnityEditor.TextureCompressionQuality.Normal;
-        }
-
+    public static class Helper {
         public readonly struct TextureFormatValue {
             public readonly int[] FormatValues;
             public readonly string[] FormatStrings;
@@ -73,13 +77,13 @@ namespace LinChunJie.AssetPostprocessor {
             }
         }
 
-        public readonly int[] TextureSizeOptions = new int[] {
+        public static readonly int[] TextureSizeOptions = new int[] {
             1024,
             2048,
             4096,
         };
 
-        public readonly string[] TextureSizeOptionLabels = new string[] {
+        public static readonly string[] TextureSizeOptionLabels = new string[] {
             "1024", "2048", "4096"
         };
 
@@ -89,7 +93,7 @@ namespace LinChunJie.AssetPostprocessor {
             PlatformAndroid,
         };
 
-        private readonly Dictionary<string, TextureFormatValue> formatValues = new Dictionary<string, TextureFormatValue>();
+        private static readonly Dictionary<string, TextureFormatValue> formatValues = new Dictionary<string, TextureFormatValue>();
 
         public static int GetDefaultTextureFormat(string platform) {
             switch (platform) {
@@ -104,7 +108,7 @@ namespace LinChunJie.AssetPostprocessor {
             return (int) TextureImporterFormat.Automatic;
         }
 
-        public TextureFormatValue GetFormatValues(string platform) {
+        public static TextureFormatValue GetFormatValues(string platform) {
             if (formatValues.ContainsKey(platform)) {
                 return formatValues[platform];
             }

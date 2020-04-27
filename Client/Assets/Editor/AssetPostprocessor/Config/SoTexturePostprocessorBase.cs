@@ -8,12 +8,12 @@ using TextureCompressionQuality = UnityEditor.TextureCompressionQuality;
 
 namespace LinChunJie.AssetPostprocessor {
     public class SoTexturePostprocessorBase : SoAssetPostprocessor {
-        public List<AssetPostprocessorHelper.TexturePlatformSettings> platformSettings = new List<AssetPostprocessorHelper.TexturePlatformSettings>();
+        public List<TexturePlatformSettings> platformSettings = new List<TexturePlatformSettings>();
 
         private void OnEnable() {
-            if (platformSettings.Count != AssetPostprocessorHelper.Platforms.Length) {
-                for (int i = 0; i < AssetPostprocessorHelper.Platforms.Length; i++) {
-                    GetPlatformSettings(AssetPostprocessorHelper.Platforms[i]);
+            if (platformSettings.Count != Helper.Platforms.Length) {
+                for (int i = 0; i < Helper.Platforms.Length; i++) {
+                    GetPlatformSettings(Helper.Platforms[i]);
                 }
 
                 EditorUtility.SetDirty(this);
@@ -21,12 +21,12 @@ namespace LinChunJie.AssetPostprocessor {
             }
         }
 
-        public AssetPostprocessorHelper.TexturePlatformSettings GetPlatformSettings(string platform) {
+        public TexturePlatformSettings GetPlatformSettings(string platform) {
             var index = platformSettings.FindIndex((x) => { return x.platform == platform; });
             if (index == -1) {
-                var platformSetting = new AssetPostprocessorHelper.TexturePlatformSettings() {
+                var platformSetting = new TexturePlatformSettings() {
                     platform = platform,
-                    format = AssetPostprocessorHelper.GetDefaultTextureFormat(platform),
+                    format = Helper.GetDefaultTextureFormat(platform),
                 };
                 platformSettings.Add(platformSetting);
                 return platformSetting;

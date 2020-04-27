@@ -186,7 +186,7 @@ namespace LinChunJie.AssetPostprocessor {
         private bool CheckDragAndDrop(Rect parentRect) {
             parentRect = new Rect(0, 0, parentRect.width, parentRect.height);
             if (parentRect.Contains(Event.current.mousePosition) && (Event.current.type == EventType.DragUpdated || Event.current.type == EventType.DragPerform)) {
-                return AssetPostprocessorHelper.IsDragFolders(DragAndDrop.paths);
+                return Helper.IsDragFolders(DragAndDrop.paths);
             }
 
             return false;

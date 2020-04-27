@@ -8,7 +8,6 @@ namespace LinChunJie.AssetPostprocessor {
     public class TexturePostprocessorBaseWidget : IAssetPostprocessorWidget {
         private readonly SoTexturePostprocessorBase so;
         private readonly Styles styles;
-        private readonly AssetPostprocessorHelper helper;
         private readonly bool allowEdit;
 
         private int platformIndex = 0;
@@ -23,8 +22,7 @@ namespace LinChunJie.AssetPostprocessor {
 
         private TexturePostprocessorBaseWidget() {
             styles = styles ?? new Styles();
-            helper = helper ?? new AssetPostprocessorHelper();
-            platformIndex = Array.FindIndex(AssetPostprocessorHelper.Platforms, (x) => x == AssetPostprocessorHelper.SelectPlatform);
+            platformIndex = Array.FindIndex(Helper.Platforms, (x) => x == Helper.SelectPlatform);
             platformIndex = platformIndex == -1 ? 0 : platformIndex;
         }
 
@@ -46,10 +44,10 @@ namespace LinChunJie.AssetPostprocessor {
             GUILayout.BeginVertical(EditorStyles.helpBox);
             GUILayout.BeginHorizontal();
             {
-                for (int i = 0; i < AssetPostprocessorHelper.Platforms.Length; i++) {
-                    if (GUILayout.Toggle(platformIndex == i, AssetPostprocessorHelper.Platforms[i], EditorStyles.toolbarButton)) {
+                for (int i = 0; i < Helper.Platforms.Length; i++) {
+                    if (GUILayout.Toggle(platformIndex == i, Helper.Platforms[i], EditorStyles.toolbarButton)) {
                         platformIndex = i;
-                        AssetPostprocessorHelper.SelectPlatform = AssetPostprocessorHelper.Platforms[i];
+                        Helper.SelectPlatform = Helper.Platforms[i];
                     }
                 }
             }
@@ -57,11 +55,11 @@ namespace LinChunJie.AssetPostprocessor {
 
             EditorGUI.BeginChangeCheck();
             using (new EditorGUI.DisabledScope(!allowEdit)) {
-                var selectPlatform = AssetPostprocessorHelper.Platforms[platformIndex];
+                var selectPlatform = Helper.Platforms[platformIndex];
                 var platformSetting = so.GetPlatformSettings(selectPlatform);
-                platformSetting.maxTextureSize = EditorGUILayout.IntPopup(styles.TextureSizeLabel, platformSetting.maxTextureSize, helper.TextureSizeOptionLabels, helper.TextureSizeOptions);
+                platformSetting.maxTextureSize = EditorGUILayout.IntPopup(styles.TextureSizeLabel, platformSetting.maxTextureSize, Helper.TextureSizeOptionLabels, Helper.TextureSizeOptions);
 
-                var textureFormatValue = helper.GetFormatValues(platformSetting.platform);
+                var textureFormatValue = Helper.GetFormatValues(platformSetting.platform);
                 platformSetting.format = EditorGUILayout.IntPopup(styles.FormatLabel, platformSetting.format, textureFormatValue.FormatStrings, textureFormatValue.FormatValues);
 
                 platformSetting.compressionQuality = (UnityEditor.TextureCompressionQuality) EditorGUILayout.EnumPopup(styles.CompressionQualityLabel, platformSetting.compressionQuality);

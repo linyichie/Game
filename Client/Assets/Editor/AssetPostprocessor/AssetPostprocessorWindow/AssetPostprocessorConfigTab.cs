@@ -270,7 +270,7 @@ namespace LinChunJie.AssetPostprocessor {
         public void Refresh() {
             paths.Clear();
             var guids = AssetDatabase.FindAssets("", new string[] {
-                AssetPostprocessorHelper.GetSoAssetPostprocessorFolder(this.assetType),
+                Helper.GetSoAssetPostprocessorFolder(this.assetType),
             });
             if (guids != null) {
                 foreach (var guid in guids) {

@@ -55,9 +55,9 @@ namespace LinChunJie.AssetPostprocessor {
             }
 
             if (soPostprocessor != null) {
-                SetPlatformSettings(AssetPostprocessorHelper.PlatformStandalone, importer, soPostprocessor);
-                SetPlatformSettings(AssetPostprocessorHelper.PlatformIPhone, importer, soPostprocessor);
-                SetPlatformSettings(AssetPostprocessorHelper.PlatformAndroid, importer, soPostprocessor);
+                SetPlatformSettings(Helper.PlatformStandalone, importer, soPostprocessor);
+                SetPlatformSettings(Helper.PlatformIPhone, importer, soPostprocessor);
+                SetPlatformSettings(Helper.PlatformAndroid, importer, soPostprocessor);
             }
         }
 
@@ -67,7 +67,7 @@ namespace LinChunJie.AssetPostprocessor {
             platformSettings.overridden = true;
             platformSettings.format = (TextureImporterFormat) soPlatformSettings.format;
             platformSettings.maxTextureSize = soPlatformSettings.maxTextureSize;
-            if (platform != AssetPostprocessorHelper.PlatformStandalone) {
+            if (platform != Helper.PlatformStandalone) {
                 platformSettings.compressionQuality = (int) soPlatformSettings.compressionQuality;
             }
 

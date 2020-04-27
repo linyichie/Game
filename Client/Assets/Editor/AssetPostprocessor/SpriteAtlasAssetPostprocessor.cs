@@ -57,13 +57,13 @@ namespace LinChunJie.AssetPostprocessor {
 
         static void SetPlatformSettings(SoSpritePostprocessor so) {
             //-- Standalone
-            SetPlatformSettings(AssetPostprocessorHelper.PlatformStandalone, so);
+            SetPlatformSettings(Helper.PlatformStandalone, so);
 
             //-- iPhone
-            SetPlatformSettings(AssetPostprocessorHelper.PlatformIPhone, so);
+            SetPlatformSettings(Helper.PlatformIPhone, so);
 
             //-- Android
-            SetPlatformSettings(AssetPostprocessorHelper.PlatformAndroid, so);
+            SetPlatformSettings(Helper.PlatformAndroid, so);
         }
 
         static void SetPlatformSettings(string platform, SoSpritePostprocessor so) {
@@ -72,7 +72,7 @@ namespace LinChunJie.AssetPostprocessor {
             platformSettings.overridden = true;
             platformSettings.format = (TextureImporterFormat) soPlatformSettings.format;
             platformSettings.maxTextureSize = soPlatformSettings.maxTextureSize;
-            if (platform != AssetPostprocessorHelper.PlatformStandalone) {
+            if (platform != Helper.PlatformStandalone) {
                 platformSettings.compressionQuality = (int) soPlatformSettings.compressionQuality;
             }
 
