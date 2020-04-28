@@ -17,6 +17,7 @@ namespace Funny.AssetPostprocessor {
             window.Show();
         }
 
+        private static readonly string documentUrl = "https://paper.dropbox.com/doc/UI--AyInNwEdmjJaeFxy1MqVOGEcAg-GRaBppVmkKLxhUipr1wRK";
         private static readonly float toolBarHeight = 20;
         private static readonly float splitterWidth = 3f;
 
@@ -38,6 +39,7 @@ namespace Funny.AssetPostprocessor {
         private Rect subRect;
         private Rect toolbarRect;
         private Texture2D fixIcon;
+        private Texture2D documentIcon;
 
         private PostprocessorAssetType selectAssetType = PostprocessorAssetType.SpriteAtlas;
 
@@ -54,6 +56,7 @@ namespace Funny.AssetPostprocessor {
 
         private void OnEnable() {
             fixIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/AssetPostprocessor/Texture/Fix.png");
+            documentIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/AssetPostprocessor/Texture/Document.png");
             subRect = GetSubWindowArea();
             horizontalLeftSplitterRect = new Rect(subRect.x + subRect.width * horizontalLeftSplitterPercent, subRect.y, splitterWidth, subRect.height);
             horizontalRightSplitterRect = new Rect(subRect.x + subRect.width * horizontalRightSplitterPercent - splitterWidth, subRect.y, splitterWidth, subRect.height);
@@ -89,7 +92,11 @@ namespace Funny.AssetPostprocessor {
         }
 
         private void ShowToolbar() {
-            toolbarRect = new Rect(20, splitterWidth, 80 * assetTypeOptions.Length, toolBarHeight);
+            toolbarRect = new Rect(toolBarHeight + 10, splitterWidth, 80 * assetTypeOptions.Length, toolBarHeight);
+            var documentRect = new Rect(5, splitterWidth, toolBarHeight, toolBarHeight);
+            if(GUI.Button(documentRect, documentIcon)) {
+                Application.OpenURL(documentUrl);
+            }
             selectAssetType = (PostprocessorAssetType)GUI.Toolbar(toolbarRect, (int)selectAssetType, assetTypeOptions);
             ShowFixTool(toolbarRect);
         }
