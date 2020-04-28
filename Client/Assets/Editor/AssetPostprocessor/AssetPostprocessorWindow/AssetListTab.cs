@@ -12,7 +12,12 @@ using Debug = UnityEngine.Debug;
 namespace Funny.AssetPostprocessor {
     public class AssetListTab : TreeView {
         private PostprocessorAssetType assetType = (PostprocessorAssetType)(-1);
+        private SoAssetPostprocessor soAssetPostprocessor;
+        private SearchField searchField;
+        private AssetState selectState;
+        private string[] oldAssetGuids;
         private string folder = string.Empty;
+        private bool inited = false;
 
         private readonly SoAssetPostprocessorFolder postprocessorFolder;
         private readonly Texture2D warnIcon;
@@ -20,12 +25,7 @@ namespace Funny.AssetPostprocessor {
         private readonly List<AssetListItem> treeViewItems = new List<AssetListItem>();
         private readonly GUIContent stateEmptyContent = new GUIContent("");
         private readonly GUIContent[] stateContents;
-
-        private SoAssetPostprocessor soAssetPostprocessor;
-        private SearchField searchField;
-        private AssetState selectState;
-        private bool inited = false;
-
+        
         public bool Inited {
             get { return inited; }
             set {
@@ -242,19 +242,27 @@ namespace Funny.AssetPostprocessor {
                 var guid = postprocessorFolder.Get(this.assetType, this.folder);
                 var assetPath = AssetDatabase.GUIDToAssetPath(guid);
                 soAssetPostprocessor = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessor>(assetPath);
-                Refresh();
+                Refresh(true);
             }
         }
 
-        public void Refresh() {
+        public void Refresh(bool forceUpdate = false) {
+            if(!forceUpdate) {
+                if(!IsRequireRefreshAsset()) {
+                    for(int i = 0; i < treeViewItems.Count; i++) {
+                        treeViewItems[i].SetDirty();
+                    }
+
+                    return;
+                }
+            }
             treeViewItems.Clear();
             if(!string.IsNullOrEmpty(this.folder)) {
                 var assetGuids = AssetDatabase.FindAssets(Helper.GetAssetSearchFilterByAssetType(this.assetType), new string[] {
                     this.folder
                 });
+                oldAssetGuids = assetGuids;
                 if(assetGuids != null) {
-                    var index = 0;
-                    var directories = new List<string>();
                     List<Task> tasks = new List<Task>();
                     var folders = postprocessorFolder.GetPaths(this.assetType);
                     for(int i = 0; i < assetGuids.Length; i++) {
@@ -284,6 +292,25 @@ namespace Funny.AssetPostprocessor {
             }
 
             Reload();
+        }
+
+        private bool IsRequireRefreshAsset() {
+            if(oldAssetGuids != null && !string.IsNullOrEmpty(this.folder)) {
+                var guids = AssetDatabase.FindAssets(Helper.GetAssetSearchFilterByAssetType(this.assetType), new string[] {
+                    this.folder
+                });
+                if(guids != null && oldAssetGuids.Length == guids.Length) {
+                    for(int i = 0; i < oldAssetGuids.Length; i++) {
+                        if(oldAssetGuids[i] != guids[i]) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         public void SoPostprocessorChanged(string guid) {
