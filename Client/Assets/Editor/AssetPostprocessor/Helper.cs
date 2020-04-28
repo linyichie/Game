@@ -11,25 +11,31 @@ namespace LinChunJie.AssetPostprocessor {
         Texture = 2,
         Model = 3,
     }
-    
+
     public enum TextureImporterFormatStandalone {
         RGBA32 = TextureImporterFormat.RGBA32,
     }
 
     public enum TextureImporterFormatIPhone {
+        RGB24 = TextureImporterFormat.RGB24,
         RGBA32 = TextureImporterFormat.RGBA32,
-#if UNITY_2019_2_OR_NEWER
-        ASTC_6X6 = TextureImporterFormat.ASTC_6x6,
-#elif UNITY_2018_4_OR_NEWER
-        ASTC_6X6 = TextureImporterFormat.ASTC_RGBA_6x6,
-#endif
+        ASTC_RGB_4x4 = TextureImporterFormat.ASTC_RGB_4x4,
+        ASTC_RGB_6x6 = TextureImporterFormat.ASTC_RGB_6x6,
+        ASTC_RGBA_4x4 = TextureImporterFormat.ASTC_RGBA_4x4,
+        ASTC_RGBA_6x6 = TextureImporterFormat.ASTC_RGBA_6x6,
         PVRTC_RGB4 = TextureImporterFormat.PVRTC_RGB4,
+        PVRTC_RGBA4 = TextureImporterFormat.PVRTC_RGBA4
     }
 
     public enum TextureImporterFormatAndroid {
         RGBA32 = TextureImporterFormat.RGBA32,
-        ETC2_RGBA8 = TextureImporterFormat.ETC2_RGBA8,
+        ETC_RGB4 = TextureImporterFormat.ETC_RGB4,
         ETC2_RGB4 = TextureImporterFormat.ETC2_RGB4,
+        ETC2_RGBA8 = TextureImporterFormat.ETC2_RGBA8,
+        ASTC_RGB_4x4 = TextureImporterFormat.ASTC_RGB_4x4,
+        ASTC_RGB_6x6 = TextureImporterFormat.ASTC_RGB_6x6,
+        ASTC_RGBA_4x4 = TextureImporterFormat.ASTC_RGBA_4x4,
+        ASTC_RGBA_6x6 = TextureImporterFormat.ASTC_RGBA_6x6,
     }
 
     [Serializable]
@@ -37,7 +43,7 @@ namespace LinChunJie.AssetPostprocessor {
         public string platform;
         public bool overridden = true;
         public int maxTextureSize = 2048;
-        public int format = (int) TextureImporterFormat.Automatic;
+        public int format = (int)TextureImporterFormat.Automatic;
         public UnityEditor.TextureCompressionQuality compressionQuality = UnityEditor.TextureCompressionQuality.Normal;
     }
 
@@ -60,18 +66,18 @@ namespace LinChunJie.AssetPostprocessor {
 
         public static string SelectPlatform {
             get {
-                if (string.IsNullOrEmpty(selectPlatform)) {
+                if(string.IsNullOrEmpty(selectPlatform)) {
                     selectPlatform = EditorPrefs.GetString("SoAssetImporter.Platform");
                 }
 
-                if (string.IsNullOrEmpty(selectPlatform)) {
+                if(string.IsNullOrEmpty(selectPlatform)) {
                     return PlatformStandalone;
                 }
 
                 return selectPlatform;
             }
             set {
-                if (selectPlatform != value) {
+                if(selectPlatform != value) {
                     selectPlatform = value;
                     EditorPrefs.SetString("SoAssetImporter.Platform", value);
                 }
@@ -97,26 +103,26 @@ namespace LinChunJie.AssetPostprocessor {
         private static readonly Dictionary<string, TextureFormatValue> formatValues = new Dictionary<string, TextureFormatValue>();
 
         public static int GetDefaultTextureFormat(string platform) {
-            switch (platform) {
+            switch(platform) {
                 case PlatformStandalone:
-                    return (int) TextureImporterFormatStandalone.RGBA32;
+                    return (int)TextureImporterFormatStandalone.RGBA32;
                 case PlatformAndroid:
-                    return (int) TextureImporterFormatAndroid.ETC2_RGBA8;
+                    return (int)TextureImporterFormatAndroid.ETC2_RGBA8;
                 case PlatformIPhone:
-                    return (int) TextureImporterFormatIPhone.ASTC_6X6;
+                    return (int)TextureImporterFormatIPhone.ASTC_RGBA_6x6;
             }
 
-            return (int) TextureImporterFormat.Automatic;
+            return (int)TextureImporterFormat.Automatic;
         }
 
         public static TextureFormatValue GetFormatValues(string platform) {
-            if (formatValues.ContainsKey(platform)) {
+            if(formatValues.ContainsKey(platform)) {
                 return formatValues[platform];
             }
 
             Array enumArray = null;
             string[] enumNames = null;
-            switch (platform) {
+            switch(platform) {
                 case PlatformStandalone:
                     enumArray = Enum.GetValues(typeof(TextureImporterFormatStandalone));
                     enumNames = Enum.GetNames(typeof(TextureImporterFormatStandalone));
@@ -131,10 +137,10 @@ namespace LinChunJie.AssetPostprocessor {
                     break;
             }
 
-            if (enumArray != null) {
+            if(enumArray != null) {
                 int[] enumValues = new int[enumArray.Length];
-                for (int i = 0; i < enumArray.Length; i++) {
-                    enumValues[i] = (int) enumArray.GetValue(i);
+                for(int i = 0; i < enumArray.Length; i++) {
+                    enumValues[i] = (int)enumArray.GetValue(i);
                 }
 
                 var formatValue = new TextureFormatValue(enumValues, enumNames);
@@ -146,7 +152,7 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         public static string GetSoAssetPostprocessorFolder(PostprocessorAssetType assetType) {
-            switch (assetType) {
+            switch(assetType) {
                 case PostprocessorAssetType.SpriteAtlas:
                     return "Assets/Editor/AssetPostprocessor/Config/SpriteAtlas";
                 case PostprocessorAssetType.Sprite:
@@ -161,7 +167,7 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         public static string GetAssetSearchFilterByAssetType(PostprocessorAssetType assetType) {
-            switch (assetType) {
+            switch(assetType) {
                 case PostprocessorAssetType.SpriteAtlas:
                     return "t:spriteatlas";
                 case PostprocessorAssetType.Sprite:
@@ -177,9 +183,9 @@ namespace LinChunJie.AssetPostprocessor {
 
         public static bool IsDragFolders(string[] paths) {
             var selectFolder = true;
-            if (paths != null && paths.Length > 0) {
-                for (int i = 0; i < paths.Length; i++) {
-                    if (!Directory.Exists(paths[i])) {
+            if(paths != null && paths.Length > 0) {
+                for(int i = 0; i < paths.Length; i++) {
+                    if(!Directory.Exists(paths[i])) {
                         selectFolder = false;
                     }
                 }
@@ -188,6 +194,18 @@ namespace LinChunJie.AssetPostprocessor {
             }
 
             return selectFolder;
+        }
+
+        public static bool IsValuePowerOf2(int value) {
+            if(value < 2) {
+                return false;
+            }
+
+            if((value & value - 1) == 0) {
+                return true;
+            }
+
+            return false;
         }
     }
 }

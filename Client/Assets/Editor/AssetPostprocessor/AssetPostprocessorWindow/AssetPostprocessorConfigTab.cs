@@ -23,22 +23,16 @@ namespace LinChunJie.AssetPostprocessor {
         public event Action<string> OnChanged;
 
         class Styles {
-            public readonly Texture checkIcon;
             public readonly GUIStyle itemSelectedStyle;
             public readonly GUIStyle itemNormalStyle;
-            public readonly GUIStyle itemConfigStyle;
 
             public Styles() {
-                checkIcon = AssetDatabase.LoadAssetAtPath<Texture>("Assets/Editor/AssetPostprocessor/Texture/check.png");
                 itemNormalStyle = new GUIStyle() {
                     alignment = TextAnchor.MiddleLeft,
                     fontStyle = FontStyle.Bold,
                 };
                 itemSelectedStyle = new GUIStyle(itemNormalStyle);
                 itemSelectedStyle.normal.textColor = Color.white;
-                itemConfigStyle = new GUIStyle(itemNormalStyle) {
-                    alignment = TextAnchor.MiddleRight,
-                };
             }
         }
 
@@ -190,6 +184,7 @@ namespace LinChunJie.AssetPostprocessor {
                 if (newPath.Length != 0) {
                     var success = AssetDatabase.CopyAsset(item.Path, newPath);
                     if (success) {
+                        AssetDatabase.SaveAssets();
                         paths.Add(newPath);
                         Reload();
                     }

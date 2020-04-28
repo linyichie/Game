@@ -6,29 +6,37 @@ using UnityEngine;
 using UnityEngine.U2D;
 
 namespace LinChunJie.AssetPostprocessor {
-    public class AssetListSpriteAtlasItem : AssetListItem {
+    public sealed class AssetListSpriteAtlasItem : AssetListItem {
+        private SpriteAtlas spriteAtlas;
         public AssetListSpriteAtlasItem(string path, int depth, string displayName) : base(path, depth, displayName) { }
 
-        public override void VerifyImporterSetting(SoAssetPostprocessor so) {
+        public override void VerifyAssetState(SoAssetPostprocessor so) {
             IsChanged = false;
 
             var texturePostprocessorBase = so as SoSpriteAtlasPostprocessor;
-            var spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(Path);
-
-            if(!SpriteAtlasAssetPostprocessor.CompareSettings(spriteAtlas, texturePostprocessorBase)) {
+            if(!SpriteAtlasAssetPostprocessor.CompareSettings(GetSpriteAltas(), texturePostprocessorBase)) {
                 IsChanged = true;
             }
 
             IsDirty = false;
         }
 
+        public override void VerifyAssetError(SoAssetPostprocessor so) {
+            IsErrorDirty = false;
+        }
+
+        private SpriteAtlas GetSpriteAltas() {
+            if(spriteAtlas == null) {
+                spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(Path);
+            }
+
+            return spriteAtlas;
+        }
+
         public override void FixAndReimport(SoAssetPostprocessor so) {
             var texturePostprocessorBase = so as SoTexturePostprocessorBase;
-            var spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(Path);
-            
-            SpriteAtlasAssetPostprocessor.SetPlatformSettings(spriteAtlas, texturePostprocessorBase as SoSpriteAtlasPostprocessor);
-
-            EditorUtility.SetDirty(spriteAtlas);
+            SpriteAtlasAssetPostprocessor.SetPlatformSettings(GetSpriteAltas(), texturePostprocessorBase as SoSpriteAtlasPostprocessor);
+            EditorUtility.SetDirty(GetSpriteAltas());
         }
     }
 }

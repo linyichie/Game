@@ -9,14 +9,27 @@ namespace LinChunJie.AssetPostprocessor {
     public abstract class AssetListItem : TreeViewItem {
         public readonly string Path;
         public bool IsChanged { get; protected set; } = false;
-
+        public bool IsError { get; protected set; } = false;
         public bool IsDirty { get; protected set; } = true;
+        public bool IsErrorDirty { get; protected set; } = true;
+
+        protected AssetImporter importer;
 
         protected AssetListItem(string path, int depth, string displayName) : base(path.GetHashCode(), depth, displayName) {
             this.Path = path;
         }
 
-        public abstract void VerifyImporterSetting(SoAssetPostprocessor so);
+        public abstract void VerifyAssetState(SoAssetPostprocessor so);
+
+        public abstract void VerifyAssetError(SoAssetPostprocessor so);
+
+        protected T GetAssetImporter<T>() where T : AssetImporter {
+            if(importer == null) {
+                importer = AssetImporter.GetAtPath(Path);
+            }
+
+            return importer as T;
+        }
 
         public virtual void SetDirty() {
             IsDirty = true;

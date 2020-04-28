@@ -20,9 +20,6 @@ MonoBehaviour:
     path: Assets/AddressableAssets/UI/Texture/Common
     guid: e72e5e5daaed248699875aa5cc84c4b6
   - assetType: 0
-    path: Assets/AddressableAssets/UI/Atlas/Common
-    guid: eb3639e085a5eb44f8c4e30a914e4b5a
-  - assetType: 0
     path: Assets/AddressableAssets/UI/Atlas
     guid: eb3639e085a5eb44f8c4e30a914e4b5a
   - assetType: 1

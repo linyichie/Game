@@ -16,10 +16,21 @@ namespace LinChunJie.AssetPostprocessor {
 
         private readonly SoAssetPostprocessorFolder postprocessorFolder;
         private readonly Texture2D warnIcon;
+        private readonly Texture2D errorIcon;
         private readonly List<AssetListItem> treeViewItems = new List<AssetListItem>();
+        private readonly GUIContent stateEmptyContent = new GUIContent("");
+        private readonly GUIContent[] stateContents;
 
         private SoAssetPostprocessor soAssetPostprocessor;
         private SearchField searchField;
+        private AssetState selectState;
+
+        public enum AssetState {
+            None = 0,
+            Normal = 1,
+            Warn = 2,
+            Error = 3,
+        }
 
         public static AssetListTab Get() {
             var treeView = new AssetListTab(new TreeViewState());
@@ -31,7 +42,14 @@ namespace LinChunJie.AssetPostprocessor {
             showAlternatingRowBackgrounds = true;
             postprocessorFolder = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();
             warnIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/AssetPostprocessor/Texture/Warn.png");
+            errorIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/AssetPostprocessor/Texture/Error.png");
             searchField = new SearchField();
+            stateContents = new GUIContent[] {
+                new GUIContent("None"), 
+                new GUIContent("Normal"), 
+                new GUIContent("Warn", warnIcon), 
+                new GUIContent("Error", errorIcon), 
+            };
         }
 
         protected override TreeViewItem BuildRoot() {
@@ -54,13 +72,21 @@ namespace LinChunJie.AssetPostprocessor {
                 count = checkCount;
                 for(int i = 0; i < rootItem.children.Count; i++) {
                     var item = rootItem.children[i] as AssetListItem;
-                    if(item.IsDirty) {
-                        item.VerifyImporterSetting(soAssetPostprocessor);
+                    if(item.IsErrorDirty || item.IsDirty) {
                         isDirty = true;
                         count--;
-                        if(count <= 0) {
-                            break;
-                        }
+                    }
+
+                    if(item.IsDirty) {
+                        item.VerifyAssetState(soAssetPostprocessor);
+                    }
+
+                    if(item.IsErrorDirty) {
+                        item.VerifyAssetError(soAssetPostprocessor);
+                    }
+
+                    if(count <= 0) {
+                        break;
                     }
                 }
             }
@@ -72,8 +98,16 @@ namespace LinChunJie.AssetPostprocessor {
 
         public override void OnGUI(Rect pos) {
             GUI.Box(pos, string.Empty, GUI.skin.box);
-            var searchFieldRect = new Rect(pos.x + 10, pos.y + 10, pos.width - 20, 20);
+            var searchFieldRect = new Rect(pos.x + 10, pos.y + 10, pos.width - 100, 20);
             searchString = searchField.OnGUI(searchFieldRect, searchString);
+            var stateRect = new Rect(searchFieldRect.xMax + 5, pos.y + 10, 80, 20);
+            var state  = (AssetState)EditorGUI.Popup(stateRect, stateEmptyContent, (int)selectState, stateContents);
+            if(state != selectState) {
+                selectState = state;
+                var oldSearchString = searchString;
+                searchString = selectState.ToString();
+                searchString = oldSearchString;
+            }
             base.OnGUI(new Rect(pos.x + 1, searchFieldRect.yMax + 3, pos.width - 2, pos.height - searchFieldRect.height - 20 - 3));
         }
 
@@ -84,13 +118,47 @@ namespace LinChunJie.AssetPostprocessor {
             var iconRect = new Rect(rect.x + 1, rect.y + 1, rect.height - 2, rect.height - 2);
             GUI.DrawTexture(iconRect, item.icon, ScaleMode.ScaleToFit);
             var labelRect = new Rect(rect.x + iconRect.xMax + 1, rect.y, rect.width - iconRect.width - 1, rect.height);
+            var rightIconRect = new Rect(rect.width - rect.height, rect.y + 1, rect.height - 2, rect.height - 2);
             if(item.IsChanged) {
-                var warnRect = new Rect(rect.width - rect.height, rect.y + 1, rect.height - 2, rect.height - 2);
-                GUI.DrawTexture(warnRect, warnIcon, ScaleMode.ScaleToFit);
-                labelRect.width = labelRect.width - warnRect.width - 2;
+                GUI.DrawTexture(rightIconRect, warnIcon, ScaleMode.ScaleToFit);
+                rightIconRect = new Rect(rightIconRect.x - rect.height, rect.y + 1, rect.height - 2, rect.height - 2);
+            }
+
+            if(item.IsError) {
+                GUI.DrawTexture(rightIconRect, errorIcon, ScaleMode.ScaleToFit);
             }
 
             DefaultGUI.BoldLabel(labelRect, item.displayName, args.selected, args.focused);
+        }
+
+        protected override IList<TreeViewItem> BuildRows(TreeViewItem root) {
+            var list = base.BuildRows(root);
+            var removeIndexs = new List<int>();
+            for(int i = 0; i < list.Count; i++) {
+                var item = list[i] as AssetListItem;
+                switch(selectState) {
+                    case AssetState.Normal:
+                        if(item.IsError || item.IsChanged) {
+                            removeIndexs.Add(i);
+                        }
+                        break;
+                    case AssetState.Warn:
+                        if(!item.IsChanged) {
+                            removeIndexs.Add(i);
+                        }
+                        break;
+                    case AssetState.Error:
+                        if(!item.IsError) {
+                            removeIndexs.Add(i);
+                        }
+                        break;
+                }
+            }
+
+            for(int i = 0; i < removeIndexs.Count; i++) {
+                list.RemoveAt(removeIndexs[i]);
+            }
+            return list;
         }
 
         protected override void DoubleClickedItem(int id) {
@@ -139,6 +207,7 @@ namespace LinChunJie.AssetPostprocessor {
                         changedItems.Add(item);
                     }
                 }
+
                 Selection.activeObject = null;
                 FixDelay(changedItems);
             }
@@ -157,6 +226,7 @@ namespace LinChunJie.AssetPostprocessor {
 
         public void Refresh() {
             treeViewItems.Clear();
+            selectState = AssetState.None;
             if(!string.IsNullOrEmpty(this.folder)) {
                 var assetGuids = AssetDatabase.FindAssets(Helper.GetAssetSearchFilterByAssetType(this.assetType), new string[] {
                     this.folder
@@ -223,6 +293,7 @@ namespace LinChunJie.AssetPostprocessor {
                     changedItems.Add(item);
                 }
             }
+
             Selection.activeObject = null;
             FixDelay(changedItems);
         }
@@ -236,6 +307,7 @@ namespace LinChunJie.AssetPostprocessor {
                 if(item.IsChanged) {
                     item.FixAndReimport(soAssetPostprocessor);
                 }
+
                 index++;
                 if(isCancel || index >= items.Count) {
                     EditorApplication.update = null;
