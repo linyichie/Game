@@ -33,6 +33,7 @@ namespace Funny.AssetPostprocessor {
 
         public virtual void SetDirty() {
             IsDirty = true;
+            IsErrorDirty = true;
         }
 
         public abstract void FixAndReimport(SoAssetPostprocessor so);

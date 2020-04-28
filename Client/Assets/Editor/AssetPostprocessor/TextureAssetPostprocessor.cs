@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Funny.AssetPostprocessor {
     public static class TextureAssetPostprocessor {
-        public static void OnPostprocessTexture(TextureImporter importer) {
+        public static void OnPreprocessTexture(TextureImporter importer) {
             var assetType = (PostprocessorAssetType)(-1);
             if(importer.assetPath.Contains("Sprite")) {
                 assetType = PostprocessorAssetType.Sprite;
@@ -39,7 +39,6 @@ namespace Funny.AssetPostprocessor {
             importer.textureType = assetType == PostprocessorAssetType.Sprite ? TextureImporterType.Sprite : TextureImporterType.Default;
             SetDefaultSettings(importer);
             SetPlatformSettings(importer, soPostprocessor);
-            Reimport(importer);
         }
 
         public static void SetDefaultSettings(TextureImporter importer) {
@@ -90,11 +89,6 @@ namespace Funny.AssetPostprocessor {
             }
 
             return same;
-        }
-        
-        static async Task Reimport(TextureImporter importer) {
-            await Task.Delay(1);
-            importer.SaveAndReimport();
         }
     }
 }
