@@ -7,11 +7,10 @@ using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace Funny.AssetPostprocessor {
-    [DisallowMultipleComponent]
     public class AssetPostprocessorWindow : EditorWindow {
         [MenuItem("Funny/资源导入工具")]
         private static void Open() {
-            var window = EditorWindow.CreateInstance<AssetPostprocessorWindow>();
+            var window = EditorWindow.GetWindow<AssetPostprocessorWindow>();
             window.autoRepaintOnSceneChange = true;
             window.titleContent = new GUIContent("资源导入工具");
             window.Show();
