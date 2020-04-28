@@ -46,6 +46,30 @@ namespace LinChunJie.AssetPostprocessor {
             return root;
         }
 
+        public void OnInspectorUpdate() {
+            var isDirty = false;
+            if(rootItem != null) {
+                var checkCount = 500;
+                var count = checkCount;
+                count = checkCount;
+                for(int i = 0; i < rootItem.children.Count; i++) {
+                    var item = rootItem.children[i] as AssetListItem;
+                    if(item.IsDirty) {
+                        item.VerifyImporterSetting(soAssetPostprocessor);
+                        isDirty = true;
+                        count--;
+                        if(count <= 0) {
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if(isDirty) {
+                Repaint();
+            }
+        }
+
         public override void OnGUI(Rect pos) {
             GUI.Box(pos, string.Empty, GUI.skin.box);
             var searchFieldRect = new Rect(pos.x + 10, pos.y + 10, pos.width - 20, 20);
@@ -56,14 +80,13 @@ namespace LinChunJie.AssetPostprocessor {
         protected override void RowGUI(RowGUIArgs args) {
             var rect = args.rowRect;
             var item = args.item as AssetListItem;
-            var iconRect = new Rect(rect.x + 1, rect.y + 1, rect.height - 2, rect.height - 2);
             item.icon = item.icon ? item.icon : (AssetDatabase.GetCachedIcon(item.Path) as Texture2D);
+            var iconRect = new Rect(rect.x + 1, rect.y + 1, rect.height - 2, rect.height - 2);
             GUI.DrawTexture(iconRect, item.icon, ScaleMode.ScaleToFit);
             var labelRect = new Rect(rect.x + iconRect.xMax + 1, rect.y, rect.width - iconRect.width - 1, rect.height);
-            if(item.IsDirty) {
+            if(item.IsChanged) {
                 var warnRect = new Rect(rect.width - rect.height, rect.y + 1, rect.height - 2, rect.height - 2);
                 GUI.DrawTexture(warnRect, warnIcon, ScaleMode.ScaleToFit);
-
                 labelRect.width = labelRect.width - warnRect.width - 2;
             }
 
@@ -88,7 +111,7 @@ namespace LinChunJie.AssetPostprocessor {
                 var isDirty = false;
                 for(int i = 0; i < selectIds.Count; i++) {
                     var item = FindItem(selectIds[i], rootItem) as AssetListItem;
-                    if(item.IsDirty) {
+                    if(item.IsChanged) {
                         isDirty = true;
                         break;
                     }
@@ -109,15 +132,15 @@ namespace LinChunJie.AssetPostprocessor {
         private void OnFixAndReimport(object o) {
             var selectIds = o as IList<int>;
             if(selectIds != null) {
-                List<AssetListItem> dirtyItems = new List<AssetListItem>();
+                List<AssetListItem> changedItems = new List<AssetListItem>();
                 for(int i = 0; i < selectIds.Count; i++) {
                     var item = FindItem(selectIds[i], rootItem) as AssetListItem;
-                    if(item.IsDirty) {
-                        dirtyItems.Add(item);
+                    if(item.IsChanged) {
+                        changedItems.Add(item);
                     }
                 }
                 Selection.activeObject = null;
-                FixDelay(dirtyItems);
+                FixDelay(changedItems);
             }
         }
 
@@ -163,7 +186,6 @@ namespace LinChunJie.AssetPostprocessor {
                     foreach(var task in tasks) {
                         if(task.Item != null) {
                             var item = task.Item;
-                            item.VerifyImporterSetting(soAssetPostprocessor);
                             treeViewItems.Add(task.Item);
                         }
                     }
@@ -178,14 +200,14 @@ namespace LinChunJie.AssetPostprocessor {
             soAssetPostprocessor = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessor>(assetPath);
             for(int i = 0; i < rootItem.children.Count; i++) {
                 var item = rootItem.children[i] as AssetListItem;
-                item.VerifyImporterSetting(soAssetPostprocessor);
+                item.SetDirty();
             }
         }
 
-        public bool IsAnyOfAssetDirty() {
+        public bool IsAnyOfAssetChanged() {
             for(int i = 0; i < rootItem.children.Count; i++) {
                 var item = rootItem.children[i] as AssetListItem;
-                if(item.IsDirty) {
+                if(item.IsChanged) {
                     return true;
                 }
             }
@@ -193,16 +215,16 @@ namespace LinChunJie.AssetPostprocessor {
             return false;
         }
 
-        public void FixAllDirty() {
-            List<AssetListItem> dirtyItems = new List<AssetListItem>();
+        public void FixAllChanged() {
+            List<AssetListItem> changedItems = new List<AssetListItem>();
             for(int i = 0; i < rootItem.children.Count; i++) {
                 var item = rootItem.children[i] as AssetListItem;
-                if(item.IsDirty) {
-                    dirtyItems.Add(item);
+                if(item.IsChanged) {
+                    changedItems.Add(item);
                 }
             }
             Selection.activeObject = null;
-            FixDelay(dirtyItems);
+            FixDelay(changedItems);
         }
 
         private async System.Threading.Tasks.Task FixDelay(List<AssetListItem> items) {
@@ -211,7 +233,7 @@ namespace LinChunJie.AssetPostprocessor {
             EditorApplication.update = () => {
                 var item = items[index];
                 var isCancel = EditorUtility.DisplayCancelableProgressBar("Fix...", StringUtility.Contact(index, "/", items.Count), index / (float)items.Count);
-                if(item.IsDirty) {
+                if(item.IsChanged) {
                     item.FixAndReimport(soAssetPostprocessor);
                 }
                 index++;

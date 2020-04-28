@@ -84,6 +84,10 @@ namespace LinChunJie.AssetPostprocessor {
             ShowSubTabs();
         }
 
+        private void OnInspectorUpdate() {
+            assetListTab?.OnInspectorUpdate();
+        }
+
         private void ShowToolbar() {
             toolbarRect = new Rect(20, splitterWidth, 80 * assetTypeOptions.Length, toolBarHeight);
             selectAssetType = (PostprocessorAssetType)GUI.Toolbar(toolbarRect, (int)selectAssetType, assetTypeOptions);
@@ -91,11 +95,11 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         private void ShowFixTool(Rect rect) {
-            var isDirty = assetListTab?.IsAnyOfAssetDirty();
+            var isChanged = assetListTab?.IsAnyOfAssetChanged();
             var buttonRect = new Rect(rect.xMax + splitterWidth, splitterWidth, fixIcon.width, toolBarHeight);
-            if(isDirty.HasValue && isDirty.Value) {
+            if(isChanged.HasValue && isChanged.Value) {
                 if(GUI.Button(buttonRect, fixIcon)) {
-                    assetListTab.FixAllDirty();
+                    assetListTab.FixAllChanged();
                 }
             }
         }

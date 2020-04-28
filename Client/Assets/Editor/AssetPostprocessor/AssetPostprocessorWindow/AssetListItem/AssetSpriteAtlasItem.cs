@@ -10,14 +10,16 @@ namespace LinChunJie.AssetPostprocessor {
         public AssetListSpriteAtlasItem(string path, int depth, string displayName) : base(path, depth, displayName) { }
 
         public override void VerifyImporterSetting(SoAssetPostprocessor so) {
-            IsDirty = false;
+            IsChanged = false;
 
             var texturePostprocessorBase = so as SoSpriteAtlasPostprocessor;
             var spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(Path);
 
             if(!SpriteAtlasAssetPostprocessor.CompareSettings(spriteAtlas, texturePostprocessorBase)) {
-                IsDirty = true;
+                IsChanged = true;
             }
+
+            IsDirty = false;
         }
 
         public override void FixAndReimport(SoAssetPostprocessor so) {

@@ -8,14 +8,16 @@ namespace LinChunJie.AssetPostprocessor {
         protected AssetTextureBaseItem(string path, int depth, string displayName) : base(path, depth, displayName) { }
 
         public override void VerifyImporterSetting(SoAssetPostprocessor so) {
-            IsDirty = false;
+            IsChanged = false;
 
             var texturePostprocessorBase = so as SoTexturePostprocessorBase;
             var importer = AssetImporter.GetAtPath(Path) as TextureImporter;
 
             if(!TextureAssetPostprocessor.CompareSettings(importer, texturePostprocessorBase)) {
-                IsDirty = true;
+                IsChanged = true;
             }
+
+            IsDirty = false;
         }
 
         public override void FixAndReimport(SoAssetPostprocessor so) {

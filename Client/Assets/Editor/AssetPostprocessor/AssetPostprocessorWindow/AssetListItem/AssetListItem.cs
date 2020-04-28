@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
@@ -6,13 +8,19 @@ using UnityEngine;
 namespace LinChunJie.AssetPostprocessor {
     public abstract class AssetListItem : TreeViewItem {
         public readonly string Path;
-        public bool IsDirty { get; protected set; }
+        public bool IsChanged { get; protected set; } = false;
+
+        public bool IsDirty { get; protected set; } = true;
 
         protected AssetListItem(string path, int depth, string displayName) : base(path.GetHashCode(), depth, displayName) {
             this.Path = path;
         }
 
         public abstract void VerifyImporterSetting(SoAssetPostprocessor so);
+
+        public virtual void SetDirty() {
+            IsDirty = true;
+        }
 
         public abstract void FixAndReimport(SoAssetPostprocessor so);
 
