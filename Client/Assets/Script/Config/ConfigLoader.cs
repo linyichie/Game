@@ -26,7 +26,7 @@ public static class ConfigLoader {
 
     static void LoadConfig(string fileName, Action<string> callback) {
         Count += 1;
-        AddressableSystem.LoadAsset<TextAsset>(StringUtility.Contact("Txt/", fileName),
+        AddressableSystem.LoadAsset<TextAsset>(StringUtil.Contact("Txt/", fileName),
             asset => { callback?.Invoke(asset.text); });
     }
 

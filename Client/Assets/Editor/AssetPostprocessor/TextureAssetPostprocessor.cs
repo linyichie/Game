@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public static class TextureAssetPostprocessor {
         public static void OnPostprocessTexture(TextureImporter importer) {
             var assetType = (PostprocessorAssetType)(-1);

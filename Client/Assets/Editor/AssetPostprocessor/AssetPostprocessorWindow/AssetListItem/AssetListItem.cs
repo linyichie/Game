@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public abstract class AssetListItem : TreeViewItem {
         public readonly string Path;
         public bool IsChanged { get; protected set; } = false;

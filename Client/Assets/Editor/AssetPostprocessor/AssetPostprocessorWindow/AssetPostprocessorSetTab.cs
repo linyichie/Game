@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEditor.Hardware;
 using UnityEngine;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public class AssetPostprocessorSetTab {
         private IAssetPostprocessorWidget postprocessorWidget;
         private PostprocessorAssetType assetType;

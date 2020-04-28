@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using TextureCompressionQuality = UnityEditor.TextureCompressionQuality;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public class SoTexturePostprocessorBase : SoAssetPostprocessor {
         public List<TexturePlatformSettings> platformSettings = new List<TexturePlatformSettings>();
 

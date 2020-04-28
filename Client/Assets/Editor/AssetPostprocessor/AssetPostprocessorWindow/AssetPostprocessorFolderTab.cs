@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public class AssetPostprocessorFolderTab : TreeView {
         private readonly EditorWindow parent;
         private readonly List<Folder> folders = new List<Folder>();

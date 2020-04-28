@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.WSA;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public class SoAssetPostprocessorFolder : ScriptableObject {
         private static readonly string path = "Assets/Editor/AssetPostprocessor/Config/SoAssetPostprocessorFolder.asset";
 
@@ -115,7 +115,7 @@ namespace LinChunJie.AssetPostprocessor {
             }
         }
 
-        [MenuItem("Tools/资源导入规范/文件夹规则")]
+        [MenuItem("Funny/资源导入规范/文件夹规则")]
         static SoAssetPostprocessorFolder Create() {
             var so = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessorFolder>(path);
             if(so == null) {

@@ -5,7 +5,7 @@ using UnityEditor.U2D;
 using UnityEngine;
 using UnityEngine.U2D;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public static class SpriteAtlasAssetPostprocessor {
         public static void OnPostprocessSpriteAtlas(string assetPath) {
             var spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(assetPath);

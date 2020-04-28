@@ -3,7 +3,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public class ModelPostprocessorWidget : IAssetPostprocessorWidget {
         private readonly SoModelPostprocessor so;
         private readonly bool allowEdit;

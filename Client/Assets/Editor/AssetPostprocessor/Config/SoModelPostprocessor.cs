@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using LinChunJie.AssetPostprocessor;
 using UnityEditor;
 using UnityEngine;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public class SoModelPostprocessor : SoAssetPostprocessor {
         private static readonly string path = "Assets/Editor/AssetPostprocessor/Config/Model/New Postprocessor.asset";
         private static readonly string defaultPath = "Assets/Editor/AssetPostprocessor/Config/Model/DefaultSoModelPostprocessor.asset";
@@ -26,7 +25,7 @@ namespace LinChunJie.AssetPostprocessor {
         public ModelImporterAnimationCompression AnimationCompression = ModelImporterAnimationCompression.KeyframeReduction;
 
 
-        [MenuItem("Tools/资源导入规范/Model")]
+        [MenuItem("Funny/资源导入规范/Model")]
         public static SoModelPostprocessor Create() {
             return Create(path);
         }

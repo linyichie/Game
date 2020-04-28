@@ -5,7 +5,7 @@ using UnityEditor.U2D;
 using UnityEngine;
 using UnityEngine.U2D;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public sealed class AssetListSpriteAtlasItem : AssetListItem {
         private SpriteAtlas spriteAtlas;
         public AssetListSpriteAtlasItem(string path, int depth, string displayName) : base(path, depth, displayName) { }

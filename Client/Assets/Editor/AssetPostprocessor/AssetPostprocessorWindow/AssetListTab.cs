@@ -9,7 +9,7 @@ using UnityEditor.U2D;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public class AssetListTab : TreeView {
         private PostprocessorAssetType assetType = (PostprocessorAssetType)(-1);
         private string folder = string.Empty;
@@ -24,7 +24,20 @@ namespace LinChunJie.AssetPostprocessor {
         private SoAssetPostprocessor soAssetPostprocessor;
         private SearchField searchField;
         private AssetState selectState;
+        private bool inited = false;
 
+        public bool Inited {
+            get { return inited; }
+            set {
+                if(inited != value) {
+                    inited = value;
+                    if(inited) {
+                        OnInited();
+                    }
+                }
+            }
+        }
+        
         public enum AssetState {
             None = 0,
             Normal = 1,
@@ -63,6 +76,17 @@ namespace LinChunJie.AssetPostprocessor {
 
             return root;
         }
+        
+        private void OnInited() {
+            RefreshAssetState();
+        }
+
+        private void RefreshAssetState() {
+            var oldSearchString = searchString;
+            searchString = selectState.ToString();
+            searchString = oldSearchString;
+        }
+
 
         public void OnInspectorUpdate() {
             var isDirty = false;
@@ -91,6 +115,8 @@ namespace LinChunJie.AssetPostprocessor {
                 }
             }
 
+            Inited = !isDirty;
+
             if(isDirty) {
                 Repaint();
             }
@@ -99,14 +125,14 @@ namespace LinChunJie.AssetPostprocessor {
         public override void OnGUI(Rect pos) {
             GUI.Box(pos, string.Empty, GUI.skin.box);
             var searchFieldRect = new Rect(pos.x + 10, pos.y + 10, pos.width - 100, 20);
-            searchString = searchField.OnGUI(searchFieldRect, searchString);
             var stateRect = new Rect(searchFieldRect.xMax + 5, pos.y + 10, 80, 20);
-            var state  = (AssetState)EditorGUI.Popup(stateRect, stateEmptyContent, (int)selectState, stateContents);
-            if(state != selectState) {
-                selectState = state;
-                var oldSearchString = searchString;
-                searchString = selectState.ToString();
-                searchString = oldSearchString;
+            using(new EditorGUI.DisabledScope(!Inited)) {
+                searchString = searchField.OnGUI(searchFieldRect, searchString);
+                var state  = (AssetState)EditorGUI.Popup(stateRect, stateEmptyContent, (int)selectState, stateContents);
+                if(state != selectState) {
+                    selectState = state;
+                    RefreshAssetState();
+                }
             }
             base.OnGUI(new Rect(pos.x + 1, searchFieldRect.yMax + 3, pos.width - 2, pos.height - searchFieldRect.height - 20 - 3));
         }
@@ -133,30 +159,25 @@ namespace LinChunJie.AssetPostprocessor {
 
         protected override IList<TreeViewItem> BuildRows(TreeViewItem root) {
             var list = base.BuildRows(root);
-            var removeIndexs = new List<int>();
-            for(int i = 0; i < list.Count; i++) {
+            for(int i = list.Count - 1; i >= 0; i--) {
                 var item = list[i] as AssetListItem;
                 switch(selectState) {
                     case AssetState.Normal:
                         if(item.IsError || item.IsChanged) {
-                            removeIndexs.Add(i);
+                            list.RemoveAt(i);
                         }
                         break;
                     case AssetState.Warn:
                         if(!item.IsChanged) {
-                            removeIndexs.Add(i);
+                            list.RemoveAt(i);
                         }
                         break;
                     case AssetState.Error:
                         if(!item.IsError) {
-                            removeIndexs.Add(i);
+                            list.RemoveAt(i);
                         }
                         break;
                 }
-            }
-
-            for(int i = 0; i < removeIndexs.Count; i++) {
-                list.RemoveAt(removeIndexs[i]);
             }
             return list;
         }
@@ -217,6 +238,7 @@ namespace LinChunJie.AssetPostprocessor {
             if(this.assetType != assetType || this.folder != path) {
                 this.assetType = assetType;
                 this.folder = path;
+                selectState = AssetState.None;
                 var guid = postprocessorFolder.Get(this.assetType, this.folder);
                 var assetPath = AssetDatabase.GUIDToAssetPath(guid);
                 soAssetPostprocessor = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessor>(assetPath);
@@ -226,7 +248,6 @@ namespace LinChunJie.AssetPostprocessor {
 
         public void Refresh() {
             treeViewItems.Clear();
-            selectState = AssetState.None;
             if(!string.IsNullOrEmpty(this.folder)) {
                 var assetGuids = AssetDatabase.FindAssets(Helper.GetAssetSearchFilterByAssetType(this.assetType), new string[] {
                     this.folder
@@ -303,7 +324,7 @@ namespace LinChunJie.AssetPostprocessor {
             var index = 0;
             EditorApplication.update = () => {
                 var item = items[index];
-                var isCancel = EditorUtility.DisplayCancelableProgressBar("Fix...", StringUtility.Contact(index, "/", items.Count), index / (float)items.Count);
+                var isCancel = EditorUtility.DisplayCancelableProgressBar("Fix...", StringUtil.Contact(index, "/", items.Count), index / (float)items.Count);
                 if(item.IsChanged) {
                     item.FixAndReimport(soAssetPostprocessor);
                 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public class AssetModelItem : AssetListItem {
         public AssetModelItem(string path, int depth, string displayName) : base(path, depth, displayName) { }
 

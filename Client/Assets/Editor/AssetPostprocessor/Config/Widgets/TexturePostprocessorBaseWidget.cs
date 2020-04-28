@@ -3,7 +3,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public class TexturePostprocessorBaseWidget : IAssetPostprocessorWidget {
         private readonly SoTexturePostprocessorBase so;
         private readonly Styles styles;
@@ -78,7 +78,7 @@ namespace LinChunJie.AssetPostprocessor {
             using(new EditorGUI.DisabledScope(!allowEdit)) {
                 var selectPlatform = Helper.Platforms[platformIndex];
                 var platformSetting = so.GetPlatformSettings(selectPlatform);
-                platformSetting.overridden = EditorGUILayout.Toggle(StringUtility.Contact("Override for ", platformSetting.platform), platformSetting.overridden);
+                platformSetting.overridden = EditorGUILayout.Toggle(StringUtil.Contact("Override for ", platformSetting.platform), platformSetting.overridden);
                 using(new EditorGUI.DisabledScope(!platformSetting.overridden)) {
                     platformSetting.maxTextureSize = EditorGUILayout.IntPopup(styles.TextureSizeLabel, platformSetting.maxTextureSize, Helper.TextureSizeOptionLabels, Helper.TextureSizeOptions);
 

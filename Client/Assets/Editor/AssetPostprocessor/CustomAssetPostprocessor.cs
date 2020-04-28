@@ -6,7 +6,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.U2D;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public class CustomAssetPostprocessor : UnityEditor.AssetPostprocessor {
         private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths) {
             for (int i = 0; i < importedAssets.Length; i++) {
@@ -35,7 +35,7 @@ namespace LinChunJie.AssetPostprocessor {
         }
 
         public static bool IsNewCreateFile(string assetPath) {
-            var metaFilePath = StringUtility.Contact(assetPath, ".meta");
+            var metaFilePath = StringUtil.Contact(assetPath, ".meta");
             if (!File.Exists(metaFilePath)) {
                 return true;
             }

@@ -6,10 +6,10 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     [DisallowMultipleComponent]
     public class AssetPostprocessorWindow : EditorWindow {
-        [MenuItem("Tools/资源导入工具")]
+        [MenuItem("Funny/资源导入工具")]
         private static void Open() {
             var window = EditorWindow.CreateInstance<AssetPostprocessorWindow>();
             window.autoRepaintOnSceneChange = true;
@@ -98,8 +98,10 @@ namespace LinChunJie.AssetPostprocessor {
             var isChanged = assetListTab?.IsAnyOfAssetChanged();
             var buttonRect = new Rect(rect.xMax + splitterWidth, splitterWidth, fixIcon.width, toolBarHeight);
             if(isChanged.HasValue && isChanged.Value) {
-                if(GUI.Button(buttonRect, fixIcon)) {
-                    assetListTab.FixAllChanged();
+                using(new EditorGUI.DisabledScope(!assetListTab.Inited)) {
+                    if(GUI.Button(buttonRect, fixIcon)) {
+                        assetListTab.FixAllChanged();
+                    } 
                 }
             }
         }

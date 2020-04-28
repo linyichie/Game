@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public class SoAssetPostprocessor : ScriptableObject {
         public static SoAssetPostprocessor Create(PostprocessorAssetType assetType) {
             switch (assetType) {

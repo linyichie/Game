@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public static class ModelAssetPostprocessor {
         public static void OnPostprocessModel(ModelImporter importer) {
             var postprocessorFolder = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();

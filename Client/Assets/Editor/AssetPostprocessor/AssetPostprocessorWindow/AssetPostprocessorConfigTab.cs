@@ -8,7 +8,7 @@ using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using Object = System.Object;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public class AssetPostprocessorConfigTab : TreeView {
         private readonly List<string> paths = new List<string>();
         private readonly SoAssetPostprocessorFolder soAssetPostprocessorFolder;

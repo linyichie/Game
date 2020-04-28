@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 
-public static class StringUtility
+public static class StringUtil
 {
     static readonly StringBuilder sb = new StringBuilder();
 

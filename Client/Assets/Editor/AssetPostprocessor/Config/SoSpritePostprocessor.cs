@@ -7,12 +7,12 @@ using UnityEditor;
 using UnityEditor.Experimental.AssetImporters;
 using UnityEngine;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public class SoSpritePostprocessor : SoTexturePostprocessorBase {
         private static readonly string path = "Assets/Editor/AssetPostprocessor/Config/Sprite/New Postprocessor.asset";
         private static readonly string defaultPath = "Assets/Editor/AssetPostprocessor/Config/Sprite/DefaultSoSpritePostprocessor.asset";
 
-        [MenuItem("Tools/资源导入规范/Sprite")]
+        [MenuItem("Funny/资源导入规范/Sprite")]
         internal static SoSpritePostprocessor Create() {
             return Create(path);
         }

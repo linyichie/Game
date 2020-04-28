@@ -19,7 +19,7 @@ public class WindowLoadTask {
     public void Begin(Action<WindowLoadTask, GameObject> callback) {
         loading = true;
         completed = callback;
-        AddressableSystem.LoadAsset<GameObject>(StringUtility.Contact("Windows/", this.windowName),
+        AddressableSystem.LoadAsset<GameObject>(StringUtil.Contact("Windows/", this.windowName),
             o => {
                 if (completed == null) {
                     AddressableSystem.Release(o);

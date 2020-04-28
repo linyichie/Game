@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.U2D;
 using UnityEngine;
 using UnityEngine.U2D;
 
-namespace LinChunJie.AssetPostprocessor {
+namespace Funny.AssetPostprocessor {
     public class AssetTextureBaseItem : AssetListItem {
         protected static MethodInfo getTextureSizeMethod;
         protected static object[] textureSizeArray;
@@ -49,19 +50,24 @@ namespace LinChunJie.AssetPostprocessor {
 
         public override void VerifyAssetError(SoAssetPostprocessor so) {
             IsError = false;
+            var inSpriteAtlas = false;
             var folder = System.IO.Path.GetDirectoryName(Path);
-            var spriteAtlasAssetPath = StringUtility.Contact(folder.Replace("Sprite", "Atlas"), ".spriteatlas");
-            var spriteAtlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(spriteAtlasAssetPath);
-            if(spriteAtlas != null) {
-                if(spriteAtlas.GetSprite(displayName) == null) {
-                    var (width, height) = GetTextureSize(GetAssetImporter<TextureImporter>());
-                    if(width != height) {
-                        IsError = true;
-                    }
+            var spriteAtlasAssetPath = StringUtil.Contact(folder.Replace("Sprite", "Atlas"), ".spriteatlas");
+            if(File.Exists(spriteAtlasAssetPath)) {
+                var allText = File.ReadAllText(spriteAtlasAssetPath);
+                if(allText.Contains(AssetDatabase.AssetPathToGUID(Path))) {
+                    inSpriteAtlas = true;
+                }
+            }
 
-                    if(!Helper.IsValuePowerOf2(width) || !Helper.IsValuePowerOf2(height)) {
-                        IsError = true;
-                    }
+            if(!inSpriteAtlas) {
+                var (width, height) = GetTextureSize(GetAssetImporter<TextureImporter>());
+                if(width != height) {
+                    IsError = true;
+                }
+
+                if(!Helper.IsValuePowerOf2(width) || !Helper.IsValuePowerOf2(height)) {
+                    IsError = true;
                 }
             }
 
