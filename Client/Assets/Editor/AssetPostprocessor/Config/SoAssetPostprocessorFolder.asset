@@ -28,3 +28,6 @@ MonoBehaviour:
   - assetType: 1
     path: Assets/AddressableAssets/UI/Sprite/Common
     guid: f7be6b0d096284f10ac9b3af047c9da2
+  - assetType: 3
+    path: Assets/Art
+    guid: c30c36d581454344ab8bd98b5ddc06fb

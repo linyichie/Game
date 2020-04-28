@@ -340,7 +340,7 @@ namespace Funny.AssetPostprocessor {
         }
 
         private void OnSetImporter(List<AssetListItem> items) {
-            AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+            AssetDatabase.SaveAssets();
             var index = 0;
             EditorApplication.update = () => {
                 var item = items[index];
