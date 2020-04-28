@@ -79,6 +79,7 @@ namespace Funny.AssetPostprocessor {
         
         private void OnInited() {
             RefreshAssetState();
+            Repaint();
         }
 
         private void RefreshAssetState() {
@@ -116,7 +117,6 @@ namespace Funny.AssetPostprocessor {
             }
 
             Inited = !isDirty;
-
             if(isDirty) {
                 Repaint();
             }
