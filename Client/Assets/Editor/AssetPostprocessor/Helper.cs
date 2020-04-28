@@ -87,11 +87,10 @@ namespace Funny.AssetPostprocessor {
         public static readonly int[] TextureSizeOptions = new int[] {
             1024,
             2048,
-            4096,
         };
 
         public static readonly string[] TextureSizeOptionLabels = new string[] {
-            "1024", "2048", "4096"
+            "1024", "2048"
         };
 
         public static readonly string[] Platforms = new string[] {

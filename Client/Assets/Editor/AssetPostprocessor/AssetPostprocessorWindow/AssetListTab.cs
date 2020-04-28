@@ -325,15 +325,31 @@ namespace Funny.AssetPostprocessor {
             EditorApplication.update = () => {
                 var item = items[index];
                 var isCancel = EditorUtility.DisplayCancelableProgressBar("Fix...", StringUtil.Contact(index, "/", items.Count), index / (float)items.Count);
-                if(item.IsChanged) {
-                    item.FixAndReimport(soAssetPostprocessor);
-                }
-
+                item.FixAndReimport(soAssetPostprocessor);
                 index++;
                 if(isCancel || index >= items.Count) {
                     EditorApplication.update = null;
                     EditorUtility.ClearProgressBar();
-                    AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+                    if(index < items.Count - 1) {
+                        OnSetImporter(items.GetRange(0, index));
+                    } else {
+                        OnSetImporter(items);
+                    }
+                }
+            };
+        }
+
+        private void OnSetImporter(List<AssetListItem> items) {
+            AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
+            var index = 0;
+            EditorApplication.update = () => {
+                var item = items[index];
+                AssetDatabase.ImportAsset(item.Path);
+                EditorUtility.DisplayCancelableProgressBar("Reimport...", StringUtil.Contact(index, "/", items.Count), index / (float)items.Count);
+                index++;
+                if(index >= items.Count) {
+                    EditorApplication.update = null;
+                    EditorUtility.ClearProgressBar();
                 }
             };
         }
