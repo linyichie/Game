@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.U2D;
@@ -46,6 +47,8 @@ namespace Funny.AssetPostprocessor {
     }
 
     public class AssetSpriteItem : AssetTextureBaseItem {
+        private static Dictionary<string, string> spriteAtlasFile = new Dictionary<string, string>();
+
         public AssetSpriteItem(string path, int depth, string displayName) : base(path, depth, displayName) { }
 
         public override void VerifyAssetError(SoAssetPostprocessor so) {
@@ -54,7 +57,13 @@ namespace Funny.AssetPostprocessor {
             var folder = System.IO.Path.GetDirectoryName(Path);
             var spriteAtlasAssetPath = StringUtil.Contact(folder.Replace("Sprite", "Atlas"), ".spriteatlas");
             if(File.Exists(spriteAtlasAssetPath)) {
-                var allText = File.ReadAllText(spriteAtlasAssetPath);
+                string allText;
+                if(spriteAtlasFile.ContainsKey(spriteAtlasAssetPath)) {
+                    allText = spriteAtlasFile[spriteAtlasAssetPath];
+                } else {
+                    allText = File.ReadAllText(spriteAtlasAssetPath);
+                    spriteAtlasFile[spriteAtlasAssetPath] = allText;
+                }
                 if(allText.Contains(AssetDatabase.AssetPathToGUID(Path))) {
                     inSpriteAtlas = true;
                 }
@@ -72,6 +81,10 @@ namespace Funny.AssetPostprocessor {
             }
 
             base.VerifyAssetError(so);
+        }
+
+        public static void ClearSpriteAtlasFile() {
+            spriteAtlasFile.Clear();
         }
     }
 

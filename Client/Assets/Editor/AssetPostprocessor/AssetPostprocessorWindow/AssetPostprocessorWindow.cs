@@ -69,7 +69,7 @@ namespace Funny.AssetPostprocessor {
             }
 
             if(setTab != null) {
-                setTab.OnChanged -= OnSoPostprocessorChanged;
+                setTab.OnChanged -= OnSoPostprocessorSetChangee;
             }
         }
 
@@ -122,7 +122,7 @@ namespace Funny.AssetPostprocessor {
 
                 configTab.DeleteSoAssetPostprocessor += OnDeleteSoAssetPostprocessor;
                 configTab.OnChanged += OnSoPostprocessorChanged;
-                setTab.OnChanged += OnSoPostprocessorChanged;
+                setTab.OnChanged += OnSoPostprocessorSetChangee;
             }
 
             HandleHorizontalResize();
@@ -152,6 +152,10 @@ namespace Funny.AssetPostprocessor {
 
         private void OnSoPostprocessorChanged(string guid) {
             assetListTab?.SoPostprocessorChanged(guid);
+        }
+
+        private void OnSoPostprocessorSetChangee(string guid) {
+            assetListTab?.SoPostprocessorSetChanged(guid);
         }
 
         private void OnDeleteSoAssetPostprocessor(string deleteGuid) {

@@ -17,6 +17,7 @@ namespace Funny.AssetPostprocessor {
         private AssetState selectState;
         private string[] oldAssetGuids;
         private string folder = string.Empty;
+        private string postprocessorGuid = string.Empty;
         private bool inited = false;
 
         private readonly SoAssetPostprocessorFolder postprocessorFolder;
@@ -242,11 +243,13 @@ namespace Funny.AssetPostprocessor {
                 var guid = postprocessorFolder.Get(this.assetType, this.folder);
                 var assetPath = AssetDatabase.GUIDToAssetPath(guid);
                 soAssetPostprocessor = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessor>(assetPath);
+                postprocessorGuid = guid;
                 Refresh(true);
             }
         }
 
         public void Refresh(bool forceUpdate = false) {
+            AssetSpriteItem.ClearSpriteAtlasFile();
             if(!forceUpdate) {
                 if(!IsRequireRefreshAsset()) {
                     for(int i = 0; i < treeViewItems.Count; i++) {
@@ -316,6 +319,17 @@ namespace Funny.AssetPostprocessor {
         public void SoPostprocessorChanged(string guid) {
             var assetPath = AssetDatabase.GUIDToAssetPath(guid);
             soAssetPostprocessor = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessor>(assetPath);
+            postprocessorGuid = guid;
+            for(int i = 0; i < rootItem.children.Count; i++) {
+                var item = rootItem.children[i] as AssetListItem;
+                item.SetDirty();
+            }
+        }
+
+        public void SoPostprocessorSetChanged(string guid) {
+            if(guid != postprocessorGuid) {
+                return;
+            }
             for(int i = 0; i < rootItem.children.Count; i++) {
                 var item = rootItem.children[i] as AssetListItem;
                 item.SetDirty();
