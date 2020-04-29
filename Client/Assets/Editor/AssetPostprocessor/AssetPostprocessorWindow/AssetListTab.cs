@@ -26,7 +26,11 @@ namespace Funny.AssetPostprocessor {
         private readonly List<AssetListItem> treeViewItems = new List<AssetListItem>();
         private readonly GUIContent stateEmptyContent = new GUIContent("");
         private readonly GUIContent[] stateContents;
+        private readonly float splitterWidth = 3;
 
+        private float verticalSplitPercent;
+        private Rect verticalSplitterRect;
+        private bool resizingVerticalSplitter = false;
         private Vector2 itemDetailScrollPosition = Vector2.zero;
 
         public bool Inited {
@@ -66,6 +70,7 @@ namespace Funny.AssetPostprocessor {
                 new GUIContent("Warn", warnIcon),
                 new GUIContent("Error", errorIcon),
             };
+            verticalSplitPercent = 0.7f;
         }
 
         protected override TreeViewItem BuildRoot() {
@@ -125,20 +130,29 @@ namespace Funny.AssetPostprocessor {
         }
 
         public override void OnGUI(Rect pos) {
-            var rect = pos;
+            verticalSplitterRect = new Rect(pos.x, pos.y + pos.height * verticalSplitPercent, pos.width, splitterWidth);
+            HandleVerticalResize(pos);
+            var showDetail = false;
+            var detailHeight = pos.height - pos.height * verticalSplitPercent - splitterWidth;
+            var detailRect = new Rect(pos.x, pos.y + pos.height * verticalSplitPercent + splitterWidth, pos.width, detailHeight);
             var selectIds = GetSelection();
             if(selectIds != null && selectIds.Count > 0) {
                 var item = FindItem(selectIds[0], rootItem) as AssetListItem;
                 if(item != null) {
                     if(item.changeLogic.value || item.errorLogic.value) {
-                        rect = ShowDetail(rect, item);
+                        showDetail = true;
+                        ShowDetail(detailRect, item);
                     }
                 }
             }
 
-            GUI.Box(rect, string.Empty, GUI.skin.box);
-            var searchFieldRect = new Rect(rect.x + 10, rect.y + 10, rect.width - 100, 20);
-            var stateRect = new Rect(searchFieldRect.xMax + 5, rect.y + 10, 80, 20);
+            var treeRect = pos;
+            if(showDetail) {
+                treeRect = new Rect(pos.x, pos.y, pos.width, pos.height * verticalSplitPercent);
+            }
+            GUI.Box(treeRect, string.Empty, GUI.skin.box);
+            var searchFieldRect = new Rect(treeRect.x + 10, treeRect.y + 10, treeRect.width - 100, 20);
+            var stateRect = new Rect(searchFieldRect.xMax + 5, treeRect.y + 10, 80, 20);
             using(new EditorGUI.DisabledScope(!Inited)) {
                 searchString = searchField.OnGUI(searchFieldRect, searchString);
                 var state = (AssetState)EditorGUI.Popup(stateRect, stateEmptyContent, (int)selectState, stateContents);
@@ -148,14 +162,31 @@ namespace Funny.AssetPostprocessor {
                 }
             }
 
-            base.OnGUI(new Rect(rect.x + 1, searchFieldRect.yMax + 3, rect.width - 2, rect.height - searchFieldRect.height - 20 - 3));
+            base.OnGUI(new Rect(treeRect.x + 1, searchFieldRect.yMax + 3, treeRect.width - 2, treeRect.height - searchFieldRect.height - 20 - 3));
+        }
+        
+        private void HandleVerticalResize(Rect subRect) {
+            EditorGUIUtility.AddCursorRect(verticalSplitterRect, MouseCursor.ResizeVertical);
+            if(Event.current.type == EventType.MouseDown && verticalSplitterRect.Contains(Event.current.mousePosition)) {
+                resizingVerticalSplitter = true;
+            }
+
+            if(resizingVerticalSplitter) {
+                verticalSplitPercent = Mathf.Clamp((Event.current.mousePosition.y - subRect.y) / subRect.height, 0.25f, 0.75f);
+            }
+
+            if(resizingVerticalSplitter) {
+                Repaint();
+            }
+
+            if(Event.current.type == EventType.MouseUp) {
+                resizingVerticalSplitter = false;
+            }
         }
 
-        private Rect ShowDetail(Rect rect, AssetListItem item) {
-            var detailHeight = 120;
-            var detailRect = new Rect(rect.x, rect.yMax - detailHeight, rect.width, detailHeight - 3);
-            GUI.Box(detailRect, string.Empty, GUI.skin.box);
-            GUILayout.BeginArea(detailRect);
+        private void ShowDetail(Rect rect, AssetListItem item) {
+            GUI.Box(rect, string.Empty, GUI.skin.box);
+            GUILayout.BeginArea(rect);
             itemDetailScrollPosition = GUILayout.BeginScrollView(itemDetailScrollPosition);
             var oldRichText = EditorStyles.helpBox.richText;
             if(item.changeLogic.value) {
@@ -170,8 +201,6 @@ namespace Funny.AssetPostprocessor {
             EditorStyles.helpBox.richText = oldRichText;
             GUILayout.EndScrollView();
             GUILayout.EndArea();
-            rect.height = rect.height - detailHeight - 3;
-            return rect;
         }
 
         protected override void RowGUI(RowGUIArgs args) {
