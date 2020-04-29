@@ -8,10 +8,9 @@ using UnityEngine;
 namespace Funny.AssetPostprocessor {
     public abstract class AssetListItem : TreeViewItem {
         public readonly string Path;
-        public bool IsChanged { get; protected set; } = false;
-        public bool IsError { get; protected set; } = false;
-        public bool IsDirty { get; protected set; } = true;
-        public bool IsErrorDirty { get; protected set; } = true;
+        
+        public LogicVar<bool> changeLogic = LogicVar<bool>.defaultLogic;
+        public LogicVar<bool> errorLogic = LogicVar<bool>.defaultLogic;
 
         protected AssetImporter importer;
 
@@ -32,8 +31,8 @@ namespace Funny.AssetPostprocessor {
         }
 
         public virtual void SetDirty() {
-            IsDirty = true;
-            IsErrorDirty = true;
+            changeLogic.Reset();
+            errorLogic.Reset();
         }
 
         public abstract void FixAndReimport(SoAssetPostprocessor so);

@@ -69,22 +69,43 @@ namespace Funny.AssetPostprocessor {
             spriteAtlas.SetPlatformSettings(platformSettings);
         }
 
-        public static bool CompareSettings(SpriteAtlas spriteAtlas, SoSpriteAtlasPostprocessor so) {
-            var same = ComparePlatformSetting(Helper.PlatformStandalone, so, spriteAtlas);
-            same &= ComparePlatformSetting(Helper.PlatformAndroid, so, spriteAtlas);
-            same &= ComparePlatformSetting(Helper.PlatformIPhone, so, spriteAtlas);
+        public static bool CompareSettings(SpriteAtlas spriteAtlas, SoSpriteAtlasPostprocessor so, out string message) {
+            message = string.Empty;
+            var same = ComparePlatformSetting(Helper.PlatformStandalone, so, spriteAtlas, ref message);
+            same &= ComparePlatformSetting(Helper.PlatformAndroid, so, spriteAtlas, ref message);
+            same &= ComparePlatformSetting(Helper.PlatformIPhone, so, spriteAtlas, ref message);
             return same;
         }
 
-        static bool ComparePlatformSetting(string platform, SoSpriteAtlasPostprocessor texturePostprocessorBase, SpriteAtlas spriteAtlas) {
+        static bool ComparePlatformSetting(string platform, SoSpriteAtlasPostprocessor texturePostprocessorBase, SpriteAtlas spriteAtlas, ref string message) {
             var so = texturePostprocessorBase.GetPlatformSettings(platform);
             var texturePlatformSettings = spriteAtlas.GetPlatformSettings(platform);
             var same = true;
-            same &= so.overridden == texturePlatformSettings.overridden;
+            var sameInfo = string.Empty;
+            if(so.overridden != texturePlatformSettings.overridden) {
+                same = false;
+                sameInfo = StringUtil.Contact(sameInfo, "\n", "overridden");
+            }
+
             if(so.overridden && texturePlatformSettings.overridden) {
-                same &= so.format == (int)texturePlatformSettings.format;
-                same &= (int)so.compressionQuality == texturePlatformSettings.compressionQuality;
-                same &= so.maxTextureSize == texturePlatformSettings.maxTextureSize;
+                if(so.format != (int)texturePlatformSettings.format) {
+                    same = false;
+                    sameInfo = StringUtil.Contact(sameInfo, "\n", "format");
+                }
+
+                if((int)so.compressionQuality != texturePlatformSettings.compressionQuality) {
+                    same = false;
+                    sameInfo = StringUtil.Contact(sameInfo, "\n", "compressionQuality");
+                }
+
+                if(so.maxTextureSize != texturePlatformSettings.maxTextureSize) {
+                    same = false;
+                    sameInfo = StringUtil.Contact(sameInfo, "\n", "maxTextureSize");
+                }
+            }
+
+            if(!same) {
+                message = StringUtil.Contact(message, "\n", "<b>platform: ", platform, "</b>", sameInfo);
             }
 
             return same;

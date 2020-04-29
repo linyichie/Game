@@ -26,7 +26,9 @@ namespace Funny.AssetPostprocessor {
         private readonly List<AssetListItem> treeViewItems = new List<AssetListItem>();
         private readonly GUIContent stateEmptyContent = new GUIContent("");
         private readonly GUIContent[] stateContents;
-        
+
+        private Vector2 itemDetailScrollPosition = Vector2.zero;
+
         public bool Inited {
             get { return inited; }
             set {
@@ -38,7 +40,7 @@ namespace Funny.AssetPostprocessor {
                 }
             }
         }
-        
+
         public enum AssetState {
             None = 0,
             Normal = 1,
@@ -59,10 +61,10 @@ namespace Funny.AssetPostprocessor {
             errorIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/AssetPostprocessor/Texture/Error.png");
             searchField = new SearchField();
             stateContents = new GUIContent[] {
-                new GUIContent("None"), 
-                new GUIContent("Normal"), 
-                new GUIContent("Warn", warnIcon), 
-                new GUIContent("Error", errorIcon), 
+                new GUIContent("None"),
+                new GUIContent("Normal"),
+                new GUIContent("Warn", warnIcon),
+                new GUIContent("Error", errorIcon),
             };
         }
 
@@ -77,7 +79,7 @@ namespace Funny.AssetPostprocessor {
 
             return root;
         }
-        
+
         private void OnInited() {
             RefreshAssetState();
             Repaint();
@@ -89,7 +91,6 @@ namespace Funny.AssetPostprocessor {
             searchString = oldSearchString;
         }
 
-
         public void OnInspectorUpdate() {
             var isDirty = false;
             if(rootItem != null) {
@@ -98,16 +99,16 @@ namespace Funny.AssetPostprocessor {
                 count = checkCount;
                 for(int i = 0; i < rootItem.children.Count; i++) {
                     var item = rootItem.children[i] as AssetListItem;
-                    if(item.IsErrorDirty || item.IsDirty) {
+                    if(item.errorLogic.dirty || item.changeLogic.dirty) {
                         isDirty = true;
                         count--;
                     }
 
-                    if(item.IsDirty) {
+                    if(item.changeLogic.dirty) {
                         item.VerifyAssetState(soAssetPostprocessor);
                     }
 
-                    if(item.IsErrorDirty) {
+                    if(item.errorLogic.dirty) {
                         item.VerifyAssetError(soAssetPostprocessor);
                     }
 
@@ -124,18 +125,53 @@ namespace Funny.AssetPostprocessor {
         }
 
         public override void OnGUI(Rect pos) {
-            GUI.Box(pos, string.Empty, GUI.skin.box);
-            var searchFieldRect = new Rect(pos.x + 10, pos.y + 10, pos.width - 100, 20);
-            var stateRect = new Rect(searchFieldRect.xMax + 5, pos.y + 10, 80, 20);
+            var rect = pos;
+            var selectIds = GetSelection();
+            if(selectIds != null && selectIds.Count > 0) {
+                var item = FindItem(selectIds[0], rootItem) as AssetListItem;
+                if(item != null) {
+                    if(item.changeLogic.value || item.errorLogic.value) {
+                        rect = ShowDetail(rect, item);
+                    }
+                }
+            }
+
+            GUI.Box(rect, string.Empty, GUI.skin.box);
+            var searchFieldRect = new Rect(rect.x + 10, rect.y + 10, rect.width - 100, 20);
+            var stateRect = new Rect(searchFieldRect.xMax + 5, rect.y + 10, 80, 20);
             using(new EditorGUI.DisabledScope(!Inited)) {
                 searchString = searchField.OnGUI(searchFieldRect, searchString);
-                var state  = (AssetState)EditorGUI.Popup(stateRect, stateEmptyContent, (int)selectState, stateContents);
+                var state = (AssetState)EditorGUI.Popup(stateRect, stateEmptyContent, (int)selectState, stateContents);
                 if(state != selectState) {
                     selectState = state;
                     RefreshAssetState();
                 }
             }
-            base.OnGUI(new Rect(pos.x + 1, searchFieldRect.yMax + 3, pos.width - 2, pos.height - searchFieldRect.height - 20 - 3));
+
+            base.OnGUI(new Rect(rect.x + 1, searchFieldRect.yMax + 3, rect.width - 2, rect.height - searchFieldRect.height - 20 - 3));
+        }
+
+        private Rect ShowDetail(Rect rect, AssetListItem item) {
+            var detailHeight = 120;
+            var detailRect = new Rect(rect.x, rect.yMax - detailHeight, rect.width, detailHeight - 3);
+            GUI.Box(detailRect, string.Empty, GUI.skin.box);
+            GUILayout.BeginArea(detailRect);
+            itemDetailScrollPosition = GUILayout.BeginScrollView(itemDetailScrollPosition);
+            var oldRichText = EditorStyles.helpBox.richText;
+            if(item.changeLogic.value) {
+                EditorStyles.helpBox.richText = true;
+                EditorGUILayout.HelpBox(item.changeLogic.message, MessageType.Warning);
+            }
+
+            if(item.errorLogic.value) {
+                EditorGUILayout.HelpBox(item.errorLogic.message, MessageType.Error);
+            }
+
+            EditorStyles.helpBox.richText = oldRichText;
+            GUILayout.EndScrollView();
+            GUILayout.EndArea();
+            rect.height = rect.height - detailHeight - 3;
+            return rect;
         }
 
         protected override void RowGUI(RowGUIArgs args) {
@@ -146,12 +182,12 @@ namespace Funny.AssetPostprocessor {
             GUI.DrawTexture(iconRect, item.icon, ScaleMode.ScaleToFit);
             var labelRect = new Rect(rect.x + iconRect.xMax + 1, rect.y, rect.width - iconRect.width - 1, rect.height);
             var rightIconRect = new Rect(rect.width - rect.height, rect.y + 1, rect.height - 2, rect.height - 2);
-            if(item.IsChanged) {
+            if(item.changeLogic.value) {
                 GUI.DrawTexture(rightIconRect, warnIcon, ScaleMode.ScaleToFit);
                 rightIconRect = new Rect(rightIconRect.x - rect.height, rect.y + 1, rect.height - 2, rect.height - 2);
             }
 
-            if(item.IsError) {
+            if(item.errorLogic.value) {
                 GUI.DrawTexture(rightIconRect, errorIcon, ScaleMode.ScaleToFit);
             }
 
@@ -164,22 +200,26 @@ namespace Funny.AssetPostprocessor {
                 var item = list[i] as AssetListItem;
                 switch(selectState) {
                     case AssetState.Normal:
-                        if(item.IsError || item.IsChanged) {
+                        if(item.changeLogic.value || item.errorLogic.value) {
                             list.RemoveAt(i);
                         }
+
                         break;
                     case AssetState.Warn:
-                        if(!item.IsChanged) {
+                        if(!item.changeLogic.value) {
                             list.RemoveAt(i);
                         }
+
                         break;
                     case AssetState.Error:
-                        if(!item.IsError) {
+                        if(!item.errorLogic.value) {
                             list.RemoveAt(i);
                         }
+
                         break;
                 }
             }
+
             return list;
         }
 
@@ -201,7 +241,7 @@ namespace Funny.AssetPostprocessor {
                 var isDirty = false;
                 for(int i = 0; i < selectIds.Count; i++) {
                     var item = FindItem(selectIds[i], rootItem) as AssetListItem;
-                    if(item.IsChanged) {
+                    if(item.changeLogic.value) {
                         isDirty = true;
                         break;
                     }
@@ -225,7 +265,7 @@ namespace Funny.AssetPostprocessor {
                 List<AssetListItem> changedItems = new List<AssetListItem>();
                 for(int i = 0; i < selectIds.Count; i++) {
                     var item = FindItem(selectIds[i], rootItem) as AssetListItem;
-                    if(item.IsChanged) {
+                    if(item.changeLogic.value) {
                         changedItems.Add(item);
                     }
                 }
@@ -259,6 +299,7 @@ namespace Funny.AssetPostprocessor {
                     return;
                 }
             }
+
             treeViewItems.Clear();
             if(!string.IsNullOrEmpty(this.folder)) {
                 var assetGuids = AssetDatabase.FindAssets(Helper.GetAssetSearchFilterByAssetType(this.assetType), new string[] {
@@ -330,6 +371,7 @@ namespace Funny.AssetPostprocessor {
             if(guid != postprocessorGuid) {
                 return;
             }
+
             for(int i = 0; i < rootItem.children.Count; i++) {
                 var item = rootItem.children[i] as AssetListItem;
                 item.SetDirty();
@@ -339,7 +381,7 @@ namespace Funny.AssetPostprocessor {
         public bool IsAnyOfAssetChanged() {
             for(int i = 0; i < rootItem.children.Count; i++) {
                 var item = rootItem.children[i] as AssetListItem;
-                if(item.IsChanged) {
+                if(item.changeLogic.value) {
                     return true;
                 }
             }
@@ -351,7 +393,7 @@ namespace Funny.AssetPostprocessor {
             List<AssetListItem> changedItems = new List<AssetListItem>();
             for(int i = 0; i < rootItem.children.Count; i++) {
                 var item = rootItem.children[i] as AssetListItem;
-                if(item.IsChanged) {
+                if(item.changeLogic.value) {
                     changedItems.Add(item);
                 }
             }

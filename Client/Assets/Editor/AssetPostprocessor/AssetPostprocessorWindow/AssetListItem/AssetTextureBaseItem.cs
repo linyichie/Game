@@ -20,18 +20,30 @@ namespace Funny.AssetPostprocessor {
         }
 
         public override void VerifyAssetState(SoAssetPostprocessor so) {
-            IsChanged = false;
+            changeLogic.SetValue(false);
 
             var texturePostprocessorBase = so as SoTexturePostprocessorBase;
-            if(!TextureAssetPostprocessor.CompareSettings(GetAssetImporter<TextureImporter>(), texturePostprocessorBase)) {
-                IsChanged = true;
+            string message;
+            if(!TextureAssetPostprocessor.CompareSettings(GetAssetImporter<TextureImporter>(), texturePostprocessorBase, out message)) {
+                changeLogic.SetValue(true);
+                changeLogic.SetMessage(message.TrimStart('\n'));
             }
-
-            IsDirty = false;
         }
 
         public override void VerifyAssetError(SoAssetPostprocessor so) {
-            IsErrorDirty = false;
+            var (width, height) = GetTextureSize(GetAssetImporter<TextureImporter>());
+            var message = string.Empty;
+            if(width != height) {
+                errorLogic.SetValue(true);
+                message = "The width of the texture should be the same as the height";
+            }
+
+            if(!Helper.IsValuePowerOf2(width) || !Helper.IsValuePowerOf2(height)) {
+                errorLogic.SetValue(true);
+                message = StringUtil.Contact(message, "\n", "The size of the texture should be a power of 2");
+            }
+
+            errorLogic.SetMessage(message.TrimStart('\n'));
         }
 
         public override void FixAndReimport(SoAssetPostprocessor so) {
@@ -52,7 +64,7 @@ namespace Funny.AssetPostprocessor {
         public AssetSpriteItem(string path, int depth, string displayName) : base(path, depth, displayName) { }
 
         public override void VerifyAssetError(SoAssetPostprocessor so) {
-            IsError = false;
+            errorLogic.SetValue(false);
             var inSpriteAtlas = false;
             var folder = System.IO.Path.GetDirectoryName(Path);
             var spriteAtlasAssetPath = StringUtil.Contact(folder.Replace("Sprite", "Atlas"), ".spriteatlas");
@@ -64,23 +76,15 @@ namespace Funny.AssetPostprocessor {
                     allText = File.ReadAllText(spriteAtlasAssetPath);
                     spriteAtlasFile[spriteAtlasAssetPath] = allText;
                 }
+
                 if(allText.Contains(AssetDatabase.AssetPathToGUID(Path))) {
                     inSpriteAtlas = true;
                 }
             }
 
             if(!inSpriteAtlas) {
-                var (width, height) = GetTextureSize(GetAssetImporter<TextureImporter>());
-                if(width != height) {
-                    IsError = true;
-                }
-
-                if(!Helper.IsValuePowerOf2(width) || !Helper.IsValuePowerOf2(height)) {
-                    IsError = true;
-                }
+                base.VerifyAssetError(so);
             }
-
-            base.VerifyAssetError(so);
         }
 
         public static void ClearSpriteAtlasFile() {
@@ -92,20 +96,11 @@ namespace Funny.AssetPostprocessor {
         public AssetTextureItem(string path, int depth, string displayName) : base(path, depth, displayName) { }
 
         public override void VerifyAssetError(SoAssetPostprocessor so) {
-            IsError = false;
+            errorLogic.SetValue(false);
             var textureImporter = GetAssetImporter<TextureImporter>();
             if(textureImporter.npotScale == TextureImporterNPOTScale.None) {
-                var (width, height) = GetTextureSize(textureImporter);
-                if(width != height) {
-                    IsError = true;
-                }
-
-                if(!Helper.IsValuePowerOf2(width) || !Helper.IsValuePowerOf2(height)) {
-                    IsError = true;
-                }
+                base.VerifyAssetError(so);
             }
-
-            base.VerifyAssetError(so);
         }
     }
 }

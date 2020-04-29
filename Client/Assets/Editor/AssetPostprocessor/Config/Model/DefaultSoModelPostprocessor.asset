@@ -12,17 +12,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c78afd709de741409d83713f961b163, type: 3}
   m_Name: DefaultSoModelPostprocessor
   m_EditorClassIdentifier: 
-  GlobalScale: 1
-  IsReadable: 1
-  ImportBlendShapes: 0
-  ImportVisibility: 0
-  ImportCameras: 0
-  ImportLights: 0
-  ImportMaterials: 1
+  GlobalScale: 2
+  IsReadable: 0
+  ImportBlendShapes: 1
+  ImportVisibility: 1
+  ImportCameras: 1
+  ImportLights: 1
+  ImportMaterials: 0
   SetMaterialMissing: 1
-  ImportAnimation: 0
+  ImportAnimation: 1
   IsRoleAnimation: 0
   SourceAvatarGuid: 
   AnimationType: 2
-  MeshCompression: 1
-  AnimationCompression: 1
+  MeshCompression: 2
+  AnimationCompression: 2

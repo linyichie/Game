@@ -11,18 +11,18 @@ namespace Funny.AssetPostprocessor {
         public AssetListSpriteAtlasItem(string path, int depth, string displayName) : base(path, depth, displayName) { }
 
         public override void VerifyAssetState(SoAssetPostprocessor so) {
-            IsChanged = false;
+            changeLogic.SetValue(false);
 
             var texturePostprocessorBase = so as SoSpriteAtlasPostprocessor;
-            if(!SpriteAtlasAssetPostprocessor.CompareSettings(GetSpriteAltas(), texturePostprocessorBase)) {
-                IsChanged = true;
+            string message;
+            if(!SpriteAtlasAssetPostprocessor.CompareSettings(GetSpriteAltas(), texturePostprocessorBase, out message)) {
+                changeLogic.SetValue(true);
+                changeLogic.SetMessage(message.TrimStart('\n'));
             }
-
-            IsDirty = false;
         }
 
         public override void VerifyAssetError(SoAssetPostprocessor so) {
-            IsErrorDirty = false;
+            errorLogic.SetValue(false);
         }
 
         private SpriteAtlas GetSpriteAltas() {

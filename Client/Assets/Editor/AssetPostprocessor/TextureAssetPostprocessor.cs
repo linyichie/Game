@@ -25,7 +25,7 @@ namespace Funny.AssetPostprocessor {
             if(string.IsNullOrEmpty(guid)) {
                 return;
             }
-            
+
             var path = AssetDatabase.GUIDToAssetPath(guid);
             SoTexturePostprocessorBase soPostprocessor = null;
             if(!string.IsNullOrEmpty(path)) {
@@ -70,22 +70,43 @@ namespace Funny.AssetPostprocessor {
             importer.SetPlatformTextureSettings(platformSettings);
         }
 
-        public static bool CompareSettings(TextureImporter importer, SoTexturePostprocessorBase soPostprocessor) {
-            var same = ComparePlatformSetting(Helper.PlatformStandalone, soPostprocessor, importer);
-            same &= ComparePlatformSetting(Helper.PlatformAndroid, soPostprocessor, importer);
-            same &= ComparePlatformSetting(Helper.PlatformIPhone, soPostprocessor, importer);
+        public static bool CompareSettings(TextureImporter importer, SoTexturePostprocessorBase soPostprocessor, out string message) {
+            message = string.Empty;
+            var same = ComparePlatformSetting(Helper.PlatformStandalone, soPostprocessor, importer, ref message);
+            same &= ComparePlatformSetting(Helper.PlatformAndroid, soPostprocessor, importer, ref message);
+            same &= ComparePlatformSetting(Helper.PlatformIPhone, soPostprocessor, importer, ref message);
             return same;
         }
-        
-        static bool ComparePlatformSetting(string platform, SoTexturePostprocessorBase texturePostprocessorBase, TextureImporter importer) {
+
+        static bool ComparePlatformSetting(string platform, SoTexturePostprocessorBase texturePostprocessorBase, TextureImporter importer, ref string message) {
             var so = texturePostprocessorBase.GetPlatformSettings(platform);
             var texturePlatformSettings = importer.GetPlatformTextureSettings(platform);
             var same = true;
-            same &= so.overridden == texturePlatformSettings.overridden;
+            var sameInfo = string.Empty;
+            if(so.overridden != texturePlatformSettings.overridden) {
+                same = false;
+                sameInfo = StringUtil.Contact(sameInfo, "\n", "overridden");
+            }
+
             if(so.overridden && texturePlatformSettings.overridden) {
-                same &= so.format == (int)texturePlatformSettings.format;
-                same &= (int)so.compressionQuality == texturePlatformSettings.compressionQuality;
-                same &= so.maxTextureSize == texturePlatformSettings.maxTextureSize;
+                if(so.format != (int)texturePlatformSettings.format) {
+                    same = false;
+                    sameInfo = StringUtil.Contact(sameInfo, "\n", "format");
+                }
+
+                if((int)so.compressionQuality != texturePlatformSettings.compressionQuality) {
+                    same = false;
+                    sameInfo = StringUtil.Contact(sameInfo, "\n", "compressionQuality");
+                }
+
+                if(so.maxTextureSize != texturePlatformSettings.maxTextureSize) {
+                    same = false;
+                    sameInfo = StringUtil.Contact(sameInfo, "\n", "maxTextureSize");
+                }
+            }
+
+            if(!same) {
+                message = StringUtil.Contact(message, "\n", "platform: ", platform, sameInfo);
             }
 
             return same;

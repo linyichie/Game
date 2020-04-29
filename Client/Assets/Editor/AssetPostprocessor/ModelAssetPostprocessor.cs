@@ -128,61 +128,132 @@ namespace Funny.AssetPostprocessor {
             importer.SaveAndReimport();
         }
 
-        public static bool CompareSettings(ModelImporter importer, SoModelPostprocessor so) {
+        public static bool CompareSettings(ModelImporter importer, SoModelPostprocessor so, out string message) {
             var same = true;
-            same &= CompareSceneSetting(importer, so);
-            same &= CompareMeshSetting(importer, so);
-            same &= CompareMaterialSetting(importer, so);
-            same &= CompareAnimationSetting(importer, so);
+            message = string.Empty;
+            same &= CompareSceneSetting(importer, so, ref message);
+            same &= CompareMeshSetting(importer, so, ref message);
+            same &= CompareMaterialSetting(importer, so, ref message);
+            same &= CompareAnimationSetting(importer, so, ref message);
             return same;
         }
 
-        static bool CompareSceneSetting(ModelImporter importer, SoModelPostprocessor so) {
+        static bool CompareSceneSetting(ModelImporter importer, SoModelPostprocessor so, ref string message) {
             var same = true;
-            same &= importer.globalScale == so.GlobalScale;
-            same &= importer.importBlendShapes == so.ImportBlendShapes;
-            same &= importer.importVisibility == so.ImportVisibility;
-            same &= importer.importCameras == so.ImportCameras;
-            same &= importer.importLights == so.ImportLights;
+            var sameInfo = string.Empty;
+            if(importer.globalScale != so.GlobalScale) {
+                same = false;
+                sameInfo = StringUtil.Contact(sameInfo, "\n", "GlobalScale");
+            }
+
+            if(importer.importBlendShapes != so.ImportBlendShapes) {
+                same = false;
+                sameInfo = StringUtil.Contact(sameInfo, "\n", "ImportBlendShapes");
+            }
+
+            if(importer.importVisibility != so.ImportVisibility) {
+                same = false;
+                sameInfo = StringUtil.Contact(sameInfo, "\n", "ImportVisibility");
+            }
+
+            if(importer.importCameras != so.ImportCameras) {
+                same = false;
+                sameInfo = StringUtil.Contact(sameInfo, "\n", "ImportCameras");
+            }
+
+            if(importer.importLights != so.ImportLights) {
+                same = false;
+                sameInfo = StringUtil.Contact(sameInfo, "\n", "ImportLights");
+            }
+
+            if(!same) {
+                message = StringUtil.Contact(message, "\n", "<b>Scene</b>", sameInfo);
+            }
+
             return same;
         }
 
-        static bool CompareMeshSetting(ModelImporter importer, SoModelPostprocessor so) {
+        static bool CompareMeshSetting(ModelImporter importer, SoModelPostprocessor so, ref string message) {
             var same = true;
-            same &= importer.meshCompression == so.MeshCompression;
-            same &= importer.isReadable == so.IsReadable;
+            var sameInfo = string.Empty;
+            if(importer.meshCompression != so.MeshCompression) {
+                same = false;
+                sameInfo = StringUtil.Contact(sameInfo, "\n", "MeshCompression");
+            }
+
+            if(importer.isReadable != so.IsReadable) {
+                same = false;
+                sameInfo = StringUtil.Contact(sameInfo, "\n", "Read/Write");
+            }
+
+            if(!same) {
+                message = StringUtil.Contact(message, "\n", "<b>Mesh</b>", sameInfo);
+            }
+
             return same;
         }
 
-        static bool CompareMaterialSetting(ModelImporter importer, SoModelPostprocessor so) {
+        static bool CompareMaterialSetting(ModelImporter importer, SoModelPostprocessor so, ref string message) {
             var same = true;
-            same &= importer.importMaterials == so.ImportMaterials;
+            var sameInfo = string.Empty;
+            if(importer.importMaterials != so.ImportMaterials) {
+                same = false;
+                sameInfo = StringUtil.Contact(sameInfo, "\n", "ImportMaterials");
+            }
+
             if(importer.importMaterials && so.ImportMaterials && so.SetMaterialMissing) {
                 using(var serializedObject = new SerializedObject(importer)) {
                     var externalObjects = serializedObject.FindProperty("m_ExternalObjects");
                     if(externalObjects.arraySize == 0) {
-                        return false;
+                        same = false;
+                        sameInfo = StringUtil.Contact(sameInfo, "\n", "Material is not null");
                     }
                 }
             }
+
+            if(!same) {
+                message = StringUtil.Contact(message, "\n", "<b>Material</b>", sameInfo);
+            }
+
             return same;
         }
 
-        static bool CompareAnimationSetting(ModelImporter importer, SoModelPostprocessor so) {
+        static bool CompareAnimationSetting(ModelImporter importer, SoModelPostprocessor so, ref string message) {
             var same = true;
-            same &= importer.importAnimation == so.ImportAnimation;
-            same &= importer.animationType == so.AnimationType;
+            var sameInfo = string.Empty;
+            if(importer.importAnimation != so.ImportAnimation) {
+                same = false;
+                sameInfo = StringUtil.Contact(sameInfo, "\n", "ImportAnimation");
+            }
+
+            if(importer.animationType != so.AnimationType) {
+                same = false;
+                sameInfo = StringUtil.Contact(sameInfo, "\n", "AnimationType");
+            }
+
             if(importer.importAnimation && so.ImportAnimation) {
-                same &= importer.animationCompression == so.AnimationCompression;
+                if(importer.animationCompression != so.AnimationCompression) {
+                    same = false;
+                    sameInfo = StringUtil.Contact(sameInfo, "\n", "AnimationCompression");
+                }
+
                 if(so.IsRoleAnimation) {
                     if(importer.sourceAvatar == null) {
-                        return false;
+                        same = false;
+                        sameInfo = StringUtil.Contact(sameInfo, "\n", "Source Avatar is null");
+                    } else {
+                        var avatarAssetPath = AssetDatabase.GetAssetPath(importer.sourceAvatar);
+                        var avatarGuid = AssetDatabase.AssetPathToGUID(avatarAssetPath);
+                        if(avatarGuid != so.SourceAvatarGuid) {
+                            same = false;
+                            sameInfo = StringUtil.Contact(sameInfo, "\n", "SourceAvatar");
+                        }
                     }
-
-                    var avatarAssetPath = AssetDatabase.GetAssetPath(importer.sourceAvatar);
-                    var avatarGuid = AssetDatabase.AssetPathToGUID(avatarAssetPath);
-                    same &= avatarGuid == so.SourceAvatarGuid;
                 }
+            }
+
+            if(!same) {
+                message = StringUtil.Contact(message, "\n", "<b>Animation</b>", sameInfo);
             }
 
             return same;
