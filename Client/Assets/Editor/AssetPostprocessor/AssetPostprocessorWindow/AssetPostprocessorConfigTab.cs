@@ -57,6 +57,12 @@ namespace Funny.AssetPostprocessor {
                 var item = new AssetPostprocessorConfigItem(path, 0, Path.GetFileNameWithoutExtension(path), defaultGuid);
                 root.AddChild(item);
             }
+            
+            root.children.Sort((lhs, rhs) => {
+                var lhsItem = lhs as AssetPostprocessorConfigItem;
+                var rhsItem = rhs as AssetPostprocessorConfigItem;
+                return -lhsItem.IsDefault.CompareTo(rhsItem.IsDefault);
+            });
 
             return root;
         }
