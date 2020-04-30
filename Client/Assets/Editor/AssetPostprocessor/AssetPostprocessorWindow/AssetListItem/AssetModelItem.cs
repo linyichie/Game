@@ -25,7 +25,7 @@ namespace Funny.AssetPostprocessor {
         public override void FixAndReimport(SoAssetPostprocessor so) {
             var modelPostprocessor = so as SoModelPostprocessor;
             ModelAssetPostprocessor.SetSettings(GetAssetImporter<ModelImporter>(), modelPostprocessor);
-            EditorUtility.SetDirty(modelPostprocessor);
+            EditorUtility.SetDirty(GetAssetImporter<ModelImporter>());
         }
     }
 }

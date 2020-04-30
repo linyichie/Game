@@ -318,7 +318,9 @@ namespace Funny.AssetPostprocessor {
         }
 
         public void Refresh(bool forceUpdate = false) {
-            AssetSpriteItem.ClearSpriteAtlasFile();
+            if(this.assetType == PostprocessorAssetType.Sprite) {
+                AssetSpriteItem.ClearSpriteAtlasFile();
+            }
             var assetGuids = GetAssetGuids(this.assetType);
             if(!forceUpdate) {
                 if(!IsRequireRefreshAsset(assetGuids)) {
@@ -352,10 +354,14 @@ namespace Funny.AssetPostprocessor {
                     }
                 }
 
+                AssetListItem lastItem = null;
                 foreach(var task in tasks) {
                     if(task.Item != null) {
                         var item = task.Item;
-                        treeViewItems.Add(task.Item);
+                        if(lastItem == null || lastItem.Path != item.Path) {
+                            treeViewItems.Add(item);
+                            lastItem = item;
+                        }
                     }
                 }
             }
@@ -370,20 +376,6 @@ namespace Funny.AssetPostprocessor {
             var assetGuids = AssetDatabase.FindAssets(Helper.GetAssetSearchFilterByAssetType(this.assetType), new string[] {
                 this.folder
             });
-            if(assetGuids != null && assetGuids.Length > 0) {
-                var list = new List<string>(assetGuids.Length);
-                for(int i = 0; i < assetGuids.Length; i++) {
-                    var path = AssetDatabase.GUIDToAssetPath(assetGuids[i]);
-                    if(list.Contains(path)) {
-                        continue;
-                    }
-                    list.Add(path);
-                }
-                assetGuids = new string[list.Count];
-                for(int i = 0; i < list.Count; i++) {
-                    assetGuids[i] = AssetDatabase.AssetPathToGUID(list[i]);
-                }
-            }
 
             return assetGuids;
         }
