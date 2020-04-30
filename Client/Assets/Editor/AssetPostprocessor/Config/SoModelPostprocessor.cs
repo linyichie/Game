@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Funny.AssetPostprocessor {
     public class SoModelPostprocessor : SoAssetPostprocessor {
@@ -16,16 +17,16 @@ namespace Funny.AssetPostprocessor {
         public bool ImportCameras = false;
         public bool ImportLights = false;
         public bool ImportMaterials = false;
-        public bool SetMaterialMissing = true;
+        public bool RemoveStandardMaterial = true;
         public bool ImportAnimation = false;
         public bool IsRoleAnimation = false;
         public string SourceAvatarGuid = string.Empty;
         public ModelImporterAnimationType AnimationType = ModelImporterAnimationType.Generic;
+        public ModelImporterMaterialLocation MaterialLocation = ModelImporterMaterialLocation.InPrefab;
         public ModelImporterMeshCompression MeshCompression = ModelImporterMeshCompression.Low;
         public ModelImporterAnimationCompression AnimationCompression = ModelImporterAnimationCompression.KeyframeReduction;
 
 
-        [MenuItem("Funny/资源导入规范/Model")]
         public static SoModelPostprocessor Create() {
             return Create(path);
         }

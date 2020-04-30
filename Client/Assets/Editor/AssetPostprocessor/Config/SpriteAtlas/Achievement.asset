@@ -9,8 +9,8 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0bb1a2c17d1581b40867cc691444a7ac, type: 3}
-  m_Name: DefaultSoSpritePostprocessor
+  m_Script: {fileID: 11500000, guid: a96de2b563da30d43ba15e62a9699b03, type: 3}
+  m_Name: Achievement
   m_EditorClassIdentifier: 
   platformSettings:
   - platform: Standalone
@@ -19,7 +19,7 @@ MonoBehaviour:
     format: 4
     compressionQuality: 50
   - platform: iPhone
-    overridden: 0
+    overridden: 1
     maxTextureSize: 2048
     format: 56
     compressionQuality: 50

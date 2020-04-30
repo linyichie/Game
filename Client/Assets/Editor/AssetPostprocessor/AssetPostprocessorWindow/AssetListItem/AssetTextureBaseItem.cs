@@ -20,30 +20,32 @@ namespace Funny.AssetPostprocessor {
         }
 
         public override void VerifyAssetState(SoAssetPostprocessor so) {
-            changeLogic.SetValue(false);
+            WarnLogic.SetValue(false);
 
             var texturePostprocessorBase = so as SoTexturePostprocessorBase;
+            var importer = GetAssetImporter<TextureImporter>();
             string message;
             if(!TextureAssetPostprocessor.CompareSettings(GetAssetImporter<TextureImporter>(), texturePostprocessorBase, out message)) {
-                changeLogic.SetValue(true);
-                changeLogic.SetMessage(message.TrimStart('\n'));
+                WarnLogic.SetValue(true);
             }
+
+            WarnLogic.SetMessage(message.TrimStart('\n'));
         }
 
         public override void VerifyAssetError(SoAssetPostprocessor so) {
             var (width, height) = GetTextureSize(GetAssetImporter<TextureImporter>());
             var message = string.Empty;
             if(width != height) {
-                errorLogic.SetValue(true);
+                ErrorLogic.SetValue(true);
                 message = "The width of the texture should be the same as the height";
             }
 
             if(!Helper.IsValuePowerOf2(width) || !Helper.IsValuePowerOf2(height)) {
-                errorLogic.SetValue(true);
+                ErrorLogic.SetValue(true);
                 message = StringUtil.Contact(message, "\n", "The size of the texture should be a power of 2");
             }
 
-            errorLogic.SetMessage(message.TrimStart('\n'));
+            ErrorLogic.SetMessage(message.TrimStart('\n'));
         }
 
         public override void FixAndReimport(SoAssetPostprocessor so) {
@@ -64,7 +66,7 @@ namespace Funny.AssetPostprocessor {
         public AssetSpriteItem(string path, int depth, string displayName) : base(path, depth, displayName) { }
 
         public override void VerifyAssetError(SoAssetPostprocessor so) {
-            errorLogic.SetValue(false);
+            ErrorLogic.SetValue(false);
             var inSpriteAtlas = false;
             var folder = System.IO.Path.GetDirectoryName(Path);
             var spriteAtlasAssetPath = StringUtil.Contact(folder.Replace("Sprite", "Atlas"), ".spriteatlas");
@@ -96,7 +98,7 @@ namespace Funny.AssetPostprocessor {
         public AssetTextureItem(string path, int depth, string displayName) : base(path, depth, displayName) { }
 
         public override void VerifyAssetError(SoAssetPostprocessor so) {
-            errorLogic.SetValue(false);
+            ErrorLogic.SetValue(false);
             var textureImporter = GetAssetImporter<TextureImporter>();
             if(textureImporter.npotScale == TextureImporterNPOTScale.None) {
                 base.VerifyAssetError(so);

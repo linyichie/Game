@@ -11,7 +11,6 @@ namespace Funny.AssetPostprocessor {
         private static readonly string path = "Assets/Editor/AssetPostprocessor/Config/SpriteAtlas/New Postprocessor.asset";
         private static readonly string defaultPath = "Assets/Editor/AssetPostprocessor/Config/SpriteAtlas/DefaultSoSpriteAtlasPostprocessor.asset";
 
-        [MenuItem("Funny/资源导入规范/SpriteAtlas")]
         public static SoSpriteAtlasPostprocessor Create() {
             return Create(path);
         }

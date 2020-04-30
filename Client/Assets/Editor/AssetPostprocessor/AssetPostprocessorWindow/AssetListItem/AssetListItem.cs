@@ -9,10 +9,10 @@ namespace Funny.AssetPostprocessor {
     public abstract class AssetListItem : TreeViewItem {
         public readonly string Path;
         
-        public LogicVar<bool> changeLogic = LogicVar<bool>.defaultLogic;
-        public LogicVar<bool> errorLogic = LogicVar<bool>.defaultLogic;
+        public LogicVar<bool> WarnLogic = LogicVar<bool>.defaultLogic;
+        public LogicVar<bool> ErrorLogic = LogicVar<bool>.defaultLogic;
 
-        protected AssetImporter importer;
+        private AssetImporter importer;
 
         protected AssetListItem(string path, int depth, string displayName) : base(path.GetHashCode(), depth, displayName) {
             this.Path = path;
@@ -31,8 +31,8 @@ namespace Funny.AssetPostprocessor {
         }
 
         public virtual void SetDirty() {
-            changeLogic.Reset();
-            errorLogic.Reset();
+            WarnLogic.Reset();
+            ErrorLogic.Reset();
         }
 
         public abstract void FixAndReimport(SoAssetPostprocessor so);

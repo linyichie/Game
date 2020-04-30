@@ -8,18 +8,18 @@ namespace Funny.AssetPostprocessor {
         public AssetModelItem(string path, int depth, string displayName) : base(path, depth, displayName) { }
 
         public override void VerifyAssetState(SoAssetPostprocessor so) {
-            changeLogic.SetValue(false);
+            WarnLogic.SetValue(false);
             
             var modelPostprocessor = so as SoModelPostprocessor;
             string message;
             if(!ModelAssetPostprocessor.CompareSettings(GetAssetImporter<ModelImporter>(), modelPostprocessor, out message)) {
-                changeLogic.SetValue(true);
-                changeLogic.SetMessage(message.TrimStart('\n'));
+                WarnLogic.SetValue(true);
+                WarnLogic.SetMessage(message.TrimStart('\n'));
             }
         }
 
         public override void VerifyAssetError(SoAssetPostprocessor so) {
-            errorLogic.SetValue(false);
+            ErrorLogic.SetValue(false);
         }
 
         public override void FixAndReimport(SoAssetPostprocessor so) {

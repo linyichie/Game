@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0bb1a2c17d1581b40867cc691444a7ac, type: 3}
-  m_Name: DefaultSoSpritePostprocessor
+  m_Name: Sprite
   m_EditorClassIdentifier: 
   platformSettings:
   - platform: Standalone
@@ -21,7 +21,7 @@ MonoBehaviour:
   - platform: iPhone
     overridden: 0
     maxTextureSize: 2048
-    format: 56
+    format: 50
     compressionQuality: 50
   - platform: Android
     overridden: 0

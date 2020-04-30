@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1c78afd709de741409d83713f961b163, type: 3}
-  m_Name: DefaultSoModelPostprocessor
+  m_Name: WithBones
   m_EditorClassIdentifier: 
   GlobalScale: 1
   IsReadable: 1
@@ -19,11 +19,10 @@ MonoBehaviour:
   ImportCameras: 0
   ImportLights: 0
   ImportMaterials: 1
-  RemoveStandardMaterial: 1
+  SetMaterialMissing: 1
   ImportAnimation: 0
   IsRoleAnimation: 0
   SourceAvatarGuid: 
-  AnimationType: 0
-  MaterialLocation: 1
+  AnimationType: 2
   MeshCompression: 1
-  AnimationCompression: 2
+  AnimationCompression: 1

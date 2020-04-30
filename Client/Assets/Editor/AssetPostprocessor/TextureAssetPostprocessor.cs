@@ -37,11 +37,11 @@ namespace Funny.AssetPostprocessor {
             }
 
             importer.textureType = assetType == PostprocessorAssetType.Sprite ? TextureImporterType.Sprite : TextureImporterType.Default;
-            SetDefaultSettings(importer);
+            SetDefaultSettings(assetType, importer);
             SetPlatformSettings(importer, soPostprocessor);
         }
 
-        public static void SetDefaultSettings(TextureImporter importer) {
+        public static void SetDefaultSettings(PostprocessorAssetType assetType, TextureImporter importer) {
             importer.alphaIsTransparency = importer.DoesSourceTextureHaveAlpha();
             importer.sRGBTexture = true;
             importer.isReadable = false;
@@ -49,6 +49,9 @@ namespace Funny.AssetPostprocessor {
             importer.streamingMipmaps = false;
             importer.filterMode = FilterMode.Bilinear;
             importer.wrapMode = TextureWrapMode.Clamp;
+            if(assetType == PostprocessorAssetType.Texture) {
+                importer.npotScale = TextureImporterNPOTScale.ToNearest;
+            }
         }
 
         public static void SetPlatformSettings(TextureImporter importer, SoTexturePostprocessorBase so) {

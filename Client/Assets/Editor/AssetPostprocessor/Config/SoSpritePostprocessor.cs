@@ -12,7 +12,6 @@ namespace Funny.AssetPostprocessor {
         private static readonly string path = "Assets/Editor/AssetPostprocessor/Config/Sprite/New Postprocessor.asset";
         private static readonly string defaultPath = "Assets/Editor/AssetPostprocessor/Config/Sprite/DefaultSoSpritePostprocessor.asset";
 
-        [MenuItem("Funny/资源导入规范/Sprite")]
         internal static SoSpritePostprocessor Create() {
             return Create(path);
         }

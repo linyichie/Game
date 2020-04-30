@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.Remoting.Lifetime;
 using System.Threading.Tasks;
 using UnityEditor;
 using UnityEngine;
@@ -21,7 +23,7 @@ namespace Funny.AssetPostprocessor {
             }
 
             SetSettings(importer, so);
-            Reimport(importer);
+            Reimport(importer, so);
         }
 
         public static void SetSettings(ModelImporter importer, SoModelPostprocessor so) {
@@ -46,12 +48,13 @@ namespace Funny.AssetPostprocessor {
 
         private static void SetMaterialSettings(ModelImporter importer, SoModelPostprocessor so) {
             importer.importMaterials = so.ImportMaterials;
-            if(importer.importMaterials && so.SetMaterialMissing) {
-                RemoveImportMaterial(importer);
+            importer.materialLocation = so.MaterialLocation;
+            if(importer.importMaterials && so.RemoveStandardMaterial && importer.materialLocation == ModelImporterMaterialLocation.InPrefab) {
+                RemoveStandardMaterial(importer);
             }
         }
 
-        static void RemoveImportMaterial(ModelImporter importer) {
+        static void RemoveStandardMaterial(ModelImporter importer) {
             using(var serializedObject = new SerializedObject(importer)) {
                 var externalObjects = serializedObject.FindProperty("m_ExternalObjects");
                 var materials = serializedObject.FindProperty("m_Materials");
@@ -76,7 +79,13 @@ namespace Funny.AssetPostprocessor {
                     }
 
                     if(materialProperty != null) {
-                        materialProperty.objectReferenceValue = null;
+                        if(materialProperty.objectReferenceValue != null) {
+                            var assetPath = AssetDatabase.GetAssetPath(materialProperty.objectReferenceValue);
+                            var mat = AssetDatabase.LoadAssetAtPath<Material>(assetPath);
+                            if(mat != null && mat.shader.name == "Standard") {
+                                materialProperty.objectReferenceValue = null;
+                            }
+                        }
                     } else {
                         var index = externalObjects.arraySize++;
                         var pair = externalObjects.GetArrayElementAtIndex(index);
@@ -123,7 +132,7 @@ namespace Funny.AssetPostprocessor {
             }
         }
 
-        static async Task Reimport(ModelImporter importer) {
+        static async Task Reimport(ModelImporter importer, SoModelPostprocessor so) {
             await Task.Delay(1);
             importer.SaveAndReimport();
         }
@@ -201,12 +210,50 @@ namespace Funny.AssetPostprocessor {
                 sameInfo = StringUtil.Contact(sameInfo, "\n", "ImportMaterials");
             }
 
-            if(importer.importMaterials && so.ImportMaterials && so.SetMaterialMissing) {
+            if(importer.materialLocation != so.MaterialLocation) {
+                same = false;
+                sameInfo = StringUtil.Contact(sameInfo, "\n", "MaterialLocation");
+            }
+
+            if(importer.importMaterials && importer.materialLocation == ModelImporterMaterialLocation.InPrefab) {
                 using(var serializedObject = new SerializedObject(importer)) {
                     var externalObjects = serializedObject.FindProperty("m_ExternalObjects");
                     if(externalObjects.arraySize == 0) {
                         same = false;
-                        sameInfo = StringUtil.Contact(sameInfo, "\n", "Material is not null");
+                        sameInfo = StringUtil.Contact(sameInfo, "\n", "Using Standard Shader");
+                    } else {
+                        var materials = serializedObject.FindProperty("m_Materials");
+
+                        for(int materialIndex = 0; materialIndex < materials.arraySize; materialIndex++) {
+                            var id = materials.GetArrayElementAtIndex(materialIndex);
+                            var name = id.FindPropertyRelative("name").stringValue;
+                            var type = id.FindPropertyRelative("type").stringValue;
+
+                            SerializedProperty materialProperty = null;
+
+                            for(int objectIndex = 0; objectIndex < externalObjects.arraySize; objectIndex++) {
+                                var pair = externalObjects.GetArrayElementAtIndex(objectIndex);
+                                var externalName = pair.FindPropertyRelative("first.name").stringValue;
+                                var externalType = pair.FindPropertyRelative("first.type").stringValue;
+
+                                if(externalName == name && externalType == type) {
+                                    materialProperty = pair.FindPropertyRelative("second");
+                                    break;
+                                }
+                            }
+
+                            if(materialProperty == null || materialProperty.objectReferenceValue == null) {
+                                continue;
+                            }
+
+                            var assetPath = AssetDatabase.GetAssetPath(materialProperty.objectReferenceValue);
+                            var mat = AssetDatabase.LoadAssetAtPath<Material>(assetPath);
+                            if(mat != null && mat.shader.name == "Standard") {
+                                same = false;
+                                sameInfo = StringUtil.Contact(sameInfo, "\n", "Using Standard Shader");
+                                break;
+                            }
+                        }
                     }
                 }
             }

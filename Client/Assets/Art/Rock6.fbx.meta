@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 28cd69c293702fe4aac724df107d5457
+guid: 23626ed462892ec44806f1522eda0a93
 ModelImporter:
   serializedVersion: 26
   internalIDToNameTable: []
@@ -7,7 +7,7 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: lambert3
+      name: Rocks
     second: {instanceID: 0}
   materials:
     importMaterials: 1
@@ -92,7 +92,7 @@ ModelImporter:
     hasExtraRoot: 0
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
-  animationType: 2
+  animationType: 0
   humanoidOversampling: 1
   additionalBone: 0
   userData: 

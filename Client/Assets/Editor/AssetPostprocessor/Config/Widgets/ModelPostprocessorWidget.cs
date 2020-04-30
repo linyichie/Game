@@ -26,13 +26,14 @@ namespace Funny.AssetPostprocessor {
             public readonly GUIContent CamerasContent = new GUIContent("Import Cameras");
             public readonly GUIContent LightsContent = new GUIContent("Import Lights");
 
-            public readonly GUIContent MeshContent = new GUIContent("Meshs");
+            public readonly GUIContent MeshContent = new GUIContent("Mesh");
             public readonly GUIContent MeshCompressionContent = new GUIContent("Mesh Compression");
             public readonly GUIContent ReadableContent = new GUIContent("Read/Write Enabled");
 
             public readonly GUIContent MaterialContent = new GUIContent("Materials");
             public readonly GUIContent ImportMaterialContent = new GUIContent("Import Materials");
-            public readonly GUIContent MaterialMissingContent = new GUIContent("Set Materials Missing");
+            public readonly GUIContent MaterialLocationContent = new GUIContent("Location");
+            public readonly GUIContent RemoveStandardMaterial = new GUIContent("RemoveStandardMaterial");
 
             public readonly GUIContent AnimationContent = new GUIContent("Animations");
             public readonly GUIContent AnimationTypeContent = new GUIContent("Animation Type");
@@ -103,7 +104,8 @@ namespace Funny.AssetPostprocessor {
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField(styles.MaterialContent, styles.labelBoldStyle);
                 so.ImportMaterials = EditorGUILayout.Toggle(styles.ImportMaterialContent, so.ImportMaterials);
-                so.SetMaterialMissing = EditorGUILayout.Toggle(styles.MaterialMissingContent, so.SetMaterialMissing);
+                so.RemoveStandardMaterial = EditorGUILayout.Toggle(styles.RemoveStandardMaterial, so.RemoveStandardMaterial);
+                so.MaterialLocation = (ModelImporterMaterialLocation)EditorGUILayout.EnumPopup(styles.MaterialLocationContent, so.MaterialLocation);
                 EditorGUILayout.Space();
                 EditorGUILayout.LabelField(styles.AnimationContent, styles.labelBoldStyle);
                 so.ImportAnimation = EditorGUILayout.Toggle(styles.ImportAnimationContent, so.ImportAnimation);

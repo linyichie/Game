@@ -12,7 +12,6 @@ namespace Funny.AssetPostprocessor {
         private static readonly string path = "Assets/Editor/AssetPostprocessor/Config/Texture/New Postprocessor.asset";
         private static readonly string defaultPath = "Assets/Editor/AssetPostprocessor/Config/Texture/DefaultSoTexturePostprocessor.asset";
 
-        [MenuItem("Funny/资源导入规范/Texture")]
         public static SoTexturePostprocessor Create() {
             return Create(path);
         }

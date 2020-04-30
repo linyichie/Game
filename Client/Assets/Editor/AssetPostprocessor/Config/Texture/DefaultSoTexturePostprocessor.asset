@@ -21,7 +21,7 @@ MonoBehaviour:
   - platform: iPhone
     overridden: 0
     maxTextureSize: 2048
-    format: 50
+    format: 56
     compressionQuality: 50
   - platform: Android
     overridden: 0
