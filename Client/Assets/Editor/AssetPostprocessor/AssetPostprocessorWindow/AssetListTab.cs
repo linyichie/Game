@@ -20,7 +20,7 @@ namespace Funny.AssetPostprocessor {
         private string postprocessorGuid = string.Empty;
         private bool inited = false;
 
-        private readonly SoAssetPostprocessorFolder postprocessorFolder;
+        private readonly SoAssetPostprocessorUtils postprocessorUtils;
         private readonly Texture2D warnIcon;
         private readonly Texture2D errorIcon;
         private readonly List<AssetListItem> treeViewItems = new List<AssetListItem>();
@@ -60,7 +60,7 @@ namespace Funny.AssetPostprocessor {
 
         private AssetListTab(TreeViewState state) : base(state) {
             showAlternatingRowBackgrounds = true;
-            postprocessorFolder = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();
+            postprocessorUtils = SoAssetPostprocessorUtils.GetSoAssetPostprocessorUtils();
             warnIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/AssetPostprocessor/Texture/Warn.png");
             errorIcon = AssetDatabase.LoadAssetAtPath<Texture2D>("Assets/Editor/AssetPostprocessor/Texture/Error.png");
             searchField = new SearchField();
@@ -309,7 +309,7 @@ namespace Funny.AssetPostprocessor {
                 this.assetType = assetType;
                 this.folder = path;
                 selectState = AssetState.None;
-                var guid = postprocessorFolder.Get(this.assetType, this.folder);
+                var guid = postprocessorUtils.Get(this.assetType, this.folder);
                 var assetPath = AssetDatabase.GUIDToAssetPath(guid);
                 soAssetPostprocessor = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessor>(assetPath);
                 postprocessorGuid = guid;
@@ -336,7 +336,7 @@ namespace Funny.AssetPostprocessor {
             oldAssetGuids = assetGuids;
             if(assetGuids != null) {
                 List<Task> tasks = new List<Task>();
-                var folders = postprocessorFolder.GetPaths(this.assetType);
+                var folders = postprocessorUtils.GetPaths(this.assetType);
                 for(int i = 0; i < assetGuids.Length; i++) {
                     tasks.Add(new Task(assetGuids[i], this.folder, this.assetType, folders));
                 }

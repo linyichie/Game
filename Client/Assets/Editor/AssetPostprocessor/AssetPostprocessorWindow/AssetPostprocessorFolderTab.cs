@@ -10,7 +10,7 @@ namespace Funny.AssetPostprocessor {
     public class AssetPostprocessorFolderTab : TreeView {
         private readonly EditorWindow parent;
         private readonly List<Folder> folders = new List<Folder>();
-        private readonly SoAssetPostprocessorFolder soAssetPostprocessorFolder;
+        private readonly SoAssetPostprocessorUtils soAssetPostprocessorUtils;
         private SearchField searchField;
         private PostprocessorAssetType assetType = (PostprocessorAssetType) (-1);
         private List<string> paths = new List<string>();
@@ -57,7 +57,7 @@ namespace Funny.AssetPostprocessor {
         private AssetPostprocessorFolderTab(EditorWindow parent, TreeViewState state) : base(state) {
             this.parent = parent;
             showAlternatingRowBackgrounds = true;
-            soAssetPostprocessorFolder = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();
+            soAssetPostprocessorUtils = SoAssetPostprocessorUtils.GetSoAssetPostprocessorUtils();
             searchField = new SearchField();
         }
 
@@ -193,7 +193,7 @@ namespace Funny.AssetPostprocessor {
                     paths.Remove(item.Path);
                 }
 
-                soAssetPostprocessorFolder.Remove(this.assetType, item.Path);
+                soAssetPostprocessorUtils.Remove(this.assetType, item.Path);
             }
 
             AssetDatabase.SaveAssets();
@@ -234,7 +234,7 @@ namespace Funny.AssetPostprocessor {
                 }
 
                 this.paths.Add(path);
-                soAssetPostprocessorFolder.Set(this.assetType, path, guid, false);
+                soAssetPostprocessorUtils.Set(this.assetType, path, guid, false);
                 dirty = true;
             }
             AssetDatabase.SaveAssets();
@@ -263,7 +263,7 @@ namespace Funny.AssetPostprocessor {
 
         public void Refresh() {
             paths?.Clear();
-            paths = soAssetPostprocessorFolder.GetPaths(this.assetType);
+            paths = soAssetPostprocessorUtils.GetPaths(this.assetType);
             Reload();
         }
     }

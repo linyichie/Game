@@ -20,8 +20,8 @@ namespace Funny.AssetPostprocessor {
                 return;
             }
 
-            var postprocessorFolder = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();
-            var guid = postprocessorFolder.Get(assetType, importer.assetPath);
+            var postprocessorUtils = SoAssetPostprocessorUtils.GetSoAssetPostprocessorUtils();
+            var guid = postprocessorUtils.Get(assetType, importer.assetPath);
             if(string.IsNullOrEmpty(guid)) {
                 return;
             }

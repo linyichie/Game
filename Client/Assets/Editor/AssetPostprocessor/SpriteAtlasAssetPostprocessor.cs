@@ -13,8 +13,8 @@ namespace Funny.AssetPostprocessor {
                 return;
             }
 
-            var postprocessorFolder = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();
-            var guid = postprocessorFolder.Get(PostprocessorAssetType.SpriteAtlas, assetPath);
+            var postprocessorUtils = SoAssetPostprocessorUtils.GetSoAssetPostprocessorUtils();
+            var guid = postprocessorUtils.Get(PostprocessorAssetType.SpriteAtlas, assetPath);
             if(string.IsNullOrEmpty(guid)) {
                 return;
             }

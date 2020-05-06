@@ -16,7 +16,7 @@ namespace Funny.AssetPostprocessor {
             window.Show();
         }
 
-        private static readonly string documentUrl = "https://baidu.com";
+        private static readonly string documentUrl = "https://paper.dropbox.com/doc/--AzB1QHwcbFw219NvQS5XvOosAg-2jXTjDV2kubjt5jdYg3uw";
         private static readonly float toolBarHeight = 20;
         private static readonly float splitterWidth = 3f;
 
@@ -74,7 +74,7 @@ namespace Funny.AssetPostprocessor {
         }
 
         private void Refresh() {
-            SoAssetPostprocessorFolder.VerifyConfigs();
+            SoAssetPostprocessorUtils.VerifyConfigs();
             folderTab?.Refresh();
             configTab?.Refresh();
             assetListTab?.Refresh();
@@ -159,7 +159,7 @@ namespace Funny.AssetPostprocessor {
         }
 
         private void OnDeleteSoAssetPostprocessor(string deleteGuid) {
-            var so = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();
+            var so = SoAssetPostprocessorUtils.GetSoAssetPostprocessorUtils();
             var defaultSo = SoAssetPostprocessor.GetDefault(selectAssetType);
             var defaultGuid = AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(defaultSo));
             var paths = so.GetPaths(selectAssetType);

@@ -9,9 +9,11 @@ using UnityEngine;
 
 namespace Funny.AssetPostprocessor {
     public static class ModelAssetPostprocessor {
+        private static SoAssetPostprocessorUtils postprocessorUtils = null;
+
         public static void OnPostprocessModel(ModelImporter importer) {
-            var postprocessorFolder = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();
-            var guid = postprocessorFolder.Get(PostprocessorAssetType.Model, importer.assetPath);
+            postprocessorUtils = postprocessorUtils ? postprocessorUtils : SoAssetPostprocessorUtils.GetSoAssetPostprocessorUtils();
+            var guid = postprocessorUtils.Get(PostprocessorAssetType.Model, importer.assetPath);
             if(string.IsNullOrEmpty(guid)) {
                 return;
             }
@@ -82,7 +84,7 @@ namespace Funny.AssetPostprocessor {
                         if(materialProperty.objectReferenceValue != null) {
                             var assetPath = AssetDatabase.GetAssetPath(materialProperty.objectReferenceValue);
                             var mat = AssetDatabase.LoadAssetAtPath<Material>(assetPath);
-                            if(mat != null && mat.shader.name == "Standard") {
+                            if(mat != null && postprocessorUtils.ContainsStandardShader(mat.shader.name)) {
                                 materialProperty.objectReferenceValue = null;
                             }
                         }
@@ -216,39 +218,13 @@ namespace Funny.AssetPostprocessor {
             }
 
             if(importer.importMaterials && importer.materialLocation == ModelImporterMaterialLocation.InPrefab) {
-                using(var serializedObject = new SerializedObject(importer)) {
-                    var externalObjects = serializedObject.FindProperty("m_ExternalObjects");
-                    if(externalObjects.arraySize == 0) {
-                        same = false;
-                        sameInfo = StringUtil.Contact(sameInfo, "\n", "Using Standard Shader");
-                    } else {
-                        var materials = serializedObject.FindProperty("m_Materials");
-
-                        for(int materialIndex = 0; materialIndex < materials.arraySize; materialIndex++) {
-                            var id = materials.GetArrayElementAtIndex(materialIndex);
-                            var name = id.FindPropertyRelative("name").stringValue;
-                            var type = id.FindPropertyRelative("type").stringValue;
-
-                            SerializedProperty materialProperty = null;
-
-                            for(int objectIndex = 0; objectIndex < externalObjects.arraySize; objectIndex++) {
-                                var pair = externalObjects.GetArrayElementAtIndex(objectIndex);
-                                var externalName = pair.FindPropertyRelative("first.name").stringValue;
-                                var externalType = pair.FindPropertyRelative("first.type").stringValue;
-
-                                if(externalName == name && externalType == type) {
-                                    materialProperty = pair.FindPropertyRelative("second");
-                                    break;
-                                }
-                            }
-
-                            if(materialProperty == null || materialProperty.objectReferenceValue == null) {
-                                continue;
-                            }
-
-                            var assetPath = AssetDatabase.GetAssetPath(materialProperty.objectReferenceValue);
-                            var mat = AssetDatabase.LoadAssetAtPath<Material>(assetPath);
-                            if(mat != null && mat.shader.name == "Standard") {
+                var objects = AssetDatabase.LoadAllAssetsAtPath(importer.assetPath);
+                if(objects != null && objects.Length > 0) {
+                    for(int i = 0; i < objects.Length; i++) {
+                        if(objects[i] is Material) {
+                            var mat = objects[i] as Material;
+                            postprocessorUtils = postprocessorUtils ? postprocessorUtils : SoAssetPostprocessorUtils.GetSoAssetPostprocessorUtils();
+                            if(postprocessorUtils.ContainsStandardShader(mat.shader.name)) {
                                 same = false;
                                 sameInfo = StringUtil.Contact(sameInfo, "\n", "Using Standard Shader");
                                 break;

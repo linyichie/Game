@@ -11,7 +11,7 @@ using Object = System.Object;
 namespace Funny.AssetPostprocessor {
     public class AssetPostprocessorConfigTab : TreeView {
         private readonly List<string> paths = new List<string>();
-        private readonly SoAssetPostprocessorFolder soAssetPostprocessorFolder;
+        private readonly SoAssetPostprocessorUtils soAssetPostprocessorUtils;
         
         private PostprocessorAssetType assetType = (PostprocessorAssetType) (-1);
         private Styles styles;
@@ -43,7 +43,7 @@ namespace Funny.AssetPostprocessor {
         }
 
         private AssetPostprocessorConfigTab(TreeViewState state) : base(state) {
-            soAssetPostprocessorFolder = SoAssetPostprocessorFolder.GetSoAssetPostprocessorFolder();
+            soAssetPostprocessorUtils = SoAssetPostprocessorUtils.GetSoAssetPostprocessorUtils();
             showAlternatingRowBackgrounds = true;
             rowHeight = 25;
         }
@@ -218,7 +218,7 @@ namespace Funny.AssetPostprocessor {
             var selectIds = o as IList<int>;
             if (selectIds != null && selectIds.Count == 1) {
                 var item = FindItem(selectIds[0], rootItem) as AssetPostprocessorConfigItem;
-                soAssetPostprocessorFolder.Set(this.assetType, folderPath, item.Guid);
+                soAssetPostprocessorUtils.Set(this.assetType, folderPath, item.Guid);
                 postprocessorConfigGuid = item.Guid;
                 OnChanged?.Invoke(postprocessorConfigGuid);
             }
@@ -232,7 +232,7 @@ namespace Funny.AssetPostprocessor {
                     var defaultConfig = SoAssetPostprocessor.GetDefault(this.assetType);
                     var path = AssetDatabase.GetAssetPath(defaultConfig);
                     var guid = AssetDatabase.AssetPathToGUID(path);
-                    soAssetPostprocessorFolder.Set(this.assetType, this.folderPath, guid);
+                    soAssetPostprocessorUtils.Set(this.assetType, this.folderPath, guid);
                     postprocessorConfigGuid = guid;
                 }
 
@@ -255,7 +255,7 @@ namespace Funny.AssetPostprocessor {
         public void SetPostprocessorFolder(string folderPath) {
             if (this.folderPath != folderPath) {
                 this.folderPath = folderPath;
-                postprocessorConfigGuid = soAssetPostprocessorFolder.Get(this.assetType, this.folderPath);
+                postprocessorConfigGuid = soAssetPostprocessorUtils.Get(this.assetType, this.folderPath);
                 if (!string.IsNullOrEmpty(postprocessorConfigGuid)) {
                     var path = AssetDatabase.GUIDToAssetPath(postprocessorConfigGuid);
                     var id = path.GetHashCode();
