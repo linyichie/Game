@@ -35,7 +35,7 @@ public static class CSharpConfigGen {
             var parseLabel = string.Join("\r\n\r\n\t\t\t", parseLines.ToArray());
 
             GenerateConfig(new ConfigClassInfo() {
-                className = StringUtility.Contact(fileInfo.Name.Substring(0, fileInfo.Name.IndexOf('.')), "Config"),
+                className = StringUtil.Contact(fileInfo.Name.Substring(0, fileInfo.Name.IndexOf('.')), "Config"),
                 fileName = fileInfo.Name.Substring(0, fileInfo.Name.IndexOf('.')),
                 keyType = keyType,
                 keyField = keyField,
@@ -53,7 +53,7 @@ public static class CSharpConfigGen {
 
         switch (type) {
             default:
-                return StringUtility.Contact("public ", type, " ", field, " { get; private set; }");
+                return StringUtil.Contact("public ", type, " ", field, " { get; private set; }");
         }
     }
 
@@ -65,9 +65,9 @@ public static class CSharpConfigGen {
 
         switch (type) {
             case "string":
-                return StringUtility.Contact(field, string.Format(" = values[{0}]", index), ".Trim();");
+                return StringUtil.Contact(field, string.Format(" = values[{0}]", index), ".Trim();");
             case "int":
-                return StringUtility.Contact(field, string.Format(" = ConfigParse.ParseInt(values[{0}].Trim())", index),
+                return StringUtil.Contact(field, string.Format(" = ConfigParse.ParseInt(values[{0}].Trim())", index),
                     ";");
         }
 
@@ -75,7 +75,7 @@ public static class CSharpConfigGen {
     }
 
     static void GenerateConfig(ConfigClassInfo classInfo) {
-        var path = StringUtility.Contact("Assets/Script/Game/Config/", classInfo.className, ".cs");
+        var path = StringUtil.Contact("Assets/Script/Game/Config/", classInfo.className, ".cs");
         string fullPath = Path.GetFullPath(path);
 
         StreamReader sr = new StreamReader(FileTemplatePath);

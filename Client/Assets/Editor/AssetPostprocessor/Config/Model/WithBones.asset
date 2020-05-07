@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c78afd709de741409d83713f961b163, type: 3}
+  m_Name: WithBones
+  m_EditorClassIdentifier: 
+  GlobalScale: 1
+  IsReadable: 1
+  ImportBlendShapes: 0
+  ImportVisibility: 0
+  ImportCameras: 0
+  ImportLights: 0
+  ImportMaterials: 1
+  SetMaterialMissing: 1
+  ImportAnimation: 0
+  IsRoleAnimation: 0
+  SourceAvatarGuid: 
+  AnimationType: 2
+  MeshCompression: 1
+  AnimationCompression: 1
