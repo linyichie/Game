@@ -13,7 +13,7 @@ public static class ConfigLoader {
     public static int Count {
         get { return count; }
         private set {
-            lock (lockObject) {
+            lock(lockObject) {
                 count = value;
             }
         }
@@ -21,22 +21,20 @@ public static class ConfigLoader {
 
     public static void Initialize() {
         LoadConfig("Geo", s => { GeoConfig.Parse(true, s, () => { CompleteLoad(); }); });
-        LoadConfig(StringUtility.Contact("Language_", Localization.language),
-            s => { LanguageConfig.Parse(true, s, () => { CompleteLoad(); }); });
-        
+        LoadConfig(StringUtil.Contact("Language_", Localization.language), s => { LanguageConfig.Parse(true, s, () => { CompleteLoad(); }); });
+
         Game.Instance.StartCoroutine(OnLoadConfigs());
     }
 
     public static void ReloadLocalization() {
         LanguageConfig.Clear();
-        LoadConfig(StringUtility.Contact("Language_", Localization.language),
-            s => { LanguageConfig.Parse(true, s, () => { CompleteLoad(); }); });
+        LoadConfig(StringUtil.Contact("Language_", Localization.language), s => { LanguageConfig.Parse(true, s, () => { CompleteLoad(); }); });
 
         Game.Instance.StartCoroutine(OnLoadConfigs());
     }
 
     public static IEnumerator OnLoadConfigs() {
-        while (Count > 0) {
+        while(Count > 0) {
             yield return null;
         }
 
@@ -46,8 +44,11 @@ public static class ConfigLoader {
 
     static void LoadConfig(string fileName, Action<string> callback) {
         Count += 1;
-        AddressableSystem.LoadAsset<TextAsset>(StringUtil.Contact("Txt/", fileName),
-            asset => { callback?.Invoke(asset.text); });
+        var addressableName = StringUtil.Contact("Txt/", fileName);
+        AssetLoad.LoadAsync<TextAsset>(addressableName, asset => {
+            var textAsset = asset as TextAsset;
+            callback?.Invoke(textAsset.text);
+        });
     }
 
     static void CompleteLoad() {

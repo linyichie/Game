@@ -19,17 +19,17 @@ public class WindowLoadTask {
     public void Begin(Action<WindowLoadTask, GameObject> callback) {
         loading = true;
         completed = callback;
-        AddressableSystem.LoadAsset<GameObject>(StringUtil.Contact("Windows/", this.windowName),
-            o => {
-                if (completed == null) {
-                    AddressableSystem.Release(o);
-                }
-                else {
-                    completed.Invoke(this, o);
-                }
-
-                loading = false;
-            });
+        //AddressableSystem.LoadAsset<GameObject>(StringUtil.Contact("Windows/", this.windowName),
+        //    o => {
+        //        if (completed == null) {
+        //            AddressableSystem.Release(o);
+        //        }
+        //        else {
+        //            completed.Invoke(this, o);
+        //        }
+//
+        //        loading = false;
+        //    });
     }
 
     public void Stop() {

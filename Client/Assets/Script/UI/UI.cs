@@ -63,7 +63,7 @@ public class UI : SingletonMonobehaviour<UI> {
             window.Open();
         }
         else {
-            AddressableSystem.Release(go);
+            //AddressableSystem.Release(go);
         }
     }
 
