@@ -46,7 +46,7 @@ public static class ConfigLoader {
         Count += 1;
         var addressableName = StringUtil.Contact("Txt/", fileName);
         AssetLoad.LoadAsync<TextAsset>(addressableName, asset => {
-            var textAsset = asset as TextAsset;
+            var textAsset = asset.asset as TextAsset;
             callback?.Invoke(textAsset.text);
         });
     }

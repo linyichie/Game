@@ -61,9 +61,7 @@ namespace Funny.Asset {
             }
         }
 
-        public override void Release(UnityEngine.Object asset) {
-            
-        }
+        public override void Release(UnityEngine.Object asset) { }
     }
 
     public class PrefabAsset : AddressableAsset {

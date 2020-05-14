@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Window : MonoBehaviour {
+    [SerializeField] private WindowConfig windowConfig;
+    
     private bool initialized = false;
     private string windowName = string.Empty;
 
