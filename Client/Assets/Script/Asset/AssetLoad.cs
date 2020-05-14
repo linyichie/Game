@@ -10,7 +10,7 @@ public static class AssetLoad {
     public static void LoadAsync<T>(string addressableName, Action<IAsset> callback) where T : UnityEngine.Object {
         IAsset asset;
         if(!assets.TryGetValue(addressableName, out asset)) {
-            asset = new AddressableAsset(addressableName);
+            asset = Get<T>(addressableName);
             assets[addressableName] = asset;
         }
 
@@ -29,5 +29,13 @@ public static class AssetLoad {
         if(assets.TryGetValue(addressableName, out asset)) {
             asset.Release(@object);
         }
+    }
+
+    static IAsset Get<T>(string addressableName) {
+        if(typeof(T) == typeof(GameObject)) {
+            return new PrefabAsset(addressableName);
+        }
+
+        return new AddressableAsset(addressableName);
     }
 }
