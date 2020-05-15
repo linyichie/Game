@@ -166,7 +166,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiRoot: {fileID: 987953487}
-  launchBackground: {fileID: 0}
   uiCamera: {fileID: 1139829162}
 --- !u!1 &1139829159
 GameObject:

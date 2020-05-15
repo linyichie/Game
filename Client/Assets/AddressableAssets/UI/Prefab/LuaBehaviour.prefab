@@ -43,7 +43,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e2b1ec4db5a4ec44914450abe088ecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  luaInjection:
-  - name: 
-    gameObject: {fileID: 0}
-    componentNames: []
+  luaInjection: []
