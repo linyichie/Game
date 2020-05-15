@@ -4,12 +4,12 @@ using UnityEngine;
 using XLua;
 
 public class LuaBehaviour : MonoBehaviour {
-    [Reorderable] [SerializeField] private LuaInjection[] luaInjections;
+    [SerializeField] private LuaComponent[] luaComponents;
 
     public void StartLuaInjection(LuaTable luaTable) {
-        if(luaInjections != null) {
-            foreach(var luaInjection in luaInjections) {
-                luaTable[luaInjection.]
+        if(luaComponents != null) {
+            foreach(var luaComponent in luaComponents) {
+                //luaTable.Set(luaComponent.name, luaComponent.Curve);
             }
         }
     }
