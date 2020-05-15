@@ -21,7 +21,7 @@ public static class ConfigLoader {
 
     public static void Initialize() {
         LoadConfig("Geo", s => { GeoConfig.Parse(true, s, () => { CompleteLoad(); }); });
-        LoadConfig(StringUtil.Contact("Language_", Localization.language), s => { LanguageConfig.Parse(true, s, () => { CompleteLoad(); }); });
+        LoadConfig(StringUtil.Contact(Localization.language, "/", "Language", Localization.language), s => { LanguageConfig.Parse(true, s, () => { CompleteLoad(); }); });
 
         Game.Instance.StartCoroutine(OnLoadConfigs());
     }

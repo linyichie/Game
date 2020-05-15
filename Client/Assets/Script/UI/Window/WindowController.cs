@@ -46,7 +46,7 @@ public class WindowController : SingletonMonobehaviour<WindowController> {
             windows.Add(windowName, window);
             window.Open();
         } else {
-            var addressableName = StringUtil.Contact("Window/", windowName);
+            var addressableName = StringUtil.Contact("Windows/", windowName);
             AssetLoad.Release(addressableName, go);
         }
     }

@@ -1105,6 +1105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5a4d7fef8045e447a3931c821d184da, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  windowConfig: {fileID: 11400000, guid: cdae9e44bb9e74843979b3a92fcd4e98, type: 2}
   m_LanguageCN: {fileID: 7005799228176135562}
   m_LanguageEN: {fileID: 4511002357652026832}
   m_LanguageJP: {fileID: 559136252075898566}

@@ -136,6 +136,10 @@ public class Window : MonoBehaviour {
                 break;
         }
     }
+
+    public int SetSortingOrder(int order) {
+        return 0;
+    }
 }
 
 public enum WindowState {
