@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6848596768211659759}
-  - component: {fileID: 3090282617860843812}
+  - component: {fileID: 479274991133560704}
   m_Layer: 0
   m_Name: LuaBehaviour
   m_TagString: Untagged
@@ -31,7 +31,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3090282617860843812
+--- !u!114 &479274991133560704
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -43,4 +43,157 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e2b1ec4db5a4ec44914450abe088ecf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  luaInjection: []
+  luaComponents:
+  - name: 
+    luaInjection: Text
+    intValues: 
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues:
+    - {fileID: 0}
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
+  - name: 
+    luaInjection: Int
+    intValues: 00000000
+    floatValues: []
+    vector2Values: []
+    vector3Values: []
+    animationCurveValues: []
+    unityObjectValues: []
