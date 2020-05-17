@@ -629,13 +629,37 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   luaComponents:
   - name: texts
-    luaInjection: Text
+    luaInjection: AnimationCurve
+    animationCurveValues:
+    - serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 1
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 1
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    unityObjectValues: []
+  - name: texts
+    luaInjection: Component
     animationCurveValues: []
     unityObjectValues:
-    - {fileID: 795383258}
-    - {fileID: 1065578992}
-    - {fileID: 1657110291}
-    - {fileID: 469466705}
+    - {fileID: 1065578990}
 --- !u!20 &2082025826
 Camera:
   m_ObjectHideFlags: 0

@@ -14,7 +14,6 @@ public class LuaComponentDrawer : PropertyDrawer {
     static Dictionary<string, bool> foldouts = new Dictionary<string, bool>();
 
     class Styles {
-        public static readonly float injectionHorizontalPercent = 0.2f;
         public static readonly int splitWidth = 3;
         public static readonly Color errorColor = new Color(Color.red.r, Color.red.g, Color.red.b, 0.35f);
     }
