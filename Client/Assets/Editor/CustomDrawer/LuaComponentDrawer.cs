@@ -196,10 +196,10 @@ public class LuaComponentDrawer : PropertyDrawer {
     }
 
     public static void GetCustomComponents(ref List<Component> components, out string[] displayNames) {
-        components.RemoveAll((x) => {
-            var type = x.GetType();
-            return !string.IsNullOrEmpty(type.Namespace) && type.Namespace.Contains("UnityEngine");
-        });
+        //components.RemoveAll((x) => {
+        //    var type = x.GetType();
+        //    return !string.IsNullOrEmpty(type.Namespace) && type.Namespace.Contains("UnityEngine");
+        //});
         displayNames = new string[components.Count];
         for(int i = 0; i < displayNames.Length; i++) {
             displayNames[i] = components[i].GetType().Name;
@@ -214,9 +214,11 @@ public class LuaComponentDrawer : PropertyDrawer {
 
         if(datasProperty.arraySize > 1 && foldouts.ContainsKey(nameProperty.stringValue) && !foldouts[nameProperty.stringValue]) {
             height += EditorGUIUtility.singleLineHeight;
+            height += Styles.splitWidth;
         } else {
             height += (datasProperty.arraySize * EditorGUIUtility.singleLineHeight);
             height += (datasProperty.arraySize - 1) * Styles.splitWidth;
+            height += Styles.splitWidth;
         }
 
         return height;
