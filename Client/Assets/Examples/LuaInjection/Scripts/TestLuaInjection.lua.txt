@@ -6,9 +6,6 @@ breakSocketHandle, debugXpCall = require("Scripts.LuaDebug")("localhost", 7003)
 function LuaBehaviour:OnInitialize()
     local luaBehaviour = self.go:GetComponent("LuaBehaviour")
     luaBehaviour:StartLuaInjection(self)
-    for i = 1, #self.texts do
-        self.texts[i].text = i
-    end
 end
 
 return LuaBehaviour
