@@ -35,7 +35,7 @@ public class LuaBehaviourInspector : Editor {
     public override void OnInspectorGUI() {
         GUILayout.Space(10);
         serializedObject.Update();
-        var height = Mathf.Min(500,reorderableList.GetHeight());
+        var height = Mathf.Min(800,reorderableList.GetHeight());
         scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Height(height));
         reorderableList.DoLayoutList();
         EditorGUILayout.EndScrollView();

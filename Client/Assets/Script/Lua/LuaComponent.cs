@@ -13,7 +13,7 @@ public partial class LuaComponent {
     public string Injection {
         get {
             if(string.IsNullOrEmpty(luaInjection)) {
-                luaInjection = LuaInjection.Int.ToString();
+                luaInjection = LuaInjection.GameObject.ToString();
             } else {
                 var enumNames = Enum.GetNames(typeof(LuaInjection));
                 if(Array.IndexOf(enumNames, luaInjection) == -1) {
@@ -27,19 +27,11 @@ public partial class LuaComponent {
 }
 
 public class LuaData {
-    public int intValue;
-    public float floatValue;
-    public Vector2 vector2Value;
-    public Vector3 vector3Value;
     public AnimationCurve animationCurve;
     public UnityEngine.Object unityObject;
 }
 
 public enum LuaInjection {
-    Int,
-    Float,
-    Vector2,
-    Vector3,
     GameObject,
     Transform,
     RectTransform,
@@ -52,6 +44,6 @@ public enum LuaInjection {
     InputField,
     ScrollRect,
     Toggle,
-    AnimationCurve,
     Component,
+    AnimationCurve,
 }

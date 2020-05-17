@@ -2,8 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Resources;
 using System.Text.RegularExpressions;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,18 +14,24 @@ public class LuaComponentDrawer : PropertyDrawer {
     static Dictionary<string, bool> foldouts = new Dictionary<string, bool>();
 
     class Styles {
+        public static readonly float injectionHorizontalPercent = 0.2f;
+        public static readonly int splitWidth = 3;
         public static readonly Color errorColor = new Color(Color.red.r, Color.red.g, Color.red.b, 0.35f);
     }
 
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
         var nameRect = new Rect(position) {
-            width = position.width / 2 - 5,
+            y = position.y + Styles.splitWidth,
+            width = position.width * 0.2f,
             height = EditorGUIUtility.singleLineHeight
         };
-        var luaInjectionRect = new Rect(position) {
-            x = position.x + nameRect.width + 10,
-            width = position.width / 2 - 5,
-            height = EditorGUIUtility.singleLineHeight
+        var arrayRect = new Rect(nameRect) {
+            x = nameRect.xMax + Styles.splitWidth,
+            width = position.width * 0.2f,
+        };
+        var luaInjectionRect = new Rect(nameRect) {
+            x = arrayRect.xMax + Styles.splitWidth,
+            width = position.width * 0.4f,
         };
         var nameProperty = property.FindPropertyRelative("name");
         nameProperty.stringValue = EditorGUI.TextField(nameRect, nameProperty.stringValue);
@@ -36,7 +44,7 @@ public class LuaComponentDrawer : PropertyDrawer {
         EditorGUI.BeginChangeCheck();
         {
             if(string.IsNullOrEmpty(luaInjectionProperty.stringValue)) {
-                luaInjectionProperty.stringValue = LuaInjection.Int.ToString();
+                luaInjectionProperty.stringValue = LuaInjection.GameObject.ToString();
             }
 
             var selected = (LuaInjection)Enum.Parse(typeof(LuaInjection), luaInjectionProperty.stringValue);
@@ -47,28 +55,20 @@ public class LuaComponentDrawer : PropertyDrawer {
         }
 
         var datasProperty = GetLuaDatasProperty(property);
-        if(datasProperty.arraySize == 0) {
-            datasProperty.arraySize = 1;
-        }
-
-        var dataRect = new Rect(position) {
-            y = position.y + EditorGUIUtility.singleLineHeight + 5,
-            height = EditorGUIUtility.singleLineHeight + 6,
-        };
-
-        var arraySizeRect = new Rect(dataRect) {
-            x = dataRect.x + dataRect.width - 100 + 3,
-            y = dataRect.y + 3,
-            width = 80,
-            height = dataRect.height - 6,
-        };
-
-        var arraySize = EditorGUI.IntField(arraySizeRect, datasProperty.arraySize);
-        if(arraySize != datasProperty.arraySize && arraySize > 0 && arraySize < 15) {
+        var arraySize = EditorGUI.IntField(arrayRect, datasProperty.arraySize);
+        arraySize = Mathf.Clamp(arraySize, 1, 15);
+        if(arraySize != datasProperty.arraySize) {
             datasProperty.arraySize = arraySize;
         }
 
-        if(arraySize > 3) {
+        var dataHorizontalPercent = 0.8f;
+        var dataRect = new Rect(position) {
+            y = nameRect.yMax + Styles.splitWidth,
+            width = position.width * dataHorizontalPercent + 2 * Styles.splitWidth,
+            height = EditorGUIUtility.singleLineHeight
+        };
+
+        if(arraySize > 1) {
             if(!foldouts.ContainsKey(nameProperty.stringValue)) {
                 foldouts[nameProperty.stringValue] = true;
             }
@@ -81,14 +81,14 @@ public class LuaComponentDrawer : PropertyDrawer {
         }
 
         var displaySize = arraySize;
-        if(arraySize > 3 && foldouts.ContainsKey(nameProperty.stringValue) && !foldouts[nameProperty.stringValue]) {
+        if(arraySize > 1 && foldouts.ContainsKey(nameProperty.stringValue) && !foldouts[nameProperty.stringValue]) {
             displaySize = Mathf.Min(1, arraySize);
         }
 
         for(int i = 0; i < displaySize; i++) {
             var element = datasProperty.GetArrayElementAtIndex(i);
             DrawLuaDataElement(dataRect, element, luaInjectionProperty.stringValue);
-            dataRect.y += EditorGUIUtility.singleLineHeight + 6 + 1;
+            dataRect.y = dataRect.yMax + Styles.splitWidth;
         }
 
         if(luaInjectionChanged) {
@@ -97,45 +97,25 @@ public class LuaComponentDrawer : PropertyDrawer {
     }
 
     private void DrawLuaDataElement(Rect position, SerializedProperty property, string luaInjection) {
-        var boxRect = new Rect(position) {
-            width = position.width - 100,
-        };
-        var valueRect = new Rect(boxRect) {
-            x = boxRect.x + 3,
-            y = boxRect.y + 3,
-            width = boxRect.width - 6,
-            height = boxRect.height - 6,
-        };
         var selected = (LuaInjection)Enum.Parse(typeof(LuaInjection), luaInjection);
         SerializedProperty elementProperty = GetLuaDataElementProperty(property, selected);
-        EditorGUI.HelpBox(boxRect, string.Empty, MessageType.None);
         switch(selected) {
-            case LuaInjection.Int:
-                elementProperty.intValue = EditorGUI.IntField(valueRect, elementProperty.intValue);
-                break;
-            case LuaInjection.Float:
-                elementProperty.floatValue = EditorGUI.FloatField(valueRect, elementProperty.floatValue);
-                break;
-            case LuaInjection.Vector3:
-                elementProperty.vector3Value = EditorGUI.Vector3Field(valueRect, string.Empty, elementProperty.vector3Value);
-                break;
-            case LuaInjection.Vector2:
-                elementProperty.vector2Value = EditorGUI.Vector2Field(valueRect, string.Empty, elementProperty.vector2Value);
-                break;
             case LuaInjection.AnimationCurve:
                 if(elementProperty.animationCurveValue.keys.Length == 0) {
                     elementProperty.animationCurveValue = AnimationCurve.Linear(0, 0, 1, 1);
                 }
 
-                elementProperty.animationCurveValue = EditorGUI.CurveField(valueRect, elementProperty.animationCurveValue);
+                elementProperty.animationCurveValue = EditorGUI.CurveField(position, elementProperty.animationCurveValue);
                 break;
             case LuaInjection.Component:
-                valueRect.width = valueRect.width / 2;
-                var component = EditorGUI.ObjectField(valueRect, elementProperty.objectReferenceValue, typeof(Component), true) as Component;
+                position.width = position.width / 2;
+                var rect = new Rect(position) {
+                    x = position.x + position.width + Styles.splitWidth,
+                    width = position.width - Styles.splitWidth
+                };
+
+                var component = EditorGUI.ObjectField(position, elementProperty.objectReferenceValue, typeof(Component), true) as Component;
                 if(component != null) {
-                    var rect = new Rect(valueRect) {
-                        x = valueRect.x + valueRect.width
-                    };
                     List<Component> components = new List<Component>();
                     component.GetComponents(components);
                     string[] displayNames;
@@ -149,22 +129,21 @@ public class LuaComponentDrawer : PropertyDrawer {
                         component = components[0];
                         index = 0;
                     }
+
                     index = EditorGUI.Popup(rect, index, displayNames);
                     if(elementProperty.objectReferenceValue != components[index]) {
                         elementProperty.objectReferenceValue = components[index];
                     }
+                } else {
+                    elementProperty.objectReferenceValue = null;
+                    EditorGUI.Popup(rect, 0, new string[0]);
                 }
 
                 break;
             default:
-                elementProperty.objectReferenceValue = EditorGUI.ObjectField(valueRect, elementProperty.objectReferenceValue, GetUnityObjectType(luaInjection), true);
+                elementProperty.objectReferenceValue = EditorGUI.ObjectField(position, elementProperty.objectReferenceValue, GetUnityObjectType(luaInjection), true);
                 break;
         }
-
-        var addRect = new Rect(position) {
-            x = position.x + boxRect.width + 10,
-            width = 30,
-        };
     }
 
     private static Type GetUnityObjectType(string luaInjection) {
@@ -205,39 +184,15 @@ public class LuaComponentDrawer : PropertyDrawer {
         var luaInjectionProperty = property.FindPropertyRelative("luaInjection");
         var selected = (LuaInjection)Enum.Parse(typeof(LuaInjection), luaInjectionProperty.stringValue);
         switch(selected) {
-            case LuaInjection.Int:
-                return property.FindPropertyRelative("intValues");
-            case LuaInjection.Float:
-                return property.FindPropertyRelative("floatValues");
-            case LuaInjection.Vector2:
-                return property.FindPropertyRelative("vector2Values");
-            case LuaInjection.Vector3:
-                return property.FindPropertyRelative("vector3Values");
             case LuaInjection.AnimationCurve:
                 return property.FindPropertyRelative("animationCurveValues");
             default:
                 return property.FindPropertyRelative("unityObjectValues");
         }
-
-        return property.FindPropertyRelative("luaDatas");
     }
 
     public static SerializedProperty GetLuaDataElementProperty(SerializedProperty property, LuaInjection luaInjection) {
         return property;
-        switch(luaInjection) {
-            case LuaInjection.Int:
-                return property.FindPropertyRelative("intValue");
-            case LuaInjection.Float:
-                return property.FindPropertyRelative("floatValue");
-            case LuaInjection.Vector2:
-                return property.FindPropertyRelative("vector2Value");
-            case LuaInjection.Vector3:
-                return property.FindPropertyRelative("vector3Value");
-            case LuaInjection.AnimationCurve:
-                return property.FindPropertyRelative("animationCurve");
-            default:
-                return property.FindPropertyRelative("unityObject");
-        }
     }
 
     public static void GetCustomComponents(ref List<Component> components, out string[] displayNames) {
@@ -253,15 +208,15 @@ public class LuaComponentDrawer : PropertyDrawer {
 
     public static float GetHeight(SerializedProperty property) {
         var height = EditorGUIUtility.singleLineHeight;
+        height += Styles.splitWidth;
         var datasProperty = GetLuaDatasProperty(property);
         var nameProperty = property.FindPropertyRelative("name");
-        if(datasProperty.arraySize > 3 && foldouts.ContainsKey(nameProperty.stringValue) && !foldouts[nameProperty.stringValue]) {
-            height += 5;
-            height += (EditorGUIUtility.singleLineHeight + 6);
+
+        if(datasProperty.arraySize > 1 && foldouts.ContainsKey(nameProperty.stringValue) && !foldouts[nameProperty.stringValue]) {
+            height += EditorGUIUtility.singleLineHeight;
         } else {
-            height += 5;
-            height += (datasProperty.arraySize * (EditorGUIUtility.singleLineHeight + 6));
-            height += (datasProperty.arraySize - 1) * 1;
+            height += (datasProperty.arraySize * EditorGUIUtility.singleLineHeight);
+            height += (datasProperty.arraySize - 1) * Styles.splitWidth;
         }
 
         return height;

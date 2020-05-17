@@ -2,4 +2,10 @@
 
 <linker>
 
+	<assembly fullname="Assembly-CSharp">
+	    <type fullname="Localization" preserve="all"/>
+		<type fullname="LuaBehaviour" preserve="all"/>
+		
+	</assembly>
+
 </linker>
