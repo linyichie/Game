@@ -12,7 +12,7 @@ public class LuaBehaviourInspector : Editor {
     private SerializedProperty luaComponentsProperty;
     private List<string> fieldNames = new List<string>();
     private List<string> repeatNames = new List<string>();
-    
+
     class Styles {
         public static readonly int splitWidth = 3;
         public static readonly Color errorColor = new Color(Color.red.r, Color.red.g, Color.red.b, 0.35f);
@@ -28,7 +28,7 @@ public class LuaBehaviourInspector : Editor {
 
     private float ElementHeightCallback(int index) {
         var element = reorderableList.serializedProperty.GetArrayElementAtIndex(index);
-        return LuaComponentDrawer.GetHeight(element) + 5;
+        return LuaComponentDrawer.GetHeight(element) + Styles.splitWidth;
     }
 
     private void DrawElementCallback(Rect rect, int index, bool isactive, bool isfocused) {
@@ -59,6 +59,7 @@ public class LuaBehaviourInspector : Editor {
             EditorGUILayout.HelpBox(StringUtil.Contact("There are duplicate field names :\n", string.Join("\n", repeatNames)), MessageType.Error);
             EditorStyles.helpBox.fontStyle = oldFontStyle;
         }
+
         serializedObject.Update();
         var height = Mathf.Min(800, reorderableList.GetHeight());
         scrollPosition = EditorGUILayout.BeginScrollView(scrollPosition, GUILayout.Height(height));
