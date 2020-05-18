@@ -1,0 +1,6 @@
+{
+    "editor.snippetSuggestions": "bottom",
+    "files.associations": {
+        "*.lua.txt": "lua",
+    }
+}

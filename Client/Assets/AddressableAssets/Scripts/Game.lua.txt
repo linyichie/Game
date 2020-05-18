@@ -1,0 +1,11 @@
+require("Scripts.Utils.Class")
+require("Scripts.Utils.Table")
+require("Scripts.Asset.Assets")
+
+local Game = {}
+
+function Game:Start()
+    print("Lua Game Start")
+end
+
+return Game
