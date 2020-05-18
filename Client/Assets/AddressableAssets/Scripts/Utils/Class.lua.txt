@@ -1,4 +1,4 @@
-function class(super, own)
+function class(super, fields)
     local superType = type(super)
     if superType ~= "table" then
         super = nil
@@ -21,6 +21,12 @@ function class(super, own)
             instance:ctor(...)
         end
         return instance
+    end
+
+    if fields then
+        for k, v in pairs(fields) do
+            instance[k] = v
+        end
     end
     return instance
 end

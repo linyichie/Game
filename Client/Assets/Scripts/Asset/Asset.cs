@@ -24,6 +24,7 @@ namespace Funny.Asset {
         protected virtual void OnLoadAssetComplete() {
             isDone = true;
             Completed?.Invoke(this);
+            Completed = null;
         }
     }
 

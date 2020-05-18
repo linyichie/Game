@@ -1057,7 +1057,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3275707076705413349}
-  - component: {fileID: 3759370735223495838}
+  - component: {fileID: 7240319502894437994}
+  - component: {fileID: 1307374932033919491}
   - component: {fileID: 6851434808018515699}
   - component: {fileID: 930651955886593199}
   - component: {fileID: 824314058771321158}
@@ -1093,7 +1094,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &3759370735223495838
+--- !u!114 &7240319502894437994
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1102,15 +1103,36 @@ MonoBehaviour:
   m_GameObject: {fileID: 8772580944679400812}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5a4d7fef8045e447a3931c821d184da, type: 3}
+  m_Script: {fileID: 11500000, guid: 732c70f2bc07ef04987ab68ff290655f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   windowConfig: {fileID: 11400000, guid: cdae9e44bb9e74843979b3a92fcd4e98, type: 2}
-  m_LanguageCN: {fileID: 7005799228176135562}
-  m_LanguageEN: {fileID: 4511002357652026832}
-  m_LanguageJP: {fileID: 559136252075898566}
-  m_LanguageKR: {fileID: 6543685221983426685}
-  m_LoginLabel: {fileID: 136880278903366034}
+--- !u!114 &1307374932033919491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8772580944679400812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e2b1ec4db5a4ec44914450abe088ecf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  luaComponents:
+  - name: startLabel
+    luaInjection: Text
+    animationCurveValues: []
+    unityObjectValues:
+    - {fileID: 136880278903366034}
+  - name: languages
+    luaInjection: Button
+    animationCurveValues: []
+    unityObjectValues:
+    - {fileID: 7005799228176135562}
+    - {fileID: 4511002357652026832}
+    - {fileID: 559136252075898566}
+    - {fileID: 6543685221983426685}
 --- !u!223 &6851434808018515699
 Canvas:
   m_ObjectHideFlags: 0
@@ -1148,7 +1170,7 @@ MonoBehaviour:
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
-  m_ScreenMatchMode: 0
+  m_ScreenMatchMode: 1
   m_MatchWidthOrHeight: 1
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96

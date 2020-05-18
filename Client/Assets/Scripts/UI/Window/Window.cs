@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Window : MonoBehaviour {
+public abstract class Window : MonoBehaviour {
     [SerializeField] private WindowConfig windowConfig;
     
     private bool initialized = false;
@@ -72,32 +72,26 @@ public class Window : MonoBehaviour {
 
     #region protected functions
 
-    protected virtual void OnInitialize() {
-        
-    }
+    protected abstract void OnInitialize();
 
-    protected virtual void OnReadyOepn() {
-    }
+    protected abstract void OnReadyOepn();
 
     protected virtual void OnOpenAnimation(Action callback) {
         callback?.Invoke();
     }
 
-    protected virtual void OnOpened() {
-    }
+    protected abstract void OnOpened();
 
     protected virtual void OnLateUpdate() {
     }
 
-    protected virtual void OnReadyClose() {
-    }
+    protected abstract void OnReadyClose();
 
     protected virtual void OnCloseAnimation(Action callback) {
         callback?.Invoke();
     }
 
-    protected virtual void OnClosed() {
-    }
+    protected abstract void OnClosed();
 
     #endregion
 

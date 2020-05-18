@@ -8,24 +8,20 @@ public class Game : SingletonMonobehaviour<Game> {
     // Start is called before the first frame update
     private LuaTable luaGame;
     private Action<LuaTable> luaStart;
+
     void Start() {
         WindowController.Instance.OpenWindow("Launch");
-        LuaStart();
     }
 
-    void LuaStart() {
+    public void LuaStart() {
         LuaUtility.Initialize();
         var textAsset = AssetLoad.Load<TextAsset>("Scripts.Game");
-        var objects =  LuaUtility.luaEnv.DoString(textAsset.bytes, "Game");
+        var objects = LuaUtility.luaEnv.DoString(textAsset.bytes, "Game");
         if(objects != null) {
             luaGame = objects[0] as LuaTable;
             luaStart = luaGame.Get<Action<LuaTable>>("Start");
         }
-        
-        luaStart?.Invoke(luaGame);
-    }
 
-    // Update is called once per frame
-    void Update() {
+        luaStart?.Invoke(luaGame);
     }
 }

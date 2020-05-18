@@ -10,9 +10,10 @@ public static class Localization {
     public static Action languageChange;
 
     public static void Set(string language) {
-        if (Localization.language != language) {
+        if(Localization.language != language) {
             Localization.language = language;
-            languageChange?.Invoke();
+            ConfigLoader.ReloadLocalization();
+            ConfigLoader.compelted = () => { languageChange?.Invoke(); };
         }
     }
 }

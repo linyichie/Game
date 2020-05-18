@@ -5,14 +5,17 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
+[XLua.LuaCallCSharp]
 public class WindowController : SingletonMonobehaviour<WindowController> {
     [SerializeField] private Transform uiRoot;
     [SerializeField] private Camera uiCamera;
 
     Dictionary<string, Window> windows = new Dictionary<string, Window>();
+    Dictionary<string, Action<Window>> loadedCallbacks = new Dictionary<string, Action<Window>>();
 
     List<string> openList = new List<string>();
     List<string> openingList = new List<string>();
+    List<string> closeList = new List<string>();
 
     public void OpenWindow(string windowName) {
         if(!openingList.Contains(windowName) && !openList.Contains(windowName)) {
@@ -20,9 +23,25 @@ public class WindowController : SingletonMonobehaviour<WindowController> {
         }
     }
 
+    public void OpenWindow(string windowName, Action<Window> callback) {
+        if(!openingList.Contains(windowName) && !openList.Contains(windowName)) {
+            openList.Add(windowName);
+        }
+
+        if(closeList.Contains(windowName)) {
+            closeList.Remove(windowName);
+        }
+
+        loadedCallbacks[windowName] = callback;
+    }
+
     public void CloseWindow(string windowName) {
         if(openList.Contains(windowName)) {
             openList.Remove(windowName);
+        }
+
+        if(!closeList.Contains(windowName)) {
+            closeList.Add(windowName);
         }
     }
 
@@ -34,6 +53,11 @@ public class WindowController : SingletonMonobehaviour<WindowController> {
 
             openList.Clear();
         }
+
+        foreach(var windowName in closeList) {
+            TryClose(windowName);
+        }
+        closeList.Clear();
     }
 
     private void OnLoadedWindow(string windowName, GameObject go) {
@@ -44,6 +68,10 @@ public class WindowController : SingletonMonobehaviour<WindowController> {
             var canvas = go.GetComponent<Canvas>();
             canvas.worldCamera = uiCamera;
             windows.Add(windowName, window);
+            if(loadedCallbacks.ContainsKey(windowName)) {
+                loadedCallbacks[windowName](window);
+            }
+
             window.Open();
         } else {
             var addressableName = StringUtil.Contact("Windows/", windowName);

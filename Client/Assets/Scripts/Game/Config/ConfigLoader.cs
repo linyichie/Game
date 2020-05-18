@@ -27,7 +27,7 @@ public static class ConfigLoader {
 
     public static void ReloadLocalization() {
         LanguageConfig.Clear();
-        LoadConfig(StringUtil.Contact("Txt/", Localization.language, "/", "Language"), s => { LanguageConfig.Parse(true, s, () => { CompleteLoad(); }); });
+        LoadConfig(StringUtil.Contact(Localization.language, "/", "Language"), s => { LanguageConfig.Parse(true, s, () => { CompleteLoad(); }); });
 
         Game.Instance.StartCoroutine(OnLoadConfigs());
     }
