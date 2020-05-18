@@ -17,8 +17,7 @@ public partial class LanguageConfig {
             configs.Add(key, this);
         }
         catch (System.Exception e) {
-            Debug.Log(e.Message);
-            Debug.LogError(string.Format("Config Parse Error : {0} key ==> {1}", "LanguageConfig", values[0]));
+            Debug.LogError(string.Format("Config Parse Error : {0} key ==> {1} {2}", "LanguageConfig", values[0], e.Message));
         }
     }
 

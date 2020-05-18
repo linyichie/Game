@@ -14,7 +14,7 @@ public partial class #ClassName# {
             configs.Add(#KeyField#, this);
         }
         catch (System.Exception e) {
-            Debug.LogError(string.Format("Config Parse Error : {0} key ==> {1}", "#ClassName#", values[0]));
+            Debug.LogError(string.Format("Config Parse Error : {0} key ==> {1} {2}", "#ClassName#", values[0], e.Message));
         }
     }
 

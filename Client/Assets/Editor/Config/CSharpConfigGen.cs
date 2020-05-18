@@ -75,7 +75,7 @@ public static class CSharpConfigGen {
     }
 
     static void GenerateConfig(ConfigClassInfo classInfo) {
-        var path = StringUtil.Contact("Assets/Script/Game/Config/", classInfo.className, ".cs");
+        var path = StringUtil.Contact("Assets/Scripts/Game/Config/", classInfo.className, ".cs");
         string fullPath = Path.GetFullPath(path);
 
         StreamReader sr = new StreamReader(FileTemplatePath);
