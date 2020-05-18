@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using System;
+using System.Threading;
 
 public partial class LanguageConfig {
     public string key { get; private set; }
@@ -30,14 +31,25 @@ public partial class LanguageConfig {
     }
 
     public static void Parse(bool async, string content, Action callback) {
-        var lines = content.Split(Const.SplitLine, StringSplitOptions.RemoveEmptyEntries);
-        for (int i = 3; i < lines.Length; i++) {
-            var line = lines[i];
-            var values = line.Split('\t');
-            var config = new LanguageConfig(values);
+        if(async) {
+            ThreadPool.QueueUserWorkItem(state => {
+                var lines = content.Split(Const.SplitLine, StringSplitOptions.RemoveEmptyEntries);
+                for (int i = 3; i < lines.Length; i++) {
+                    var line = lines[i];
+                    var values = line.Split('\t');
+                    new LanguageConfig(values);
+                }
+                callback?.Invoke();
+            });
+        } else {
+            var lines = content.Split(Const.SplitLine, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 3; i < lines.Length; i++) {
+                var line = lines[i];
+                var values = line.Split('\t');
+                new LanguageConfig(values);
+            }
+            callback?.Invoke();
         }
-
-        callback?.Invoke();
     }
     
     public static void Clear() {
