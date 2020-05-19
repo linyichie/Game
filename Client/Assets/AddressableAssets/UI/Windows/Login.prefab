@@ -1058,7 +1058,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3275707076705413349}
   - component: {fileID: 7240319502894437994}
-  - component: {fileID: 1307374932033919491}
+  - component: {fileID: -853132771919217918}
   - component: {fileID: 6851434808018515699}
   - component: {fileID: 930651955886593199}
   - component: {fileID: 824314058771321158}
@@ -1107,7 +1107,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   windowConfig: {fileID: 11400000, guid: cdae9e44bb9e74843979b3a92fcd4e98, type: 2}
---- !u!114 &1307374932033919491
+--- !u!114 &-853132771919217918
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1120,19 +1120,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   luaComponents:
-  - name: startLabel
-    luaInjection: Text
+  - name: 
+    luaInjection: Component
     animationCurveValues: []
     unityObjectValues:
-    - {fileID: 136880278903366034}
-  - name: languages
-    luaInjection: Button
-    animationCurveValues: []
-    unityObjectValues:
-    - {fileID: 7005799228176135562}
-    - {fileID: 4511002357652026832}
-    - {fileID: 559136252075898566}
-    - {fileID: 6543685221983426685}
+    - {fileID: 0}
 --- !u!223 &6851434808018515699
 Canvas:
   m_ObjectHideFlags: 0

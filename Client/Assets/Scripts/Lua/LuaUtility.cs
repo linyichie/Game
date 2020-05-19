@@ -8,6 +8,8 @@ using XLua;
 
 public static class LuaUtility {
     public static readonly LuaEnv luaEnv = new LuaEnv();
+    private static float tickTime = 0f;
+    private static float tickInterval = 1f;
 
     public static void Initialize() {
         luaEnv.AddLoader(CustomLoadLua);
@@ -25,5 +27,13 @@ public static class LuaUtility {
 
     private static byte[] CustomLoadLua(ref string path) {
         return Encoding.UTF8.GetBytes(LoadLua(ref path));
+    }
+
+    public static void Update() {
+        tickTime += Time.deltaTime;
+        if(tickTime >= tickInterval) {
+            tickTime = 0f;
+            luaEnv?.Tick();
+        }
     }
 }

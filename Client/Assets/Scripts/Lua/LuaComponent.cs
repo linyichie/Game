@@ -33,17 +33,6 @@ public class LuaData {
 
 public enum LuaInjection {
     GameObject,
-    Transform,
-    RectTransform,
-    Canvas,
-    CanvasGroup,
-    Image,
-    Text,
-    Button,
-    RawImage,
-    InputField,
-    ScrollRect,
-    Toggle,
     Component,
     AnimationCurve,
 }

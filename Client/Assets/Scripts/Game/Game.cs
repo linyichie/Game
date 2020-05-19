@@ -24,4 +24,8 @@ public class Game : SingletonMonobehaviour<Game> {
 
         luaStart?.Invoke(luaGame);
     }
+
+    private void Update() {
+        LuaUtility.Update();
+    }
 }

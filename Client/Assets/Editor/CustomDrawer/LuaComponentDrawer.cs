@@ -150,30 +150,8 @@ public class LuaComponentDrawer : PropertyDrawer {
         switch(selected) {
             case LuaInjection.GameObject:
                 return typeof(GameObject);
-            case LuaInjection.Transform:
-                return typeof(Transform);
-            case LuaInjection.Canvas:
-                return typeof(Canvas);
-            case LuaInjection.RectTransform:
-                return typeof(RectTransform);
-            case LuaInjection.Image:
-                return typeof(Image);
-            case LuaInjection.Text:
-                return typeof(Text);
-            case LuaInjection.CanvasGroup:
-                return typeof(CanvasGroup);
-            case LuaInjection.ScrollRect:
-                return typeof(ScrollRect);
-            case LuaInjection.Button:
-                return typeof(Button);
-            case LuaInjection.RawImage:
-                return typeof(RawImage);
-            case LuaInjection.InputField:
-                return typeof(InputField);
-            case LuaInjection.Toggle:
-                return typeof(Toggle);
             case LuaInjection.Component:
-                return typeof(MonoBehaviour);
+                return typeof(Component);
         }
 
         return typeof(UnityEngine.Object);

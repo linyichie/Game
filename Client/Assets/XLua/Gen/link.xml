@@ -3,11 +3,8 @@
 <linker>
 
 	<assembly fullname="Assembly-CSharp">
-	    <type fullname="Language" preserve="all"/>
-		<type fullname="Localization" preserve="all"/>
+	    <type fullname="Localization" preserve="all"/>
 		<type fullname="LuaBehaviour" preserve="all"/>
-		<type fullname="LuaWindow" preserve="all"/>
-		<type fullname="WindowController" preserve="all"/>
 		
 	</assembly>
 

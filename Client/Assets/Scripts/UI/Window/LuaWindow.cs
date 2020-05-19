@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using XLua;
 
-[RequireComponent(typeof(LuaBehaviour))]
 [XLua.LuaCallCSharp]
 public class LuaWindow : Window {
     private LuaTable luaTable;
@@ -28,7 +27,10 @@ public class LuaWindow : Window {
         if(luaBehaviour == null) {
             luaBehaviour = GetComponent<LuaBehaviour>();
         }
-        luaBehaviour.StartLuaInjection(luaTable);
+
+        if(luaBehaviour != null) {
+            luaBehaviour.StartLuaInjection(luaTable);
+        }
     }
 
     #region override
