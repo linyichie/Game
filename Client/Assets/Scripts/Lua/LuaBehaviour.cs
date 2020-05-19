@@ -41,12 +41,6 @@ public class LuaBehaviour : MonoBehaviour {
                 }
                 luaTable.Set(fieldName, luaData.animationCurve);
                 break;
-            case LuaInjection.Component:
-                if(luaData.unityObject == null) {
-                    Debug.LogErrorFormat("The component is not assigned : {0} Type : {1}", fieldName, luaInjection);
-                }
-                luaTable.Set(fieldName, luaData.unityObject);
-                break;
             default:
                 if(luaData.unityObject == null) {
                     Debug.LogErrorFormat("The component is not assigned : {0} Type : {1}", fieldName, luaInjection);
