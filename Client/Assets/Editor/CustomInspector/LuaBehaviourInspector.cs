@@ -35,8 +35,8 @@ public class LuaBehaviourInspector : Editor {
         var element = reorderableList.serializedProperty.GetArrayElementAtIndex(index);
         EditorGUI.PropertyField(rect, element);
         var nameProperty = element.FindPropertyRelative("name");
-        if(!string.IsNullOrEmpty(nameProperty.stringValue)) {
-            if(repeatNames.Contains(nameProperty.stringValue)) {
+        if (!string.IsNullOrEmpty(nameProperty.stringValue)) {
+            if (repeatNames.Contains(nameProperty.stringValue)) {
                 var nameRect = new Rect(rect) {
                     y = rect.y + Styles.splitWidth,
                     width = rect.width * 0.2f,
@@ -53,11 +53,13 @@ public class LuaBehaviourInspector : Editor {
 
     public override void OnInspectorGUI() {
         GUILayout.Space(3);
-        if(repeatNames.Count > 0) {
+        if (repeatNames.Count > 0) {
             var oldFontStyle = EditorStyles.helpBox.fontStyle;
             EditorStyles.helpBox.fontStyle = FontStyle.Bold;
             EditorGUILayout.HelpBox(StringUtil.Contact("There are duplicate field names :\n", string.Join("\n", repeatNames)), MessageType.Error);
             EditorStyles.helpBox.fontStyle = oldFontStyle;
+        } else {
+            EditorGUILayout.HelpBox(string.Empty, MessageType.None);
         }
 
         serializedObject.Update();
@@ -67,15 +69,15 @@ public class LuaBehaviourInspector : Editor {
         EditorGUILayout.EndScrollView();
         serializedObject.ApplyModifiedProperties();
 
-        if(GUI.changed) {
+        if (GUI.changed) {
             fieldNames.Clear();
             repeatNames.Clear();
-            for(int i = 0; i < luaComponentsProperty.arraySize; i++) {
+            for (int i = 0; i < luaComponentsProperty.arraySize; i++) {
                 var element = reorderableList.serializedProperty.GetArrayElementAtIndex(i);
                 var nameProperty = element.FindPropertyRelative("name");
-                if(!string.IsNullOrEmpty(nameProperty.stringValue)) {
-                    if(fieldNames.Contains(nameProperty.stringValue)) {
-                        if(!repeatNames.Contains(nameProperty.stringValue)) {
+                if (!string.IsNullOrEmpty(nameProperty.stringValue)) {
+                    if (fieldNames.Contains(nameProperty.stringValue)) {
+                        if (!repeatNames.Contains(nameProperty.stringValue)) {
                             repeatNames.Add(nameProperty.stringValue);
                         }
                     } else {
