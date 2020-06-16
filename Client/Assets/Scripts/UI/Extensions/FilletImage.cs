@@ -53,7 +53,7 @@ public class FilletImage : BaseMeshEffect {
         var yMin = rect.yMin;
         var xMax = rect.xMax - radius;
         var yMax = rect.yMax;
-        
+
         AddRectangle(vh, xMin, yMin, xMax, yMax);
 
         xMin = rect.xMin;
@@ -70,15 +70,34 @@ public class FilletImage : BaseMeshEffect {
 
         AddRectangle(vh, xMin, yMin, xMax, yMax);
 
+        var tileWidth = overrideSprite.rect.width;
+        var tileHeight = overrideSprite.rect.height;
+
         if (radius > 0) {
             xMin = rect.xMin;
             yMin = rect.yMin;
             xMax = rect.xMin + radius;
             yMax = rect.yMin + radius;
 
-            var minIndex = GetTileVertIndex(new Vector2(xMin, yMin));
-            var maxIndex = GetTileVertIndex(new Vector2(xMax, yMax));
-            for (int i = 0; i < segments; i++) {
+            var minIndices = GetTileVertIndex(new Vector2(xMin, yMin));
+            var maxIndices = GetTileVertIndex(new Vector2(xMax, yMax));
+            var points = GetCirclePoints(xMin, yMin, xMax, yMax);
+            for (long i = minIndices.y; i < maxIndices.y + 1; i++) {
+                var posMin = Vector2.zero;
+                var posMax = Vector2.zero;
+                posMin.y = Math.Max(rect.yMin + i * tileHeight, yMin);
+                posMax.y = Mathf.Min(rect.yMin + (i + 1) * tileHeight, yMax);
+                for (long j = minIndices.x; j < maxIndices.x + 1; j++) {
+                    posMin.x = Math.Max(rect.xMin + j * tileWidth, xMin);
+                    posMax.x = Mathf.Min(rect.xMin + (j + 1) * tileWidth, xMax);
+                    var bound = new Bounds();
+                    bound.SetMinMax(posMin, posMax);
+                    for (int k = 0; k < points.Count; k++) {
+                        if (bound.Contains(points[k])) {
+                            
+                        }
+                    }
+                }
             }
         }
     }
@@ -88,15 +107,15 @@ public class FilletImage : BaseMeshEffect {
         var tileWidth = overrideSprite.rect.width;
         var tileHeight = overrideSprite.rect.height;
 
-        var minIndex = GetTileVertIndex(new Vector2(xMin, yMin));
-        var maxIndex = GetTileVertIndex(new Vector2(xMax, yMax));
+        var minIndices = GetTileVertIndex(new Vector2(xMin, yMin));
+        var maxIndices = GetTileVertIndex(new Vector2(xMax, yMax));
 
-        for (long i = minIndex.y; i < maxIndex.y + 1; i++) {
+        for (long i = minIndices.y; i < maxIndices.y + 1; i++) {
             var posMin = Vector2.zero;
             var posMax = Vector2.zero;
             posMin.y = Math.Max(rect.yMin + i * tileHeight, yMin);
             posMax.y = Mathf.Min(rect.yMin + (i + 1) * tileHeight, yMax);
-            for (long j = minIndex.x; j < maxIndex.x + 1; j++) {
+            for (long j = minIndices.x; j < maxIndices.x + 1; j++) {
                 posMin.x = Math.Max(rect.xMin + j * tileWidth, xMin);
                 posMax.x = Mathf.Min(rect.xMin + (j + 1) * tileWidth, xMax);
                 AddQuad(vh, posMin, posMax);
@@ -105,7 +124,7 @@ public class FilletImage : BaseMeshEffect {
     }
 
     private void AddQuad(VertexHelper vh, Vector2 posMin, Vector2 posMax) {
-        int startIndex = vh.currentVertCount;
+        var startIndex = vh.currentVertCount;
 
         var position = new Vector2(posMin.x, posMin.y);
         vh.AddVert(position, target.color, GetTileVertUV(GetTileVertIndex(posMin), position));
@@ -138,5 +157,18 @@ public class FilletImage : BaseMeshEffect {
             tileUV = new Vector2(uv.x + (uv.z - uv.x) * (position.x - posMin.x) / tileWidth, uv.y + (uv.w - uv.y) * (position.y - posMin.y) / tileHeight);
         }
         return tileUV;
+    }
+
+    private List<Vector3> GetCirclePoints(float xMin, float yMin, float xMax, float yMax) {
+        List<Vector3> points = new List<Vector3>();
+        var interval = radius / segments;
+        for (int i = 0; i <= segments; i++) {
+            var point = Vector3.zero;
+            point.x = xMin + i * interval;
+            var offsetX = xMax - point.x;
+            point.y = yMax - Mathf.Sqrt(radius * radius - offsetX * offsetX);
+            points.Add(point);
+        }
+        return points;
     }
 }
