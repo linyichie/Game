@@ -65,11 +65,14 @@ SpriteAtlas:
       enableRotation: 0
       enableTightPacking: 0
     variantMultiplier: 1
-    packables: []
-    totalSpriteSurfaceArea: 0
+    packables:
+    - {fileID: 102900000, guid: aee6dfa702dad464b9d6545c6586ec0c, type: 3}
+    totalSpriteSurfaceArea: 2550
     bindAsDefault: 1
   m_MasterAtlas: {fileID: 0}
-  m_PackedSprites: []
-  m_PackedSpriteNamesToIndex: []
+  m_PackedSprites:
+  - {fileID: 21300000, guid: ef91cab91b8a34c468298e12ebc2a818, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Btn20_yellow
   m_Tag: Login
   m_IsVariant: 0

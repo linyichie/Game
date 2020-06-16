@@ -8,7 +8,7 @@ public class LaunchWin : Window {
 
     protected override void OnReadyOepn() {
         ConfigLoader.Initialize();
-        ConfigLoader.compelted = () => { Game.Instance.LuaStart(); };
+        //ConfigLoader.compelted = () => { Game.Instance.LuaStart(); };
     }
 
     protected override void OnOpened() {
