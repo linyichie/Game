@@ -55,11 +55,6 @@ public class FilletImage : BaseMeshEffect {
         radius = Mathf.Min(radius, rect.width / 2, rect.height / 2);
         radius = Mathf.Max(0, radius);
 
-        var circleBL = new Vector2(rect.xMin + radius, rect.yMin + radius);
-        var circleTL = new Vector2(rect.xMin + radius, rect.yMax - radius);
-        var circleBR = new Vector2(rect.xMax - radius, rect.yMin + radius);
-        var circleTR = new Vector2(rect.xMax - radius, rect.yMax - radius);
-
         var xMin = rect.xMin + radius;
         var yMin = rect.yMin;
         var xMax = rect.xMax - radius;
@@ -130,16 +125,16 @@ public class FilletImage : BaseMeshEffect {
                     var distance = float.MaxValue;
                     switch (fillet) {
                         case Fillet.TopLeft:
-                            distance = Vector3.Distance(new Vector3(filletRect.xMax, filletRect.yMin), minPoint);
+                            distance = Vector3.Distance(new Vector3(filletRect.xMax, filletRect.yMin), new Vector3(minPoint.x, maxPoint.y));
                             break;
                         case Fillet.TopRight:
-                            distance = Vector3.Distance(new Vector3(filletRect.xMin, filletRect.yMin), minPoint);
+                            distance = Vector3.Distance(new Vector3(filletRect.xMin, filletRect.yMin), new Vector3(maxPoint.x, maxPoint.y));
                             break;
                         case Fillet.BottomLeft:
-                            distance = Vector3.Distance(new Vector3(filletRect.xMax, filletRect.yMax), minPoint);
+                            distance = Vector3.Distance(new Vector3(filletRect.xMax, filletRect.yMax), new Vector3(minPoint.x, minPoint.y));
                             break;
                         case Fillet.BottomRight:
-                            distance = Vector3.Distance(new Vector3(filletRect.xMin, filletRect.yMax), minPoint);
+                            distance = Vector3.Distance(new Vector3(filletRect.xMin, filletRect.yMax), new Vector3(maxPoint.x, minPoint.y));
                             break;
                     }
                     if (distance < radius) {
