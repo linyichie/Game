@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using File = System.IO.File;
 using Object = UnityEngine.Object;
 
 namespace Funny.Asset {
@@ -107,7 +109,9 @@ namespace Funny.Asset {
                 return asset as T;
             }
 #if UNITY_EDITOR
-            asset = UnityEditor.AssetDatabase.LoadAssetAtPath<TextAsset>(StringUtil.Contact("Assets/AddressableAssets/", this.luaPath, ".lua.txt"));
+            var path = StringUtil.Contact("Assets/AddressableAssets/", this.luaPath, ".lua");
+            var text = File.ReadAllText(path, Encoding.UTF8);
+            asset = new TextAsset(text);
             base.OnLoadAssetComplete();
             return asset as T;
 #endif

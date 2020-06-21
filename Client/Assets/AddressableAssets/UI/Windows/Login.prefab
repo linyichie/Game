@@ -1120,11 +1120,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   luaComponents:
-  - name: 
+  - name: languages
     luaInjection: Component
     animationCurveValues: []
     unityObjectValues:
-    - {fileID: 0}
+    - {fileID: 7005799228176135562}
+    - {fileID: 4511002357652026832}
+    - {fileID: 559136252075898566}
+    - {fileID: 6543685221983426685}
+  - name: startLabel
+    luaInjection: Component
+    animationCurveValues: []
+    unityObjectValues:
+    - {fileID: 136880278903366034}
 --- !u!223 &6851434808018515699
 Canvas:
   m_ObjectHideFlags: 0

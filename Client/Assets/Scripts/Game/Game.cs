@@ -15,7 +15,7 @@ public class Game : SingletonMonobehaviour<Game> {
 
     public void LuaStart() {
         LuaUtility.Initialize();
-        var textAsset = AssetLoad.Load<TextAsset>("Scripts.Game.Game");
+        var textAsset = AssetLoad.Load<TextAsset>("Scripts.Game");
         var objects = LuaUtility.luaEnv.DoString(textAsset.bytes, "Game");
         if(objects != null) {
             luaGame = objects[0] as LuaTable;

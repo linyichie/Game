@@ -1,4 +1,6 @@
-local Login = class()
+local Login = class(nil, {
+    testEvent = Event:new()
+})
 
 function Login:OnInitialize()
     local onSwitchCN = function()
@@ -20,11 +22,14 @@ function Login:OnInitialize()
 
     CS.Localization.languageChange = table.handler(self, self.OnLanguageChange)
 
+    self.testEventId = self.testEvent:AddListener(table.handler(self, self.OnTestEvent))
+
     WindowController:Close("Launch")
 end
 
 function Login:OnReadyOepn()
-    self:DisplayLabel();
+    self:DisplayLabel()
+    self.testEvent:Invoke(123)
 end
 
 function Login:OnOpened()
@@ -42,6 +47,10 @@ end
 
 function Login:DisplayLabel()
     self.startLabel.text = CS.Language.Get("Login");
+end
+
+function Login:OnTestEvent(value)
+    print(value)
 end
 
 return Login
