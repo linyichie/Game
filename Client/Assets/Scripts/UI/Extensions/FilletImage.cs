@@ -10,6 +10,7 @@ using UnityEngine.UI;
 public class FilletImage : BaseMeshEffect {
     [SerializeField] private float radius = 10f;
     [SerializeField, Range(8, 128)] private int segments = 8;
+    [SerializeField, EnumFlags] private Fillet fillet = (Fillet)(-1);
 
     private Image target;
     private RectTransform rectTransform {
@@ -23,11 +24,12 @@ public class FilletImage : BaseMeshEffect {
         }
     }
 
+    [Flags]
     enum Fillet {
-        TopLeft,
-        TopRight,
-        BottomLeft,
-        BottomRight,
+        TopLeft = 1 << 0,
+        TopRight = 1 << 1,
+        BottomLeft = 1 << 2,
+        BottomRight = 1 << 3,
     }
 
     readonly Dictionary<Vector3, int> indices = new Dictionary<Vector3, int>();
@@ -42,10 +44,15 @@ public class FilletImage : BaseMeshEffect {
         switch (target.type) {
             case Image.Type.Simple:
                 break;
+            case Image.Type.Sliced:
+                break;
             case Image.Type.Tiled:
                 GenerateTiledSprite(vh);
                 break;
         }
+    }
+
+    private void GenerateSlicedSprite(VertexHelper vh) {
     }
 
     private void GenerateTiledSprite(VertexHelper vh) {
@@ -77,10 +84,31 @@ public class FilletImage : BaseMeshEffect {
         AddRectangle(vh, xMin, yMin, xMax, yMax);
 
         if (radius > 0) {
-            AddCircle(vh, Fillet.TopLeft);
-            AddCircle(vh, Fillet.TopRight);
-            AddCircle(vh, Fillet.BottomLeft);
-            AddCircle(vh, Fillet.BottomRight);
+            var topLeft = 0 != (fillet & Fillet.TopLeft);
+            var topRight = 0 != (fillet & Fillet.TopRight);
+            var bottomLeft = 0 != (fillet & Fillet.BottomLeft);
+            var bottomRight = 0 != (fillet & Fillet.BottomRight);
+
+            if (!topLeft) {
+                AddRectangle(vh, rect.xMin, rect.yMax - radius, rect.xMin + radius, rect.yMax);
+            } else {
+                AddCircle(vh, Fillet.TopLeft);
+            }
+            if (!topRight) {
+                AddRectangle(vh, rect.xMax - radius, rect.yMax - radius, rect.xMax, rect.yMax);
+            } else {
+                AddCircle(vh, Fillet.TopRight);
+            }
+            if (!bottomLeft) {
+                AddRectangle(vh, rect.xMin, rect.yMin, rect.xMin + radius, rect.yMin + radius);
+            } else {
+                AddCircle(vh, Fillet.BottomLeft);
+            }
+            if (!bottomRight) {
+                AddRectangle(vh, rect.xMax - radius, rect.yMin, rect.xMax, rect.yMin + radius);
+            } else {
+                AddCircle(vh, Fillet.BottomRight);
+            }
         }
     }
 
