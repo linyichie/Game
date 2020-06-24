@@ -10,7 +10,7 @@ public class Game : SingletonMonobehaviour<Game> {
     private Action<LuaTable> luaStart;
 
     void Start() {
-        WindowController.Instance.OpenWindow("Launch");
+        WindowManager.Instance.OpenWindow("Launch");
     }
 
     public void LuaStart() {

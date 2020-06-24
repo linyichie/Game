@@ -6,7 +6,7 @@ using System.Linq;
 using UnityEngine;
 
 [XLua.LuaCallCSharp]
-public class WindowController : SingletonMonobehaviour<WindowController> {
+public class WindowManager : Singleton<WindowManager> {
     [SerializeField] private Transform uiRoot;
     [SerializeField] private Camera uiCamera;
 
