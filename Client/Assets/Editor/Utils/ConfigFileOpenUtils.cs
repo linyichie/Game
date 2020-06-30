@@ -159,7 +159,6 @@ public static class ConfigFileOpenUtils {
         var isOpened = false;
         try {
             fileStream = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
-            isOpened = false;
         } catch (IOException ioEx) {
             isOpened = true;
         } catch (Exception ex) {
