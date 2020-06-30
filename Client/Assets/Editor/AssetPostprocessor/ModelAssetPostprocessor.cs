@@ -154,31 +154,31 @@ namespace Funny.AssetPostprocessor {
             var sameInfo = string.Empty;
             if(importer.globalScale != so.GlobalScale) {
                 same = false;
-                sameInfo = StringUtil.Contact(sameInfo, "\n", "GlobalScale");
+                sameInfo = StringUtil.Concat(sameInfo, "\n", "GlobalScale");
             }
 
             if(importer.importBlendShapes != so.ImportBlendShapes) {
                 same = false;
-                sameInfo = StringUtil.Contact(sameInfo, "\n", "ImportBlendShapes");
+                sameInfo = StringUtil.Concat(sameInfo, "\n", "ImportBlendShapes");
             }
 
             if(importer.importVisibility != so.ImportVisibility) {
                 same = false;
-                sameInfo = StringUtil.Contact(sameInfo, "\n", "ImportVisibility");
+                sameInfo = StringUtil.Concat(sameInfo, "\n", "ImportVisibility");
             }
 
             if(importer.importCameras != so.ImportCameras) {
                 same = false;
-                sameInfo = StringUtil.Contact(sameInfo, "\n", "ImportCameras");
+                sameInfo = StringUtil.Concat(sameInfo, "\n", "ImportCameras");
             }
 
             if(importer.importLights != so.ImportLights) {
                 same = false;
-                sameInfo = StringUtil.Contact(sameInfo, "\n", "ImportLights");
+                sameInfo = StringUtil.Concat(sameInfo, "\n", "ImportLights");
             }
 
             if(!same) {
-                message = StringUtil.Contact(message, "\n", "<b>Scene</b>", sameInfo);
+                message = StringUtil.Concat(message, "\n", "<b>Scene</b>", sameInfo);
             }
 
             return same;
@@ -189,16 +189,16 @@ namespace Funny.AssetPostprocessor {
             var sameInfo = string.Empty;
             if(importer.meshCompression != so.MeshCompression) {
                 same = false;
-                sameInfo = StringUtil.Contact(sameInfo, "\n", "MeshCompression");
+                sameInfo = StringUtil.Concat(sameInfo, "\n", "MeshCompression");
             }
 
             if(importer.isReadable != so.IsReadable) {
                 same = false;
-                sameInfo = StringUtil.Contact(sameInfo, "\n", "Read/Write");
+                sameInfo = StringUtil.Concat(sameInfo, "\n", "Read/Write");
             }
 
             if(!same) {
-                message = StringUtil.Contact(message, "\n", "<b>Mesh</b>", sameInfo);
+                message = StringUtil.Concat(message, "\n", "<b>Mesh</b>", sameInfo);
             }
 
             return same;
@@ -209,12 +209,12 @@ namespace Funny.AssetPostprocessor {
             var sameInfo = string.Empty;
             if(importer.importMaterials != so.ImportMaterials) {
                 same = false;
-                sameInfo = StringUtil.Contact(sameInfo, "\n", "ImportMaterials");
+                sameInfo = StringUtil.Concat(sameInfo, "\n", "ImportMaterials");
             }
 
             if(importer.materialLocation != so.MaterialLocation) {
                 same = false;
-                sameInfo = StringUtil.Contact(sameInfo, "\n", "MaterialLocation");
+                sameInfo = StringUtil.Concat(sameInfo, "\n", "MaterialLocation");
             }
 
             if(importer.importMaterials && importer.materialLocation == ModelImporterMaterialLocation.InPrefab) {
@@ -226,7 +226,7 @@ namespace Funny.AssetPostprocessor {
                             postprocessorUtils = postprocessorUtils ? postprocessorUtils : SoAssetPostprocessorUtils.GetSoAssetPostprocessorUtils();
                             if(postprocessorUtils.ContainsStandardShader(mat.shader.name)) {
                                 same = false;
-                                sameInfo = StringUtil.Contact(sameInfo, "\n", "Using Standard Shader");
+                                sameInfo = StringUtil.Concat(sameInfo, "\n", "Using Standard Shader");
                                 break;
                             }
                         }
@@ -235,7 +235,7 @@ namespace Funny.AssetPostprocessor {
             }
 
             if(!same) {
-                message = StringUtil.Contact(message, "\n", "<b>Material</b>", sameInfo);
+                message = StringUtil.Concat(message, "\n", "<b>Material</b>", sameInfo);
             }
 
             return same;
@@ -246,37 +246,37 @@ namespace Funny.AssetPostprocessor {
             var sameInfo = string.Empty;
             if(importer.importAnimation != so.ImportAnimation) {
                 same = false;
-                sameInfo = StringUtil.Contact(sameInfo, "\n", "ImportAnimation");
+                sameInfo = StringUtil.Concat(sameInfo, "\n", "ImportAnimation");
             }
 
             if(importer.animationType != so.AnimationType) {
                 same = false;
-                sameInfo = StringUtil.Contact(sameInfo, "\n", "AnimationType");
+                sameInfo = StringUtil.Concat(sameInfo, "\n", "AnimationType");
             }
 
             if(importer.importAnimation && so.ImportAnimation) {
                 if(importer.animationCompression != so.AnimationCompression) {
                     same = false;
-                    sameInfo = StringUtil.Contact(sameInfo, "\n", "AnimationCompression");
+                    sameInfo = StringUtil.Concat(sameInfo, "\n", "AnimationCompression");
                 }
 
                 if(so.IsRoleAnimation) {
                     if(importer.sourceAvatar == null) {
                         same = false;
-                        sameInfo = StringUtil.Contact(sameInfo, "\n", "Source Avatar is null");
+                        sameInfo = StringUtil.Concat(sameInfo, "\n", "Source Avatar is null");
                     } else {
                         var avatarAssetPath = AssetDatabase.GetAssetPath(importer.sourceAvatar);
                         var avatarGuid = AssetDatabase.AssetPathToGUID(avatarAssetPath);
                         if(avatarGuid != so.SourceAvatarGuid) {
                             same = false;
-                            sameInfo = StringUtil.Contact(sameInfo, "\n", "SourceAvatar");
+                            sameInfo = StringUtil.Concat(sameInfo, "\n", "SourceAvatar");
                         }
                     }
                 }
             }
 
             if(!same) {
-                message = StringUtil.Contact(message, "\n", "<b>Animation</b>", sameInfo);
+                message = StringUtil.Concat(message, "\n", "<b>Animation</b>", sameInfo);
             }
 
             return same;

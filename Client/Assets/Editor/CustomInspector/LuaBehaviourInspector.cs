@@ -56,7 +56,7 @@ public class LuaBehaviourInspector : Editor {
         if (repeatNames.Count > 0) {
             var oldFontStyle = EditorStyles.helpBox.fontStyle;
             EditorStyles.helpBox.fontStyle = FontStyle.Bold;
-            EditorGUILayout.HelpBox(StringUtil.Contact("There are duplicate field names :\n", string.Join("\n", repeatNames)), MessageType.Error);
+            EditorGUILayout.HelpBox(StringUtil.Concat("There are duplicate field names :\n", string.Join("\n", repeatNames)), MessageType.Error);
             EditorStyles.helpBox.fontStyle = oldFontStyle;
         } else {
             EditorGUILayout.HelpBox(string.Empty, MessageType.None);

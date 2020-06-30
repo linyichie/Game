@@ -20,14 +20,14 @@ public static class ConfigLoader {
     }
 
     public static void Initialize() {
-        LoadConfig(StringUtil.Contact(Localization.language, "/", "Language"), s => { LanguageConfig.Parse(true, s, () => { CompleteLoad(); }); });
+        LoadConfig(StringUtil.Concat(Localization.language, "/", "Language"), s => { LanguageConfig.Parse(true, s, () => { CompleteLoad(); }); });
 
         Game.Instance.StartCoroutine(OnLoadConfigs());
     }
 
     public static void ReloadLocalization() {
         LanguageConfig.Clear();
-        LoadConfig(StringUtil.Contact(Localization.language, "/", "Language"), s => { LanguageConfig.Parse(true, s, () => { CompleteLoad(); }); });
+        LoadConfig(StringUtil.Concat(Localization.language, "/", "Language"), s => { LanguageConfig.Parse(true, s, () => { CompleteLoad(); }); });
 
         Game.Instance.StartCoroutine(OnLoadConfigs());
     }
@@ -43,7 +43,7 @@ public static class ConfigLoader {
 
     static void LoadConfig(string fileName, Action<string> callback) {
         Count += 1;
-        var addressableName = StringUtil.Contact("Txt/", fileName);
+        var addressableName = StringUtil.Concat("Txt/", fileName);
         AssetLoad.LoadAsync<TextAsset>(addressableName, asset => {
             var textAsset = asset.asset as TextAsset;
             callback?.Invoke(textAsset.text);

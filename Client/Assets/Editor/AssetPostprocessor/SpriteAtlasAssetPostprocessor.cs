@@ -84,28 +84,28 @@ namespace Funny.AssetPostprocessor {
             var sameInfo = string.Empty;
             if(so.overridden != texturePlatformSettings.overridden) {
                 same = false;
-                sameInfo = StringUtil.Contact(sameInfo, "\n", "overridden");
+                sameInfo = StringUtil.Concat(sameInfo, "\n", "overridden");
             }
 
             if(so.overridden && texturePlatformSettings.overridden) {
                 if(so.format != (int)texturePlatformSettings.format) {
                     same = false;
-                    sameInfo = StringUtil.Contact(sameInfo, "\n", "format");
+                    sameInfo = StringUtil.Concat(sameInfo, "\n", "format");
                 }
 
                 if((int)so.compressionQuality != texturePlatformSettings.compressionQuality) {
                     same = false;
-                    sameInfo = StringUtil.Contact(sameInfo, "\n", "compressionQuality");
+                    sameInfo = StringUtil.Concat(sameInfo, "\n", "compressionQuality");
                 }
 
                 if(so.maxTextureSize != texturePlatformSettings.maxTextureSize) {
                     same = false;
-                    sameInfo = StringUtil.Contact(sameInfo, "\n", "maxTextureSize");
+                    sameInfo = StringUtil.Concat(sameInfo, "\n", "maxTextureSize");
                 }
             }
 
             if(!same) {
-                message = StringUtil.Contact(message, "\n", "<b>platform: ", platform, "</b>", sameInfo);
+                message = StringUtil.Concat(message, "\n", "<b>platform: ", platform, "</b>", sameInfo);
             }
 
             return same;

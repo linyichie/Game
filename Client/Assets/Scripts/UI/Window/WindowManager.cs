@@ -74,7 +74,7 @@ public class WindowManager : Singleton<WindowManager> {
 
             window.Open();
         } else {
-            var addressableName = StringUtil.Contact("Windows/", windowName);
+            var addressableName = StringUtil.Concat("Windows/", windowName);
             AssetLoad.Release(addressableName, go);
         }
     }
@@ -87,7 +87,7 @@ public class WindowManager : Singleton<WindowManager> {
             }
         } else {
             openingList.Add(windowName);
-            var addressableName = StringUtil.Contact("Windows/", windowName);
+            var addressableName = StringUtil.Concat("Windows/", windowName);
             AssetLoad.LoadAsync<GameObject>(addressableName, asset => { OnLoadedWindow(windowName, asset.asset as GameObject); });
         }
     }

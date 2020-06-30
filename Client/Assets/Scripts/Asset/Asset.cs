@@ -109,7 +109,7 @@ namespace Funny.Asset {
                 return asset as T;
             }
 #if UNITY_EDITOR
-            var path = StringUtil.Contact("Assets/AddressableAssets/", this.luaPath, ".lua");
+            var path = StringUtil.Concat("Assets/AddressableAssets/", this.luaPath, ".lua");
             var text = File.ReadAllText(path, Encoding.UTF8);
             asset = new TextAsset(text);
             base.OnLoadAssetComplete();

@@ -450,7 +450,7 @@ namespace Funny.AssetPostprocessor {
             var index = 0;
             EditorApplication.update = () => {
                 var item = items[index];
-                var isCancel = EditorUtility.DisplayCancelableProgressBar("Fix...", StringUtil.Contact(index, "/", items.Count), index / (float)items.Count);
+                var isCancel = EditorUtility.DisplayCancelableProgressBar("Fix...", StringUtil.Concat(index, "/", items.Count), index / (float)items.Count);
                 item.FixAndReimport(soAssetPostprocessor);
                 index++;
                 if (isCancel || index >= items.Count) {

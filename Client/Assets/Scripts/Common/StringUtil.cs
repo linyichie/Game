@@ -9,7 +9,7 @@ public static class StringUtil
 
     static readonly object lockObj = new object();
 
-    public static string Contact(params object[] objs)
+    public static string Concat(params object[] objs)
     {
         lock (lockObj)
         {

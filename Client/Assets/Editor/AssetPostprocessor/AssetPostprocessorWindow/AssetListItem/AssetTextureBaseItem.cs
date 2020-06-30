@@ -42,7 +42,7 @@ namespace Funny.AssetPostprocessor {
 
             if(!Helper.IsValuePowerOf2(width) || !Helper.IsValuePowerOf2(height)) {
                 ErrorLogic.SetValue(true);
-                message = StringUtil.Contact(message, "\n", "The size of the texture should be a power of 2");
+                message = StringUtil.Concat(message, "\n", "The size of the texture should be a power of 2");
             }
 
             ErrorLogic.SetMessage(message.TrimStart('\n'));
@@ -69,7 +69,7 @@ namespace Funny.AssetPostprocessor {
             ErrorLogic.SetValue(false);
             var inSpriteAtlas = false;
             var folder = System.IO.Path.GetDirectoryName(Path);
-            var spriteAtlasAssetPath = StringUtil.Contact(folder.Replace("Sprite", "Atlas"), ".spriteatlas");
+            var spriteAtlasAssetPath = StringUtil.Concat(folder.Replace("Sprite", "Atlas"), ".spriteatlas");
             if(File.Exists(spriteAtlasAssetPath)) {
                 string allText;
                 if(spriteAtlasFile.ContainsKey(spriteAtlasAssetPath)) {

@@ -35,7 +35,7 @@ namespace Funny.AssetPostprocessor {
         }
 
         public static bool IsNewCreateFile(string assetPath) {
-            var metaFilePath = StringUtil.Contact(assetPath, ".meta");
+            var metaFilePath = StringUtil.Concat(assetPath, ".meta");
             if (!File.Exists(metaFilePath)) {
                 return true;
             }

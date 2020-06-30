@@ -78,7 +78,7 @@ namespace Funny.AssetPostprocessor {
             using(new EditorGUI.DisabledScope(!allowEdit)) {
                 var selectPlatform = Helper.Platforms[platformIndex];
                 var platformSetting = so.GetPlatformSettings(selectPlatform);
-                platformSetting.overridden = EditorGUILayout.Toggle(StringUtil.Contact("Override for ", platformSetting.platform), platformSetting.overridden);
+                platformSetting.overridden = EditorGUILayout.Toggle(StringUtil.Concat("Override for ", platformSetting.platform), platformSetting.overridden);
                 using(new EditorGUI.DisabledScope(!platformSetting.overridden)) {
                     platformSetting.maxTextureSize = EditorGUILayout.IntPopup(styles.TextureSizeLabel, platformSetting.maxTextureSize, Helper.TextureSizeOptionLabels, Helper.TextureSizeOptions);
 
