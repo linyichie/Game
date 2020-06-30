@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
-using UnityEditor;
-using Debug = UnityEngine.Debug;
 
 public static class ConfigFileOpenUtils {
     public static bool VerifyConfigFile(string path) {
@@ -56,14 +52,22 @@ public static class ConfigFileOpenUtils {
 
     static void OpenExcelFile(string path, Action callback) {
         ThreadPool.QueueUserWorkItem((@object) => {
-            using (var process = new System.Diagnostics.Process()) {
-                var startInfo = new System.Diagnostics.ProcessStartInfo();
+            using (var process = new Process()) {
+                var startInfo = new ProcessStartInfo();
                 startInfo.FileName = path;
                 process.StartInfo = startInfo;
                 process.Start();
-                while (!process.HasExited) {
+                Thread.Sleep(2000);
+                var isFileOpened = true;
+                while (isFileOpened) {
+                    isFileOpened = false;
+                    for (int i = 0; i < 10; i++) {
+                        if (IsFileOpened(path)) {
+                            isFileOpened = true;
+                            break;
+                        }
+                    }
                 }
-                Debug.Log(111);
                 callback?.Invoke();
             }
         });
@@ -83,8 +87,11 @@ public static class ConfigFileOpenUtils {
                     var value = dataTable.Rows[r][c] == null ? string.Empty : dataTable.Rows[r][c].ToString();
                     values.Add(value);
                 }
-                var line = string.Join("\t", values);
-                sw.WriteLine(line);
+                var emptyLength = values.FindAll(x => { return string.IsNullOrEmpty(x); })?.Count;
+                if (!emptyLength.HasValue || emptyLength.Value < values.Count) {
+                    var line = string.Join("\t", values);
+                    sw.WriteLine(line);
+                }
             }
         }
 
@@ -144,5 +151,21 @@ public static class ConfigFileOpenUtils {
             excel.Close();
             return dataTable;
         }
+    }
+
+    static bool IsFileOpened(string path) {
+        FileStream fileStream = null;
+        var isOpened = false;
+        try {
+            fileStream = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
+            isOpened = false;
+        } catch (IOException ioEx) {
+            isOpened = true;
+        } catch (Exception ex) {
+            isOpened = true;
+        } finally {
+            fileStream?.Close();
+        }
+        return isOpened;
     }
 }
