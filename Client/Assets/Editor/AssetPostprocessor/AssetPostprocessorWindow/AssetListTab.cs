@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
@@ -10,6 +11,7 @@ using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace Funny.AssetPostprocessor {
+
     public class AssetListTab : TreeView {
         private PostprocessorAssetType assetType = (PostprocessorAssetType)(-1);
         private SoAssetPostprocessor soAssetPostprocessor;
@@ -34,11 +36,13 @@ namespace Funny.AssetPostprocessor {
         private Vector2 itemDetailScrollPosition = Vector2.zero;
 
         public bool Inited {
-            get { return inited; }
+            get {
+                return inited;
+            }
             set {
-                if(inited != value) {
+                if (inited != value) {
                     inited = value;
-                    if(inited) {
+                    if (inited) {
                         OnInited();
                     }
                 }
@@ -76,8 +80,8 @@ namespace Funny.AssetPostprocessor {
         protected override TreeViewItem BuildRoot() {
             var root = new TreeViewItem(-1, -1);
             root.children = new List<TreeViewItem>();
-            if(treeViewItems.Count > 0) {
-                foreach(var item in treeViewItems) {
+            if (treeViewItems.Count > 0) {
+                foreach (var item in treeViewItems) {
                     root.AddChild(item);
                 }
             }
@@ -98,33 +102,33 @@ namespace Funny.AssetPostprocessor {
 
         public void OnInspectorUpdate() {
             var isDirty = false;
-            if(rootItem != null) {
+            if (rootItem != null) {
                 var checkCount = 500;
                 var count = checkCount;
                 count = checkCount;
-                for(int i = 0; i < rootItem.children.Count; i++) {
+                for (int i = 0; i < rootItem.children.Count; i++) {
                     var item = rootItem.children[i] as AssetListItem;
-                    if(item.ErrorLogic.dirty || item.WarnLogic.dirty) {
+                    if (item.ErrorLogic.dirty || item.WarnLogic.dirty) {
                         isDirty = true;
                         count--;
                     }
 
-                    if(item.WarnLogic.dirty) {
+                    if (item.WarnLogic.dirty) {
                         item.VerifyAssetState(soAssetPostprocessor);
                     }
 
-                    if(item.ErrorLogic.dirty) {
+                    if (item.ErrorLogic.dirty) {
                         item.VerifyAssetError(soAssetPostprocessor);
                     }
 
-                    if(count <= 0) {
+                    if (count <= 0) {
                         break;
                     }
                 }
             }
 
             Inited = !isDirty;
-            if(isDirty) {
+            if (isDirty) {
                 Repaint();
             }
         }
@@ -136,10 +140,10 @@ namespace Funny.AssetPostprocessor {
             var detailHeight = pos.height - pos.height * verticalSplitPercent - splitterWidth;
             var detailRect = new Rect(pos.x, pos.y + pos.height * verticalSplitPercent + splitterWidth, pos.width, detailHeight);
             var selectIds = GetSelection();
-            if(selectIds != null && selectIds.Count > 0) {
+            if (selectIds != null && selectIds.Count > 0) {
                 var item = FindItem(selectIds[0], rootItem) as AssetListItem;
-                if(item != null) {
-                    if(item.WarnLogic.value || item.ErrorLogic.value) {
+                if (item != null) {
+                    if (item.WarnLogic.value || item.ErrorLogic.value) {
                         showDetail = true;
                         ShowDetail(detailRect, item);
                     }
@@ -147,16 +151,16 @@ namespace Funny.AssetPostprocessor {
             }
 
             var treeRect = pos;
-            if(showDetail) {
+            if (showDetail) {
                 treeRect = new Rect(pos.x, pos.y, pos.width, pos.height * verticalSplitPercent);
             }
             GUI.Box(treeRect, string.Empty, GUI.skin.box);
             var searchFieldRect = new Rect(treeRect.x + 10, treeRect.y + 10, treeRect.width - 100, 20);
             var stateRect = new Rect(searchFieldRect.xMax + 5, treeRect.y + 10, 80, 20);
-            using(new EditorGUI.DisabledScope(!Inited)) {
+            using (new EditorGUI.DisabledScope(!Inited)) {
                 searchString = searchField.OnGUI(searchFieldRect, searchString);
                 var state = (AssetState)EditorGUI.Popup(stateRect, stateEmptyContent, (int)selectState, stateContents);
-                if(state != selectState) {
+                if (state != selectState) {
                     selectState = state;
                     RefreshAssetState();
                 }
@@ -164,22 +168,22 @@ namespace Funny.AssetPostprocessor {
 
             base.OnGUI(new Rect(treeRect.x + 1, searchFieldRect.yMax + 3, treeRect.width - 2, treeRect.height - searchFieldRect.height - 20 - 3));
         }
-        
+
         private void HandleVerticalResize(Rect subRect) {
             EditorGUIUtility.AddCursorRect(verticalSplitterRect, MouseCursor.ResizeVertical);
-            if(Event.current.type == EventType.MouseDown && verticalSplitterRect.Contains(Event.current.mousePosition)) {
+            if (Event.current.type == EventType.MouseDown && verticalSplitterRect.Contains(Event.current.mousePosition)) {
                 resizingVerticalSplitter = true;
             }
 
-            if(resizingVerticalSplitter) {
+            if (resizingVerticalSplitter) {
                 verticalSplitPercent = Mathf.Clamp((Event.current.mousePosition.y - subRect.y) / subRect.height, 0.25f, 0.75f);
             }
 
-            if(resizingVerticalSplitter) {
+            if (resizingVerticalSplitter) {
                 Repaint();
             }
 
-            if(Event.current.type == EventType.MouseUp) {
+            if (Event.current.type == EventType.MouseUp) {
                 resizingVerticalSplitter = false;
             }
         }
@@ -189,12 +193,12 @@ namespace Funny.AssetPostprocessor {
             GUILayout.BeginArea(rect);
             itemDetailScrollPosition = GUILayout.BeginScrollView(itemDetailScrollPosition);
             var oldRichText = EditorStyles.helpBox.richText;
-            if(item.WarnLogic.value) {
+            if (item.WarnLogic.value) {
                 EditorStyles.helpBox.richText = true;
                 EditorGUILayout.HelpBox(item.WarnLogic.message, MessageType.Warning);
             }
 
-            if(item.ErrorLogic.value) {
+            if (item.ErrorLogic.value) {
                 EditorGUILayout.HelpBox(item.ErrorLogic.message, MessageType.Error);
             }
 
@@ -211,12 +215,12 @@ namespace Funny.AssetPostprocessor {
             GUI.DrawTexture(iconRect, item.icon, ScaleMode.ScaleToFit);
             var labelRect = new Rect(rect.x + iconRect.xMax + 1, rect.y, rect.width - iconRect.width - 1, rect.height);
             var rightIconRect = new Rect(rect.width - rect.height, rect.y + 1, rect.height - 2, rect.height - 2);
-            if(item.WarnLogic.value) {
+            if (item.WarnLogic.value) {
                 GUI.DrawTexture(rightIconRect, warnIcon, ScaleMode.ScaleToFit);
                 rightIconRect = new Rect(rightIconRect.x - rect.height, rect.y + 1, rect.height - 2, rect.height - 2);
             }
 
-            if(item.ErrorLogic.value) {
+            if (item.ErrorLogic.value) {
                 GUI.DrawTexture(rightIconRect, errorIcon, ScaleMode.ScaleToFit);
             }
 
@@ -225,23 +229,23 @@ namespace Funny.AssetPostprocessor {
 
         protected override IList<TreeViewItem> BuildRows(TreeViewItem root) {
             var list = base.BuildRows(root);
-            for(int i = list.Count - 1; i >= 0; i--) {
+            for (int i = list.Count - 1; i >= 0; i--) {
                 var item = list[i] as AssetListItem;
-                switch(selectState) {
+                switch (selectState) {
                     case AssetState.Normal:
-                        if(item.WarnLogic.value || item.ErrorLogic.value) {
+                        if (item.WarnLogic.value || item.ErrorLogic.value) {
                             list.RemoveAt(i);
                         }
 
                         break;
                     case AssetState.Warn:
-                        if(!item.WarnLogic.value) {
+                        if (!item.WarnLogic.value) {
                             list.RemoveAt(i);
                         }
 
                         break;
                     case AssetState.Error:
-                        if(!item.ErrorLogic.value) {
+                        if (!item.ErrorLogic.value) {
                             list.RemoveAt(i);
                         }
 
@@ -254,7 +258,7 @@ namespace Funny.AssetPostprocessor {
 
         protected override void DoubleClickedItem(int id) {
             var item = FindItem(id, rootItem) as AssetListItem;
-            if(item != null) {
+            if (item != null) {
                 var o = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(item.Path);
                 EditorGUIUtility.PingObject(o);
                 Selection.activeObject = o;
@@ -264,25 +268,25 @@ namespace Funny.AssetPostprocessor {
         protected override void ContextClickedItem(int id) {
             var selectIds = GetSelection();
 
-            if(selectIds.Count > 0) {
+            if (selectIds.Count > 0) {
                 GenericMenu menu = new GenericMenu();
 
                 var isDirty = false;
-                for(int i = 0; i < selectIds.Count; i++) {
+                for (int i = 0; i < selectIds.Count; i++) {
                     var item = FindItem(selectIds[i], rootItem) as AssetListItem;
-                    if(item.WarnLogic.value) {
+                    if (item.WarnLogic.value) {
                         isDirty = true;
                         break;
                     }
                 }
 
-                if(isDirty) {
+                if (isDirty) {
                     menu.AddItem(new GUIContent("FixAndReimport"), false, OnFixAndReimport, selectIds);
                 } else {
                     menu.AddItem(new GUIContent("FixAndReimport"), false, null);
                 }
 
-                if(menu.GetItemCount() > 0) {
+                if (menu.GetItemCount() > 0) {
                     menu.ShowAsContext();
                 }
             }
@@ -290,11 +294,11 @@ namespace Funny.AssetPostprocessor {
 
         private void OnFixAndReimport(object o) {
             var selectIds = o as IList<int>;
-            if(selectIds != null) {
+            if (selectIds != null) {
                 List<AssetListItem> changedItems = new List<AssetListItem>();
-                for(int i = 0; i < selectIds.Count; i++) {
+                for (int i = 0; i < selectIds.Count; i++) {
                     var item = FindItem(selectIds[i], rootItem) as AssetListItem;
-                    if(item.WarnLogic.value) {
+                    if (item.WarnLogic.value) {
                         changedItems.Add(item);
                     }
                 }
@@ -305,7 +309,7 @@ namespace Funny.AssetPostprocessor {
         }
 
         public void SetFolder(PostprocessorAssetType assetType, string path) {
-            if(this.assetType != assetType || this.folder != path) {
+            if (this.assetType != assetType || this.folder != path) {
                 this.assetType = assetType;
                 this.folder = path;
                 selectState = AssetState.None;
@@ -318,13 +322,13 @@ namespace Funny.AssetPostprocessor {
         }
 
         public void Refresh(bool forceUpdate = false) {
-            if(this.assetType == PostprocessorAssetType.Sprite) {
+            if (this.assetType == PostprocessorAssetType.Sprite) {
                 AssetSpriteItem.ClearSpriteAtlasFile();
             }
             var assetGuids = GetAssetGuids(this.assetType);
-            if(!forceUpdate) {
-                if(!IsRequireRefreshAsset(assetGuids)) {
-                    for(int i = 0; i < treeViewItems.Count; i++) {
+            if (!forceUpdate) {
+                if (!IsRequireRefreshAsset(assetGuids)) {
+                    for (int i = 0; i < treeViewItems.Count; i++) {
                         treeViewItems[i].SetDirty();
                     }
 
@@ -334,31 +338,31 @@ namespace Funny.AssetPostprocessor {
 
             treeViewItems.Clear();
             oldAssetGuids = assetGuids;
-            if(assetGuids != null) {
+            if (assetGuids != null) {
                 List<Task> tasks = new List<Task>();
                 var folders = postprocessorUtils.GetPaths(this.assetType);
-                for(int i = 0; i < assetGuids.Length; i++) {
+                for (int i = 0; i < assetGuids.Length; i++) {
                     tasks.Add(new Task(assetGuids[i], this.folder, this.assetType, folders));
                 }
 
-                foreach(var task in tasks) {
+                foreach (var task in tasks) {
                     ThreadPool.QueueUserWorkItem(x => { task.Begin(); });
                 }
 
                 var completeCount = 0;
                 var taskTotal = tasks.Count;
-                while(completeCount < taskTotal) {
+                while (completeCount < taskTotal) {
                     completeCount = 0;
-                    foreach(var task in tasks) {
+                    foreach (var task in tasks) {
                         completeCount += task.IsDone ? 1 : 0;
                     }
                 }
 
                 AssetListItem lastItem = null;
-                foreach(var task in tasks) {
-                    if(task.Item != null) {
+                foreach (var task in tasks) {
+                    if (task.Item != null) {
                         var item = task.Item;
-                        if(lastItem == null || lastItem.Path != item.Path) {
+                        if (lastItem == null || lastItem.Path != item.Path) {
                             treeViewItems.Add(item);
                             lastItem = item;
                         }
@@ -370,7 +374,7 @@ namespace Funny.AssetPostprocessor {
         }
 
         private string[] GetAssetGuids(PostprocessorAssetType assetType) {
-            if(string.IsNullOrEmpty(this.folder)) {
+            if (string.IsNullOrEmpty(this.folder)) {
                 return null;
             }
             var assetGuids = AssetDatabase.FindAssets(Helper.GetAssetSearchFilterByAssetType(this.assetType), new string[] {
@@ -381,10 +385,10 @@ namespace Funny.AssetPostprocessor {
         }
 
         private bool IsRequireRefreshAsset(string[] guids) {
-            if(oldAssetGuids != null && guids != null) {
-                if(oldAssetGuids.Length == guids.Length) {
-                    for(int i = 0; i < oldAssetGuids.Length; i++) {
-                        if(oldAssetGuids[i] != guids[i]) {
+            if (oldAssetGuids != null && guids != null) {
+                if (oldAssetGuids.Length == guids.Length) {
+                    for (int i = 0; i < oldAssetGuids.Length; i++) {
+                        if (oldAssetGuids[i] != guids[i]) {
                             return true;
                         }
                     }
@@ -400,27 +404,27 @@ namespace Funny.AssetPostprocessor {
             var assetPath = AssetDatabase.GUIDToAssetPath(guid);
             soAssetPostprocessor = AssetDatabase.LoadAssetAtPath<SoAssetPostprocessor>(assetPath);
             postprocessorGuid = guid;
-            for(int i = 0; i < rootItem.children.Count; i++) {
+            for (int i = 0; i < rootItem.children.Count; i++) {
                 var item = rootItem.children[i] as AssetListItem;
                 item.SetDirty();
             }
         }
 
         public void SoPostprocessorSetChanged(string guid) {
-            if(guid != postprocessorGuid) {
+            if (guid != postprocessorGuid) {
                 return;
             }
 
-            for(int i = 0; i < rootItem.children.Count; i++) {
+            for (int i = 0; i < rootItem.children.Count; i++) {
                 var item = rootItem.children[i] as AssetListItem;
                 item.SetDirty();
             }
         }
 
         public bool IsAnyOfAssetChanged() {
-            for(int i = 0; i < rootItem.children.Count; i++) {
+            for (int i = 0; i < rootItem.children.Count; i++) {
                 var item = rootItem.children[i] as AssetListItem;
-                if(item.WarnLogic.value) {
+                if (item.WarnLogic.value) {
                     return true;
                 }
             }
@@ -430,9 +434,9 @@ namespace Funny.AssetPostprocessor {
 
         public void FixAllChanged() {
             List<AssetListItem> changedItems = new List<AssetListItem>();
-            for(int i = 0; i < rootItem.children.Count; i++) {
+            for (int i = 0; i < rootItem.children.Count; i++) {
                 var item = rootItem.children[i] as AssetListItem;
-                if(item.WarnLogic.value) {
+                if (item.WarnLogic.value) {
                     changedItems.Add(item);
                 }
             }
@@ -449,10 +453,10 @@ namespace Funny.AssetPostprocessor {
                 var isCancel = EditorUtility.DisplayCancelableProgressBar("Fix...", StringUtil.Contact(index, "/", items.Count), index / (float)items.Count);
                 item.FixAndReimport(soAssetPostprocessor);
                 index++;
-                if(isCancel || index >= items.Count) {
+                if (isCancel || index >= items.Count) {
                     EditorApplication.update = null;
                     EditorUtility.ClearProgressBar();
-                    if(index < items.Count - 1) {
+                    if (index < items.Count - 1) {
                         OnSetImporter(items.GetRange(0, index));
                     } else {
                         OnSetImporter(items);
@@ -463,17 +467,8 @@ namespace Funny.AssetPostprocessor {
 
         private void OnSetImporter(List<AssetListItem> items) {
             AssetDatabase.SaveAssets();
-            var index = 0;
-            EditorApplication.update = () => {
-                var item = items[index];
-                AssetDatabase.ImportAsset(item.Path);
-                EditorUtility.DisplayCancelableProgressBar("Reimport...", StringUtil.Contact(index, "/", items.Count), index / (float)items.Count);
-                index++;
-                if(index >= items.Count) {
-                    EditorApplication.update = null;
-                    EditorUtility.ClearProgressBar();
-                }
-            };
+            AssetDatabase.ForceReserializeAssets(items.Select(x => x.Path), ForceReserializeAssetsOptions.ReserializeMetadata);
+            AssetDatabase.Refresh(ImportAssetOptions.ForceUpdate);
         }
 
         public class Task {
@@ -497,7 +492,7 @@ namespace Funny.AssetPostprocessor {
             private List<string> GetParentDirectories(string rootPath, string path) {
                 var directories = new List<string>();
                 path = Path.GetDirectoryName(path);
-                while(path.Length > rootPath.Length) {
+                while (path.Length > rootPath.Length) {
                     path = path.Replace('\\', '/');
                     directories.Add(path);
                     path = path.Substring(0, path.LastIndexOf("/", StringComparison.Ordinal));
@@ -509,14 +504,14 @@ namespace Funny.AssetPostprocessor {
             public void Begin() {
                 var directories = GetParentDirectories(folder, path);
                 var contains = false;
-                for(int i = 0; i < directories.Count; i++) {
-                    if(folders.Contains(directories[i])) {
+                for (int i = 0; i < directories.Count; i++) {
+                    if (folders.Contains(directories[i])) {
                         contains = true;
                         break;
                     }
                 }
 
-                if(directories.Count == 0 || !contains) {
+                if (directories.Count == 0 || !contains) {
                     Item = AssetListItem.Get(assetType, path, 0, Path.GetFileNameWithoutExtension(path));
                 }
 
@@ -524,4 +519,5 @@ namespace Funny.AssetPostprocessor {
             }
         }
     }
+
 }
