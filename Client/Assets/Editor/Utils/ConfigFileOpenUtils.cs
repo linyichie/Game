@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
+using UnityEngine;
 
 public static class ConfigFileOpenUtils {
     public static bool VerifyConfigFile(string path) {
@@ -16,7 +17,7 @@ public static class ConfigFileOpenUtils {
     public static void StartOpenConfigFile(string path) {
         var fileInfo = new FileInfo(path);
         var filePath = fileInfo.FullName;
-        var excelFilePath = StringUtil.Concat(filePath.Substring(0, filePath.Length - 4).Replace("Config", "Config~"), ".xls");
+        var excelFilePath = StringUtil.Concat(Application.dataPath.Substring(0, Application.dataPath.Length - 6), "/Temp/CacheTxtConfig/", Path.GetFileNameWithoutExtension(path), ".xls");
         CreateExcelFile(filePath, excelFilePath);
         OpenExcelFile(excelFilePath, () => { ApplyConfigChange(filePath, excelFilePath); });
     }
