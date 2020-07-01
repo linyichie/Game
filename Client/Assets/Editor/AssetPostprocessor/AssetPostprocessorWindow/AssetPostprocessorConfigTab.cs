@@ -122,9 +122,9 @@ namespace Funny.AssetPostprocessor {
                 var item = FindItem(selectIds[0], rootItem) as AssetPostprocessorConfigItem;
                 if (!string.IsNullOrEmpty(postprocessorConfigGuid)) {
                     if(item.Guid == postprocessorConfigGuid) {
-                        menu.AddItem(new GUIContent("Set as Config"), false, null);
+                        menu.AddItem(new GUIContent("Selected"), false, null);
                     } else {
-                        menu.AddItem(new GUIContent("Set as Config"), false, OnChangeConfig, selectIds);
+                        menu.AddItem(new GUIContent("Select"), false, OnChangeConfig, selectIds);
                     }
                 }
                 if (!item.IsDefault) {

@@ -7,7 +7,9 @@ using System.Text;
 using System.Threading;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
+using UnityEditor;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 public static class ConfigFileOpenUtils {
     public static bool VerifyConfigFile(string path) {
@@ -17,12 +19,16 @@ public static class ConfigFileOpenUtils {
     public static void StartOpenConfigFile(string path) {
         var fileInfo = new FileInfo(path);
         var filePath = fileInfo.FullName;
-        var excelFilePath = StringUtil.Concat(Application.dataPath.Substring(0, Application.dataPath.Length - 6), "/Temp/CacheTxtConfig/", Path.GetFileNameWithoutExtension(path), ".xls");
+        var excelFilePath = StringUtil.Concat(Application.dataPath.Substring(0, Application.dataPath.Length - 6), "/Temp~/CacheTxtConfig/", Path.GetFileNameWithoutExtension(path), ".xls");
+        if (File.Exists(excelFilePath) && IsFileOpened(excelFilePath)) {
+            EditorUtility.DisplayDialog("警告", "文件已打开，请先关闭相应的 Excel 文件", "确认");
+            return;
+        }
         CreateExcelFile(filePath, excelFilePath);
         OpenExcelFile(excelFilePath, () => { ApplyConfigChange(filePath, excelFilePath); });
     }
 
-    static void CreateExcelFile(string filePath, string excelFilePath) {
+    private static void CreateExcelFile(string filePath, string excelFilePath) {
         var excel = new HSSFWorkbook();
         excel.CreateSheet("sheet1");
         var sheet = excel.GetSheet("sheet1") as HSSFSheet;
@@ -38,12 +44,12 @@ public static class ConfigFileOpenUtils {
                 sheetCells[j].SetCellValue(values[j]);
             }
         }
+        if (File.Exists(excelFilePath)) {
+            File.Delete(excelFilePath);
+        }
         var directoryPath = Path.GetDirectoryName(excelFilePath);
         if (!Directory.Exists(directoryPath)) {
             Directory.CreateDirectory(directoryPath);
-        }
-        if (File.Exists(excelFilePath)) {
-            File.Delete(excelFilePath);
         }
         using (var fs = new FileStream(excelFilePath, FileMode.CreateNew, FileAccess.Write)) {
             excel.Write(fs);
@@ -51,47 +57,49 @@ public static class ConfigFileOpenUtils {
         excel.Close();
     }
 
-    static void OpenExcelFile(string path, Action callback) {
+    private static void OpenExcelFile(string path, Action callback) {
         ThreadPool.QueueUserWorkItem((@object) => {
-            using (var process = new Process()) {
-                var startInfo = new ProcessStartInfo();
-                startInfo.FileName = path;
-                process.StartInfo = startInfo;
-                process.Start();
-                Thread.Sleep(2000);
-                var isFileOpened = true;
-                while (isFileOpened) {
-                    isFileOpened = false;
-                    for (int i = 0; i < 10; i++) {
-                        if (IsFileOpened(path)) {
-                            isFileOpened = true;
-                            break;
+            try {
+                using (var process = new Process()) {
+                    var startInfo = new ProcessStartInfo();
+                    startInfo.FileName = path;
+                    process.StartInfo = startInfo;
+                    process.Start();
+                    process.WaitUtilFileExit(path);
+                    if (!process.HasExited) {
+                        var success = process.CloseMainWindow();
+                        if (!success) {
+                            process.Kill();
                         }
                     }
+                    callback?.Invoke();
                 }
-                callback?.Invoke();
+            } catch (Exception e) {
+                Debug.LogError(e);
             }
         });
     }
 
-    static void ApplyConfigChange(string filePath, string excelFilePath) {
+    private static void ApplyConfigChange(string filePath, string excelFilePath) {
         var dataTable = GetExcelData(excelFilePath);
-        var col = dataTable.Columns.Count;
-        var row = dataTable.Rows.Count;
+        if (dataTable != null) {
+            var col = dataTable.Columns.Count;
+            var row = dataTable.Rows.Count;
 
-        var values = new List<string>(col);
-        using (var fs = new FileStream(filePath, FileMode.Create))
-        using (var sw = new StreamWriter(fs, Encoding.UTF8)) {
-            for (int r = 0; r < row; r++) {
-                values.Clear();
-                for (int c = 0; c < col; c++) {
-                    var value = dataTable.Rows[r][c] == null ? string.Empty : dataTable.Rows[r][c].ToString();
-                    values.Add(value);
-                }
-                var emptyLength = values.FindAll(x => { return string.IsNullOrEmpty(x); })?.Count;
-                if (!emptyLength.HasValue || emptyLength.Value < values.Count) {
-                    var line = string.Join("\t", values);
-                    sw.WriteLine(line);
+            var values = new List<string>(col);
+            using (var fs = new FileStream(filePath, FileMode.Create))
+            using (var sw = new StreamWriter(fs, Encoding.UTF8)) {
+                for (int r = 0; r < row; r++) {
+                    values.Clear();
+                    for (int c = 0; c < col; c++) {
+                        var value = dataTable.Rows[r][c] == null ? string.Empty : dataTable.Rows[r][c].ToString();
+                        values.Add(value);
+                    }
+                    var emptyLength = values.FindAll(x => { return string.IsNullOrEmpty(x); })?.Count;
+                    if (!emptyLength.HasValue || emptyLength.Value < values.Count) {
+                        var line = string.Join("\t", values);
+                        sw.WriteLine(line);
+                    }
                 }
             }
         }
@@ -101,12 +109,14 @@ public static class ConfigFileOpenUtils {
         }
     }
 
-    static DataTable GetExcelData(string excelFilePath) {
+    private static DataTable GetExcelData(string excelFilePath) {
+        var dataTable = new DataTable();
         using (var fs = new FileStream(excelFilePath, FileMode.Open, FileAccess.Read)) {
-            var dataTable = new DataTable();
             var excel = new HSSFWorkbook(fs);
             var sheet = excel.GetSheetAt(0);
             if (sheet == null) {
+                fs.Close();
+                excel.Close();
                 return null;
             }
             var colCount = sheet.GetRow(0).LastCellNum;
@@ -150,11 +160,27 @@ public static class ConfigFileOpenUtils {
                 dataTable.Rows.Add(dataRow);
             }
             excel.Close();
-            return dataTable;
+        }
+        return dataTable;
+    }
+
+    private static void WaitUtilFileExit(this Process process, string path) {
+        if (process != null) {
+            var isFileOpened = true;
+            while (isFileOpened) {
+                Thread.Sleep(1000);
+                isFileOpened = false;
+                for (int i = 0; i < 5; i++) {
+                    if (IsFileOpened(path)) {
+                        isFileOpened = true;
+                        break;
+                    }
+                }
+            }
         }
     }
 
-    static bool IsFileOpened(string path) {
+    private static bool IsFileOpened(string path) {
         FileStream fileStream = null;
         var isOpened = false;
         try {
