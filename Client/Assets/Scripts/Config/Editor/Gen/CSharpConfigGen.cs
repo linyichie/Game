@@ -20,8 +20,8 @@ public static class CSharpConfigGen {
     public static void Generate(FileInfo fileInfo) {
         var lines = File.ReadAllLines(fileInfo.FullName);
         if (lines.Length > 2) {
-            var typeLine = lines[0];
-            var fieldLine = lines[1];
+            var fieldLine = lines[0];
+            var typeLine = lines[1];
             var types = typeLine.Split('\t');
             var fields = fieldLine.Split('\t');
             var min = Mathf.Min(types.Length, fields.Length);
@@ -32,10 +32,10 @@ public static class CSharpConfigGen {
             for (int j = 0; j < min; j++) {
                 var type = types[j];
                 var field = fields[j];
-                var fieldstring = GetFieldLine(type, field);
-                var readString = GetReadLine(type, field, index);
-                if (!string.IsNullOrEmpty(fieldstring)) {
-                    fieldLines.Add(fieldstring);
+                var fieldString = GetFieldLine(field, type);
+                var readString = GetReadLine(field, type, index);
+                if (!string.IsNullOrEmpty(fieldString)) {
+                    fieldLines.Add(fieldString);
                 }
 
                 if (!string.IsNullOrEmpty(readString)) {
