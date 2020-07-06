@@ -12,8 +12,6 @@ public static class Localization {
     public static void Set(string language) {
         if(Localization.language != language) {
             Localization.language = language;
-            ConfigLoader.ReloadLocalization();
-            ConfigLoader.compelted = () => { languageChange?.Invoke(); };
         }
     }
 }

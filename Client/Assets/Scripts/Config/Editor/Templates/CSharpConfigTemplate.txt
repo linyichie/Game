@@ -1,26 +1,24 @@
 ﻿//--------------------------------------------------------
 //    [Author]:               Sausage
-//    [  Date ]:             2020年7月6日
+//    [  Date ]:             #DateTime#
 //--------------------------------------------------------
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System;
 using UnityEngine;
-public partial class LanguageConfig {
-    public readonly string key;
-	public readonly string text;
-    public LanguageConfig(string input) {
+public partial class #ClassName# {
+    #Field#
+    public #ClassName#(string input) {
         try {
             var tables = input.Split('\t');
-            key = tables[0];
-			text = tables[1];
+            #Read#
         } catch (Exception ex) {
             Debug.Log(ex);
         }
     }
-    static Dictionary<string, LanguageConfig> configs = null;
-    public static LanguageConfig Get(string id) {
+    static Dictionary<string, #ClassName#> configs = null;
+    public static #ClassName# Get(string id) {
         if (!Inited) {
             Init(true);
         }
@@ -30,17 +28,17 @@ public partial class LanguageConfig {
         if (configs.ContainsKey(id)) {
             return configs[id];
         }
-        LanguageConfig config = null;
+        #ClassName# config = null;
         if (rawDatas.ContainsKey(id)) {
-            config = configs[id] = new LanguageConfig(rawDatas[id]);
+            config = configs[id] = new #ClassName#(rawDatas[id]);
             rawDatas.Remove(id);
         }
         if (config == null) {
-            Debug.LogFormat("获取配置失败 LanguageConfig id:{0}", id);
+            Debug.LogFormat("获取配置失败 #ClassName# id:{0}", id);
         }
         return config;
     }
-    public static LanguageConfig Get(int id) {
+    public static #ClassName# Get(int id) {
         return Get(id.ToString());
     }
     public static bool Has(string id) {
@@ -62,8 +60,8 @@ public partial class LanguageConfig {
     protected static Dictionary<string, string> rawDatas = null;
     public static void Init(bool sync = false) {
         Inited = false;
-        var lines = ConfigLoader.GetConfigRawDatas("Language");
-        configs = new Dictionary<string, LanguageConfig>();
+        var lines = ConfigLoader.GetConfigRawDatas("#FileName#");
+        configs = new Dictionary<string, #ClassName#>();
         if (sync) {
             rawDatas = new Dictionary<string, string>(lines.Length - 3);
             for (var i = 3; i < lines.Length; i++) {

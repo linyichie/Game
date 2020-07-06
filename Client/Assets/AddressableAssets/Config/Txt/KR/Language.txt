@@ -1,5 +1,0 @@
-﻿string	string
-key	text
-唯一标识	文本
-localization_1	多语言测试1
-Login	로그인

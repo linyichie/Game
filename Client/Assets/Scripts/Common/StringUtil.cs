@@ -1,27 +1,28 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using System.Text;
-using UnityEngine;
 
 public static class StringUtil
 {
-    static readonly StringBuilder sb = new StringBuilder();
+    public readonly static string[] splitSeparator = new string[] { "|" };
 
-    static readonly object lockObj = new object();
+    static StringBuilder stringBuilder = new StringBuilder();
 
-    public static string Concat(params object[] objs)
-    {
-        lock (lockObj)
-        {
-            sb.Remove(0, sb.Length);
-            for (int i = 0; i < objs.Length; i++)
-            {
-                if (null != objs[i])
-                {
-                    sb.Append(objs[i]);
+    static object lockObject = new object();
+
+    public static string Concat(params object[] objects) {
+        if (objects == null) {
+            return string.Empty;
+        }
+
+        lock (lockObject) {
+            stringBuilder.Length = 0;
+            foreach (var item in objects) {
+                if (item != null) {
+                    stringBuilder.Append(item);
                 }
             }
-            return sb.ToString();
+
+            return stringBuilder.ToString();
         }
     }
 }

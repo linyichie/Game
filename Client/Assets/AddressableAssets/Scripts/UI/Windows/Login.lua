@@ -1,38 +1,19 @@
 local Login = class(nil, {
-    testEvent = Event:new()
 })
 
 function Login:OnInitialize()
-    local onSwitchCN = function()
-        CS.Localization.Set("CN")
+    local onRefresh = function()
+        self:Refresh()
     end
-    self.languages[1].onClick:AddListener(onSwitchCN)
-    local onSwitchEN = function()
-        CS.Localization.Set("EN")
-    end
-    self.languages[2].onClick:AddListener(onSwitchEN)
-    local onSwitchJP = function()
-        CS.Localization.Set("JP")
-    end
-    self.languages[3].onClick:AddListener(onSwitchJP)
-    local onSwitchKR = function()
-        CS.Localization.Set("KR")
-    end
-    self.languages[4].onClick:AddListener(onSwitchKR)
-
-    CS.Localization.languageChange = table.handler(self, self.OnLanguageChange)
-
-    self.testEventId = self.testEvent:AddListener(table.handler(self, self.OnTestEvent))
-
-    WindowController:Close("Launch")
+    self.btnRefresh.onClick:AddListener(onRefresh)
 end
 
 function Login:OnReadyOepn()
     self:DisplayLabel()
-    self.testEvent:Invoke(123)
 end
 
 function Login:OnOpened()
+    WindowManager:Close("Launch")
 end
 
 function Login:OnReadyClose()
@@ -46,11 +27,27 @@ function Login:OnLanguageChange()
 end
 
 function Login:DisplayLabel()
-    self.startLabel.text = CS.Language.Get("Login");
+    self.startLabel.text = CS.LanguageConfig.Get("Login").text;
 end
 
-function Login:OnTestEvent(value)
-    print(value)
+function Login:Refresh()
+    local config = CS.ExampleConfig.Get(1)
+    print(config.floatValue)
+    print(config.label)
+    print(config.position)
+    print(config.boolValue)
+    for i = 0, config.intValues.Length - 1 do
+        print(config.intValues[i])
+    end
+    for i = 0, config.floatValues.Length - 1 do
+        print(config.floatValues[i])
+    end
+    for i = 0, config.labels.Length - 1 do
+        print(config.labels[i])
+    end
+    for i = 0, config.positions.Length - 1 do
+        print(config.positions[i])
+    end
 end
 
 return Login
