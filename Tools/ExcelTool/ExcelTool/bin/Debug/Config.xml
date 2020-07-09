@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+  <Form Name="S_Form">
+    <!--部门-->>
+    <Key Name="Departments" Value="UI|客户端|服务端|美术2D|3D场景|3D角色|3D动作|3D特效|音频|QA|工具|数据分析" />
+    <!--S 表部门及负责人的 F 表列索引_标题名-->>
+    <Key Name="DepartmentColumn" Value="4_部门|5_执行人" />
+    <!--S 表无负责人标识-->>
+    <Key Name="EmptySign" Value="/" />
+    <!--S 表列索引_F 表列索引-->>
+    <Key Name="ExportColumns" Value="0_0|1_1|2_2|8_6" />
+    <!--F 表增加的 列索引_列标题-->>
+    <Key Name="AddColumns" Value="3_开发内容|7_是否导入F表|8_是否完成|9_工量评估" />
+  </Form>
+</configuration>

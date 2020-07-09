@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ContentModelStore">
+    <e p="C:\Company\Tools\ExcelTool" t="IncludeFlat">
+      <e p="ExcelTool" t="IncludeRecursive">
+        <e p="app.config" t="Include" />
+        <e p="bin" t="ExcludeRecursive" />
+        <e p="Config.cs" t="Include" />
+        <e p="ExcelSplit.cs" t="Include" />
+        <e p="ExcelTool.csproj" t="IncludeRecursive" />
+        <e p="ExcelUtils.cs" t="Include" />
+        <e p="obj" t="ExcludeRecursive" />
+        <e p="packages.config" t="Include" />
+        <e p="Program.cs" t="Include" />
+        <e p="Properties" t="Include">
+          <e p="AssemblyInfo.cs" t="Include" />
+        </e>
+        <e p="SForm" t="Include">
+          <e p="SFormData.cs" t="Include" />
+        </e>
+      </e>
+      <e p="ExcelTool.sln" t="IncludeFlat" />
+      <e p="packages" t="ExcludeRecursive" />
+    </e>
+    <e p="C:\Users\ZYQ\AppData\Local\JetBrains\Rider2020.1\extResources" t="IncludeRecursive" />
+    <e p="C:\Users\ZYQ\AppData\Local\JetBrains\Rider2020.1\resharper-host\Local\Transient\ReSharperHost\v201\SolutionCaches\_ExcelTool.2102554199.00" t="ExcludeRecursive" />
+  </component>
+</project>

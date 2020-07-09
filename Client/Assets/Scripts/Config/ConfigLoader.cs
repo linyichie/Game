@@ -16,7 +16,7 @@ public static class ConfigLoader {
 
         var path = string.Empty;
         if (Application.isEditor) {
-            path = Path.Combine(SoConfigGenerate.ConfigPath, relativePath);
+            path = Path.Combine(TxtExportConfig.ConfigPath, relativePath);
             return File.ReadAllText(path);
         }
         

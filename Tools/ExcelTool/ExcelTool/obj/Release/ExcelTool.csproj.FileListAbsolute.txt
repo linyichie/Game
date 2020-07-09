@@ -1,0 +1,14 @@
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Release\ExcelTool.exe.config
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Release\ExcelTool.exe
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Release\ExcelTool.pdb
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Release\ICSharpCode.SharpZipLib.dll
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Release\NPOI.dll
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Release\NPOI.OOXML.dll
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Release\NPOI.OpenXml4Net.dll
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Release\NPOI.OpenXmlFormats.dll
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Release\ICSharpCode.SharpZipLib.xml
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Release\NPOI.xml
+C:\Company\Tools\ExcelTool\ExcelTool\obj\Release\ExcelTool.csproj.CoreCompileInputs.cache
+C:\Company\Tools\ExcelTool\ExcelTool\obj\Release\ExcelTool.csproj.CopyComplete
+C:\Company\Tools\ExcelTool\ExcelTool\obj\Release\ExcelTool.exe
+C:\Company\Tools\ExcelTool\ExcelTool\obj\Release\ExcelTool.pdb

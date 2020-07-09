@@ -1,0 +1,17 @@
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Debug\ExcelTool.exe
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Debug\ExcelTool.pdb
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Debug\NPOI.dll
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Debug\NPOI.OOXML.dll
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Debug\NPOI.OpenXml4Net.dll
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Debug\NPOI.OpenXmlFormats.dll
+C:\Company\Tools\ExcelTool\ExcelTool\obj\Debug\ExcelTool.csproj.CoreCompileInputs.cache
+C:\Company\Tools\ExcelTool\ExcelTool\obj\Debug\ExcelTool.csproj.CopyComplete
+C:\Company\Tools\ExcelTool\ExcelTool\obj\Debug\ExcelTool.exe
+C:\Company\Tools\ExcelTool\ExcelTool\obj\Debug\ExcelTool.pdb
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Debug\ExcelTool.exe.config
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Debug\ICSharpCode.SharpZipLib.dll
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Debug\ICSharpCode.SharpZipLib.xml
+C:\Company\Tools\ExcelTool\ExcelTool\obj\Debug\ExcelTool.csprojAssemblyReference.cache
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Debug\BouncyCastle.Crypto.dll
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Debug\BouncyCastle.Crypto.xml
+C:\Company\Tools\ExcelTool\ExcelTool\bin\Debug\ICSharpCode.SharpZipLib.pdb

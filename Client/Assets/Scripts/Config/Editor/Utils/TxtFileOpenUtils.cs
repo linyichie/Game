@@ -14,7 +14,7 @@ using Debug = UnityEngine.Debug;
 
 public static class TxtFileOpenUtils {
     public static bool VerifyConfigFile(string path) {
-        return path.StartsWith(SoConfigGenerate.ConfigPath) && path.ToLower().EndsWith(".txt");
+        return path.StartsWith(TxtExportConfig.ConfigPath) && path.ToLower().EndsWith(".txt");
     }
 
     public static void StartOpenConfigFile(string path) {

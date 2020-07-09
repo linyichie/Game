@@ -140,9 +140,9 @@ public static class CSharpConfigGen {
     }
 
     private  static void GenerateConfig(string name) {
-        var newConfigPath = SoConfigGenerate.CSharpConfigClassPath + string.Format("/{0}Config.cs", name);
+        var newConfigPath = TxtExportConfig.CSharpConfigClassPath + string.Format("/{0}Config.cs", name);
         AssetDatabase.DeleteAsset(newConfigPath);
-        UnityEngine.Object o = CreateScriptAssetFromTemplate(newConfigPath, SoConfigGenerate.CSharpConfigTemplatePath);
+        UnityEngine.Object o = CreateScriptAssetFromTemplate(newConfigPath, TxtExportConfig.CSharpConfigTemplatePath);
         ProjectWindowUtil.ShowCreatedAsset(o);
     }
     
@@ -159,9 +159,7 @@ public static class CSharpConfigGen {
         text = Regex.Replace(text, "#Read#", readContent);
         text = Regex.Replace(text, "#FileName#", fileNameWithoutExtension.Substring(0, fileNameWithoutExtension.Length - 6));
 
-        var encoderShouldEmitUTF8Identifier = true;
-        var throwOnInvalidBytes = false;
-        var encoding = new UTF8Encoding(encoderShouldEmitUTF8Identifier, throwOnInvalidBytes);
+        var encoding = new UTF8Encoding(true, false);
         var append = false;
         var streamWriter = new StreamWriter(fullPath, append, encoding);
         streamWriter.Write(text);
