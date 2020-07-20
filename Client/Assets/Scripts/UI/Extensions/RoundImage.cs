@@ -7,20 +7,23 @@ using UnityEngine.Sprites;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Image))]
-public class FilletImage : BaseMeshEffect {
+public class RoundImage : BaseMeshEffect {
     [SerializeField] private float radius = 10f;
     [SerializeField, Range(8, 128)] private int segments = 8;
+    [SerializeField, Range(0, 90)] private float radian = 15;
     [SerializeField, EnumFlags] private Fillet fillet = (Fillet)(-1);
 
-    private Image target;
-    private RectTransform rectTransform {
+    private Image image;
+    
+    private RectTransform RectTransform {
         get {
             return transform as RectTransform;
         }
     }
-    private Sprite overrideSprite {
+    
+    private Sprite OverrideSprite {
         get {
-            return target.overrideSprite;
+            return image.overrideSprite;
         }
     }
 
@@ -32,16 +35,19 @@ public class FilletImage : BaseMeshEffect {
         BottomRight = 1 << 3,
     }
 
-    readonly Dictionary<Vector3, int> indices = new Dictionary<Vector3, int>();
-
     public override void ModifyMesh(VertexHelper vh) {
-        vh.Clear();
-        indices.Clear();
-        if (target == null) {
-            target = GetComponent<Image>();
+        var rect = graphic.GetPixelAdjustedRect();
+        radius = Mathf.Min(radius, rect.width / 2, rect.height / 2);
+        if (radius <= 0) {
+            return;
         }
 
-        switch (target.type) {
+        vh.Clear();
+        if (image == null) {
+            image = GetComponent<Image>();
+        }
+
+        switch (image.type) {
             case Image.Type.Simple:
                 GenerateSimpleSprite(vh);
                 break;
@@ -54,12 +60,7 @@ public class FilletImage : BaseMeshEffect {
     }
 
     private void GenerateSimpleSprite(VertexHelper vh) {
-        var uv = overrideSprite != null ? DataUtility.GetOuterUV(overrideSprite) : Vector4.zero;
         var rect = graphic.GetPixelAdjustedRect();
-
-        radius = Mathf.Min(radius, rect.width / 2, rect.height / 2);
-        radius = Mathf.Max(0, radius);
-
         AddSimpleQuad(vh, rect.xMin, rect.yMin + radius, rect.xMin + radius, rect.yMax - radius);
         AddSimpleQuad(vh, rect.xMin + radius, rect.yMax - radius, rect.xMax - radius, rect.yMax);
         AddSimpleQuad(vh, rect.xMax - radius, rect.yMin + radius, rect.xMax, rect.yMax - radius);
@@ -97,13 +98,13 @@ public class FilletImage : BaseMeshEffect {
         var startIndex = vh.currentVertCount;
 
         var position = new Vector2(xMin, yMin);
-        vh.AddVert(position, target.color, GetSimpleVertUV(position));
+        vh.AddVert(position, image.color, GetSimpleVertUV(position));
         position = new Vector2(xMin, yMax);
-        vh.AddVert(position, target.color, GetSimpleVertUV(position));
+        vh.AddVert(position, image.color, GetSimpleVertUV(position));
         position = new Vector2(xMax, yMax);
-        vh.AddVert(position, target.color, GetSimpleVertUV(position));
+        vh.AddVert(position, image.color, GetSimpleVertUV(position));
         position = new Vector2(xMax, yMin);
-        vh.AddVert(position, target.color, GetSimpleVertUV(position));
+        vh.AddVert(position, image.color, GetSimpleVertUV(position));
 
         vh.AddTriangle(startIndex, startIndex + 1, startIndex + 2);
         vh.AddTriangle(startIndex, startIndex + 2, startIndex + 3);
@@ -173,14 +174,14 @@ public class FilletImage : BaseMeshEffect {
     private UIVertex GetSimpleVert(Vector3 position) {
         var vertex = new UIVertex();
         vertex.position = position;
-        vertex.color = target.color;
+        vertex.color = image.color;
         vertex.uv0 = GetSimpleVertUV(position);
         return vertex;
     }
 
     private Vector2 GetSimpleVertUV(Vector2 position) {
         var rect = graphic.GetPixelAdjustedRect();
-        var uv = overrideSprite != null ? DataUtility.GetOuterUV(overrideSprite) : Vector4.zero;
+        var uv = OverrideSprite != null ? DataUtility.GetOuterUV(OverrideSprite) : Vector4.zero;
         var posMin = new Vector2(rect.xMin, rect.yMin);
         var tileUV = new Vector2(uv.x, uv.y);
         if (posMin != position) {
@@ -193,7 +194,7 @@ public class FilletImage : BaseMeshEffect {
     }
 
     private void GenerateTiledSprite(VertexHelper vh) {
-        var uv = overrideSprite != null ? DataUtility.GetOuterUV(overrideSprite) : Vector4.zero;
+        var uv = OverrideSprite != null ? DataUtility.GetOuterUV(OverrideSprite) : Vector4.zero;
         var rect = graphic.GetPixelAdjustedRect();
 
         radius = Mathf.Min(radius, rect.width / 2, rect.height / 2);
@@ -271,8 +272,8 @@ public class FilletImage : BaseMeshEffect {
                 break;
         }
 
-        var tileWidth = overrideSprite.rect.width;
-        var tileHeight = overrideSprite.rect.height;
+        var tileWidth = OverrideSprite.rect.width;
+        var tileHeight = OverrideSprite.rect.height;
 
         var points = GetCirclePoints(filletRect, fillet);
         var minIndices = GetTileVertIndex(new Vector2(filletRect.xMin, filletRect.yMin));
@@ -425,16 +426,16 @@ public class FilletImage : BaseMeshEffect {
 
     private void AddTriangle(VertexHelper vh, Vector3 p1, Vector3 p2, Vector3 p3, Vector3 min) {
         var startIndex = vh.currentVertCount;
-        vh.AddVert(p1, target.color, GetTileVertUV(GetTileVertIndex(min), p1));
-        vh.AddVert(p2, target.color, GetTileVertUV(GetTileVertIndex(min), p2));
-        vh.AddVert(p3, target.color, GetTileVertUV(GetTileVertIndex(min), p3));
+        vh.AddVert(p1, image.color, GetTileVertUV(GetTileVertIndex(min), p1));
+        vh.AddVert(p2, image.color, GetTileVertUV(GetTileVertIndex(min), p2));
+        vh.AddVert(p3, image.color, GetTileVertUV(GetTileVertIndex(min), p3));
         vh.AddTriangle(startIndex, startIndex + 1, startIndex + 2);
     }
 
     private void AddRectangle(VertexHelper vh, float xMin, float yMin, float xMax, float yMax) {
         var rect = graphic.GetPixelAdjustedRect();
-        var tileWidth = overrideSprite.rect.width;
-        var tileHeight = overrideSprite.rect.height;
+        var tileWidth = OverrideSprite.rect.width;
+        var tileHeight = OverrideSprite.rect.height;
 
         var minIndices = GetTileVertIndex(new Vector2(xMin, yMin));
         var maxIndices = GetTileVertIndex(new Vector2(xMax, yMax));
@@ -456,13 +457,13 @@ public class FilletImage : BaseMeshEffect {
         var startIndex = vh.currentVertCount;
 
         var position = new Vector2(min.x, min.y);
-        vh.AddVert(position, target.color, GetTileVertUV(GetTileVertIndex(min), position));
+        vh.AddVert(position, image.color, GetTileVertUV(GetTileVertIndex(min), position));
         position = new Vector2(min.x, max.y);
-        vh.AddVert(position, target.color, GetTileVertUV(GetTileVertIndex(min), position));
+        vh.AddVert(position, image.color, GetTileVertUV(GetTileVertIndex(min), position));
         position = new Vector2(max.x, max.y);
-        vh.AddVert(position, target.color, GetTileVertUV(GetTileVertIndex(min), position));
+        vh.AddVert(position, image.color, GetTileVertUV(GetTileVertIndex(min), position));
         position = new Vector2(max.x, min.y);
-        vh.AddVert(position, target.color, GetTileVertUV(GetTileVertIndex(min), position));
+        vh.AddVert(position, image.color, GetTileVertUV(GetTileVertIndex(min), position));
 
         vh.AddTriangle(startIndex, startIndex + 1, startIndex + 2);
         vh.AddTriangle(startIndex, startIndex + 2, startIndex + 3);
@@ -470,16 +471,16 @@ public class FilletImage : BaseMeshEffect {
 
     private Vector2Int GetTileVertIndex(Vector2 position) {
         var rect = graphic.GetPixelAdjustedRect();
-        var tileWidth = overrideSprite.rect.width;
-        var tileHeight = overrideSprite.rect.height;
+        var tileWidth = OverrideSprite.rect.width;
+        var tileHeight = OverrideSprite.rect.height;
         return new Vector2Int((int)((position.x - rect.xMin) / tileWidth), (int)((position.y - rect.yMin) / tileHeight));
     }
 
     private Vector2 GetTileVertUV(Vector2Int index, Vector2 position) {
         var rect = graphic.GetPixelAdjustedRect();
-        var uv = overrideSprite != null ? DataUtility.GetOuterUV(overrideSprite) : Vector4.zero;
-        var tileWidth = overrideSprite.rect.width;
-        var tileHeight = overrideSprite.rect.height;
+        var uv = OverrideSprite != null ? DataUtility.GetOuterUV(OverrideSprite) : Vector4.zero;
+        var tileWidth = OverrideSprite.rect.width;
+        var tileHeight = OverrideSprite.rect.height;
         var posMin = new Vector2(rect.xMin + index.x * tileWidth, rect.yMin + index.y * tileHeight);
         var tileUV = new Vector2(uv.x, uv.y);
         if (posMin != position) {
@@ -522,8 +523,8 @@ public class FilletImage : BaseMeshEffect {
         var rect = graphic.GetPixelAdjustedRect();
         var minIndices = GetTileVertIndex(new Vector2(filletRect.xMin, filletRect.yMin));
         var maxIndices = GetTileVertIndex(new Vector2(filletRect.xMax, filletRect.yMax));
-        var tileWidth = overrideSprite.rect.width;
-        var tileHeight = overrideSprite.rect.height;
+        var tileWidth = OverrideSprite.rect.width;
+        var tileHeight = OverrideSprite.rect.height;
         var intersectionPoints = new List<Vector3>();
         for (int i = minIndices.y; i < maxIndices.y + 1; i++) {
             Vector3 p1 = new Vector3(filletRect.xMin, rect.yMin + i * tileHeight);
